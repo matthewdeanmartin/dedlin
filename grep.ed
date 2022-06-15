@@ -1,0 +1,6 @@
+# open file
+1T file.txt
+# search for cats
+S cats
+# quit
+Q
