@@ -1,0 +1,4 @@
+cats
+dogs
+rabbits
+lizards

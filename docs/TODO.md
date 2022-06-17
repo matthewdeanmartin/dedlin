@@ -1,0 +1,16 @@
+- Implement search, sort, shuffle
+- Save on crash
+- Implement Naive, 1 level undo
+- Chatty Mode/Quiet Mode
+  - Insert - "Control-C to stop adding new lines"
+  - Help
+  - Warnings - Not a range! etc.
+- Implement load file, transfer
+- Implement "run script"
+- Use more questionary things, esp for load file
+  - Use questionary for confirm delete
+- docopts, e.g.
+  - `dedlin file.txt --quiet|chatty --script=script.ed`
+- More unit tests
+  - Integration tests using script.ed files
+  - Test files
