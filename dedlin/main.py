@@ -1,4 +1,30 @@
 # This is a sample Python script.
+HELP_TEXT = """
+Command format: [number],[number] [command] [parameter] [parameter]
+
+Display Commands
+[start],[end] List - display lines, set current to end of range
+[start],[end] Page - repeat to flipt through entire document
+[start],[end] Search [text]
+
+Edit Commands
+[line number] Insert - insert line at line number
+[line number] Edit - edit number
+[start],[end] Delete - delete range
+[target] Transfer [file name] - inserts file contents to target
+[start],[end] Replace "[text]", "[text]" - replace text in range
+
+Reorder Commands
+[start],[end] Move [target line number]
+[start],[end] Copy [target line number]
+[start],[end] Sort
+[start],[end] Shuffle 
+
+File System Commands
+Quit
+Exit [file name]
+
+"""
 
 import sys
 from enum import Enum, auto
@@ -11,6 +37,7 @@ import questionary
 
 from dedlin.basic_types import LineRange
 from dedlin.document import Document
+from dedlin.lorem_data import LOREM_IPSUM
 
 """
 [RANGE] L[ist] 	Displays a range of lines. If no range is specified, L lists the first 23 lines of the file you are editing.
@@ -45,6 +72,9 @@ class Commands(Enum):
     Edit = auto()
     Delete = auto()
     Help = auto()
+    Lorem = auto()
+    Undo = auto()
+    Unknown = auto()
 
 def go(file_name:Optional[str]=None)->None:
 
@@ -75,17 +105,27 @@ def go(file_name:Optional[str]=None)->None:
         elif command == Commands.Save:
             with open(path, "w", encoding="utf-8") as file:
                 file.writelines(doc.lines)
-            sys.exit()
+            return 0
         elif command == Commands.Quit:
-            sys.exit()
+            return 0
         elif command == Commands.Insert:
             line_number = cast(int, params)
             doc.process_insert(line_number)
         elif command == Commands.Edit:
             line_number = cast(int, params)
             doc.process_edit(line_number)
+        elif command == Commands.Lorem:
+            line_number = cast(int, params)
+            doc.process_lorem(line_number)
+        elif command == Commands.Undo:
+            doc.process_undo()
         elif command == Commands.Empty:
             pass
+        elif command == Commands.Help:
+            print(HELP_TEXT)
+        elif command == Commands.Unknown:
+            print("Unknown command")
+            print(HELP_TEXT)
         else:
             print("1i to insert at line 1.  E to save and quit. Q to just quit.")
     return 0
@@ -162,6 +202,19 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
     front_part = "".join(front_part_chars)
     end_part = command[len(front_part):]
 
+    # Commands without abbreviations first
+    if command in ("UNDO"):
+        return Commands.Undo, False
+
+    lorem_commands = ("LOREM")
+    if ends_with_any(command, lorem_commands) or command in lorem_commands:
+        if front_part in lorem_commands:
+            return Commands.Lorem, len(LOREM_IPSUM)
+
+        line_count = int(front_part.split("LOREM")[0].strip())
+        return Commands.Lorem, line_count
+
+
     delete_commands = ("D", "DELETE")
     if ends_with_any(front_part, delete_commands) or front_part in delete_commands:
         if front_part in delete_commands:
@@ -173,18 +226,20 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
         if line_range:
             return Commands.Delete, line_range
 
+
+    # Commands with Abbreviations
     list_commands = ("L", "LIST")
-    if ends_with_any(command, list_commands) or command in list_commands:
+    if ends_with_any(front_part, list_commands) or command in list_commands:
         if front_part in list_commands:
             return Commands.List, LineRange(start=0, end=document_length)
 
-        range_text = command[0:len(command)-1]
+        range_text = front_part[0:len(front_part)-1]
         line_range = extract_one_range(range_text)
         if line_range:
             return Commands.List, line_range
 
     page_command = ("P" , "PAGE")
-    if ends_with_any(command, page_command) or command in page_command:
+    if ends_with_any(front_part, page_command) or front_part in page_command:
         # This just increments the pointer
         return Commands.Page, False
 
@@ -203,13 +258,15 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
         # line_number = int(command[0:len(command) - 1])
         # return Commands.Insert, line_number
 
+
+
     if command in ("Q", "QUIT"):
         return Commands.Quit, False
 
     if command in ("E", "EXIT"):
         return Commands.Save, False
 
-    raise TypeError("unknown command")
+    return Commands.Unknown, False
 
 if __name__ == '__main__':
     go()
