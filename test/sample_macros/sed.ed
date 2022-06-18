@@ -1,6 +1,4 @@
-# open file
-1T file.txt
-# search for cats
-R dogs cats
+# search for giraffe and replace with butt
+R giraffe butt
 # quit
-E
+Q

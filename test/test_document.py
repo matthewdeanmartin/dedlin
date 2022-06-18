@@ -1,30 +1,21 @@
 from dedlin.basic_types import LineRange
 from dedlin.document import Document
+from test.fakes import fake_input, fake_edit
+
 
 def test_document_copy():
-    lines = [
-        "cats",
-        "dogs"
-    ]
-    doc = Document(lines)
+    lines = ["cats", "dogs"]
+    doc = Document(fake_input, fake_edit, lines)
 
-    doc.process_copy(LineRange(1, 1), 2)
-    assert doc.lines == [
-        "cats",
-        "cats",
-        "dogs"
-    ]
+    doc.copy(LineRange(1, 1), 2)
+    assert doc.lines == ["cats", "cats", "dogs"]
+
 
 def test_document_move_front_stuff_to_back():
-    lines = [
-        "1",
-        "2",
-        "3",
-        "4"
-    ]
-    doc = Document(lines)
+    lines = ["1", "2", "3", "4"]
+    doc = Document(fake_input, fake_edit, lines)
 
-    doc.process_move(LineRange(1, 2), 4)
+    doc.move(LineRange(1, 2), 4)
     assert doc.lines == [
         "3",
         "4",
@@ -32,16 +23,12 @@ def test_document_move_front_stuff_to_back():
         "2",
     ]
 
-def test_document_move_back_stuff_to_front():
-    lines = [
-        "1",
-        "2",
-        "3",
-        "4"
-    ]
-    doc = Document(lines)
 
-    doc.process_move(LineRange(3, 4), 1)
+def test_document_move_back_stuff_to_front():
+    lines = ["1", "2", "3", "4"]
+    doc = Document(fake_input, fake_edit, lines)
+
+    doc.move(LineRange(3, 4), 1)
     assert doc.lines == [
         "3",
         "4",

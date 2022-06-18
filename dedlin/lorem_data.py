@@ -1,4 +1,7 @@
-# Lines of lorem ipsum text
+"""
+Data for Lorem Ipsum text
+"""
+
 LOREM_IPSUM = [
     "Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, ",
     "totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt,",
@@ -19,5 +22,5 @@ LOREM_IPSUM = [
     "aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae.",
     "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias",
     "consequatur aut perferendis doloribus asperiores repellat.",
-    ""
+    "",
 ]

@@ -18,7 +18,12 @@ except ModuleNotFoundError:
 
 # alternate windows: https://stackoverflow.com/a/11616477
 if probably_windows:
+
     def input_with_prefill(prompt: str, default: str) -> str:
+        """Show prompt and prefill input text with default value.
+
+        Windows Version.
+        """
         # ref: https://stackoverflow.com/a/5888246/33264
         keys = []
         for c in default:
@@ -30,8 +35,14 @@ if probably_windows:
 
         _stdin.WriteConsoleInput(keys)
         return input(prompt)
+
 else:
+
     def input_with_prefill(prompt: str, text: str) -> str:
+        """Show prompt and prefill input text with default value.
+
+        Linux/Mac Version
+        """
         # ref https://stackoverflow.com/a/8505387
         def hook() -> None:
             readline.insert_text(text)

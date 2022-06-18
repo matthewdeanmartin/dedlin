@@ -1,5 +1,6 @@
-from dedlin.basic_types import LineRange
-from dedlin.main import extract_one_range, parse_command, Commands
+from dedlin.basic_types import LineRange, Command, Phrases
+from dedlin.main import parse_command, Commands
+from dedlin.parsers import extract_one_range, extract_phrases
 
 
 def test_extract_one_range():
@@ -10,15 +11,19 @@ def test_extract_one_range():
 
 def test_parse_command_insert():
     for insert in ("I", "Insert", "insert", "i", "INSERT"):
-        assert parse_command(insert, 3) == (Commands.Insert, -1), insert
-        assert parse_command(f"2{insert}", 3) == (Commands.Insert, 2), f"2{insert}"
-        assert parse_command(f"2 {insert}", 3) == (Commands.Insert, 2), f"2 {insert}"
+        assert parse_command(insert, 3) == Command(Commands.Insert, None), insert
+        assert parse_command(f"2{insert}", 3) == Command(
+            Commands.Insert, LineRange(start=2, end=2)
+        ), f"2{insert}"
+        assert parse_command(f"2 {insert}", 3) == Command(
+            Commands.Insert, LineRange(start=2, end=2)
+        ), f"2 {insert}"
 
 
 def test_parse_command_edit():
-    assert parse_command("1", 3) == (Commands.Edit, 1)
-    assert parse_command("2", 3) == (Commands.Edit, 2)
-    assert parse_command("3", 3) == (Commands.Edit, 3)
+    assert parse_command("1", 3) == Command(Commands.Edit, LineRange(start=1, end=1))
+    assert parse_command("2", 3) == Command(Commands.Edit, LineRange(start=2, end=2))
+    assert parse_command("3", 3) == Command(Commands.Edit, LineRange(start=3, end=3))
 
     # for edit in ("E", "Edit", "edit", "e", "EDIT"):
     # assert parse_command(f"1{edit}", 3) == (Commands.Edit, 1), f"1{edit}"
@@ -26,13 +31,30 @@ def test_parse_command_edit():
 
 
 def test_parse_command_delete():
-    assert parse_command("D", 3) == (Commands.Delete, LineRange(start=1, end=3))
+    assert parse_command("D", 3) == Command(Commands.Delete, LineRange(start=1, end=3))
     for edit in ("D", "Delete", "delete", "d", "DELETE"):
-        assert parse_command(f"1{edit}", 3) == (Commands.Delete, LineRange(start=1, end=1)), f"1{edit}"
-        assert parse_command(f"1 {edit}", 3) == (Commands.Delete, LineRange(start=1, end=1)), f"1 {edit}"
-        assert parse_command(f"1,2 {edit}", 3) == (Commands.Delete, LineRange(start=1, end=2)), f"1,2 {edit}"
-        assert parse_command(f"1,2{edit}", 3) == (Commands.Delete, LineRange(start=1, end=2)), f"1,2{edit}"
-#
-# def test_trouble():
-#     edit = "DELETE"
-#     assert parse_command(f"1{edit}", 3) == (Commands.Delete, LineRange(start=1, end=1)), f"1{edit}"
+        assert parse_command(f"1{edit}", 3) == Command(
+            Commands.Delete, LineRange(start=1, end=1)
+        ), f"1{edit}"
+        assert parse_command(f"1 {edit}", 3) == Command(
+            Commands.Delete, LineRange(start=1, end=1)
+        ), f"1 {edit}"
+        assert parse_command(f"1,2 {edit}", 3) == Command(
+            Commands.Delete, LineRange(start=1, end=2)
+        ), f"1,2 {edit}"
+        assert parse_command(f"1,2{edit}", 3) == Command(
+            Commands.Delete, LineRange(start=1, end=2)
+        ), f"1,2{edit}"
+
+
+def test_parse_phrases_space_delimited():
+    assert extract_phrases("cat dog") == Phrases(first="cat", second="dog")
+
+
+def test_parse_phrases_quoted():
+    assert extract_phrases('"cat frog" "log dog"') == Phrases(
+        first="cat frog", second="log dog"
+    )
+
+def test_parse_extract_phrases():
+    assert extract_phrases("cat") == Phrases(first="cat")

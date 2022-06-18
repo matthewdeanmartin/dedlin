@@ -20,8 +20,14 @@ to make it less user hostile.
 
 ## Implemented Commands
 ### Command Structure
-([Range]) [Command] ([Words] ([Words]))
+```
+([Range]) [Command] ([Phrase] ([Phrase]))
+Range = Start,(End),(Repeat)
+Command = [Letter]|Command
+Words = "text with spaces" "text with spaces"
+Words = text_without_spaces text_without_spaces
 Where () means optional.
+```
 
 #### Commands
 A command is either a letter or a word, e.g. I or Insert.

@@ -36,8 +36,7 @@ def configure_logging() -> dict[str, Any]:
         "dedlin.document",
     ]
 
-    info_level_modules = [
-    ]
+    info_level_modules = []
     warn_level_modules = [
         "psycopg2",
     ]
