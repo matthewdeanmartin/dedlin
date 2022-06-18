@@ -1,4 +1,6 @@
-# This is a sample Python script.
+"""
+Main code.
+"""
 HELP_TEXT = """
 Command format: [number],[number] [command] [parameter] [parameter]
 
@@ -29,7 +31,7 @@ Exit [file name]
 import sys
 from enum import Enum, auto
 from pathlib import Path
-from typing import cast, Optional,  Any, Tuple, Iterable
+from typing import cast, Optional, Any, Tuple, Iterable, Callable, Generator
 
 import questionary
 # Press Shift+F10 to execute it or replace it with your code.
@@ -39,33 +41,11 @@ from dedlin.basic_types import LineRange
 from dedlin.document import Document
 from dedlin.lorem_data import LOREM_IPSUM
 
-"""
-[RANGE] L[ist] 	Displays a range of lines. If no range is specified, L lists the first 23 lines of the file you are editing.
-[RANGE] P[age] 	Page. Repeated P with no range specified displays the next 23 lines.
-
-[LINE] I[nsert] 	Inserts new line at the beginning of line specified.
-To save the line instead and exit out of the insert menu press <Ctrl> + Z + <Enter>
-Press <Ctrl> + <C> to exit out of the insertion.
-[LINE] 	Allows the editing of the specified line.
-[RANGE] D[elete] 	Deletes a certain range of lines.
-
-[RANGE], [LINE], [NUMBER] C[opy] 	Copies the specified range to the specified line. The number specifies how many copies to do.
-[RANGE], [LINE] M[ove] 	Moves a certain range to the specified line.
-
-[RANGE] S[earch] [STRING] 	Searches the current file open for a certain string in quotes!.
-[RANGE] R[eplace] [STRING1] [STRING2] 	Searches the specified range for the first specified string if the string is found replaces the string with the second specified string.
-
-[LINE] T [DRIVE:] [\PATH] [FILE] 	Merges the specified file into the current document at the specified line.
-
-Q[uit] 	Quits edlin without saving changes.
-E[xit] 	Quits edlin after saving changes.
-"""
-
 
 class Commands(Enum):
     Empty = auto()
-    List= auto()
-    Page= auto()
+    List = auto()
+    Page = auto()
     Quit = auto()
     Save = auto()
     Insert = auto()
@@ -76,62 +56,83 @@ class Commands(Enum):
     Undo = auto()
     Unknown = auto()
 
-def go(file_name:Optional[str]=None)->None:
 
-    if file_name:
-        path = Path(file_name)
-        print(f"Editing {path.absolute()}")
-        lines = read_file(path)
-    else:
-        path = None
-        lines = []
+class Dedlin:
+    def __init__(self,
+                 inputter: Generator[str, None, None],
+                 outputter: Callable[[Optional[str]], None]):
+        self.inputter = inputter
+        self.outputter = outputter
+        self.doc: Optional[Document] = None
+        self.halt_on_error = False
+        self.echo = False
 
-    doc = Document(lines=lines, file_name=path)
-    while True:
-        user_command_text = questionary.text("*").ask()
-        command, params = parse_command(user_command_text, document_length=len(doc.lines))
-        if command == Commands.List:
-            line_range = cast(LineRange, params)
-            doc.process_list(line_range)
-            print()
-        elif command == Commands.Page:
-            # line_range = cast(LineRange, params)
-            doc.process_page()
-            print()
-        elif command == Commands.Delete:
-            line_range = cast( LineRange, params)
-            doc.process_delete(line_range)
-            print(f"Deleted lines {line_range.start} to {line_range.end}")
-        elif command == Commands.Save:
-            with open(path, "w", encoding="utf-8") as file:
-                file.writelines(doc.lines)
-            return 0
-        elif command == Commands.Quit:
-            return 0
-        elif command == Commands.Insert:
-            line_number = cast(int, params)
-            doc.process_insert(line_number)
-        elif command == Commands.Edit:
-            line_number = cast(int, params)
-            doc.process_edit(line_number)
-        elif command == Commands.Lorem:
-            line_number = cast(int, params)
-            doc.process_lorem(line_number)
-        elif command == Commands.Undo:
-            doc.process_undo()
-        elif command == Commands.Empty:
-            pass
-        elif command == Commands.Help:
-            print(HELP_TEXT)
-        elif command == Commands.Unknown:
-            print("Unknown command")
-            print(HELP_TEXT)
+    def go(self, file_name: Optional[str] = None) -> None:
+
+        if file_name:
+            path = Path(file_name)
+            print(f"Editing {path.absolute()}")
+            lines = read_file(path)
         else:
-            print("1i to insert at line 1.  E to save and quit. Q to just quit.")
-    return 0
+            path = None
+            lines = []
+
+        self.doc = Document(lines=lines, file_name=path)
+        while True:
+            try:
+                user_command_text = next(self.inputter)
+            except StopIteration:
+                break  # it on down now
+
+            command, params = parse_command(user_command_text,
+                                            document_length=len(self.doc.lines))
+            self.outputter((command, params))
+            if command == Commands.List:
+                line_range = cast(LineRange, params)
+                self.doc.process_list(line_range)
+                self.outputter()
+            elif command == Commands.Page:
+                # line_range = cast(LineRange, params)
+                self.doc.process_page()
+                self.outputter()
+            elif command == Commands.Delete:
+                line_range = cast(LineRange, params)
+                self.doc.process_delete(line_range)
+                self.outputter(f"Deleted lines {line_range.start} to {line_range.end}")
+            elif command == Commands.Save:
+                with open(path, "w", encoding="utf-8") as file:
+                    file.writelines(self.doc.lines)
+                return 0
+            elif command == Commands.Quit:
+                return 0
+            elif command == Commands.Insert:
+                line_number = cast(int, params)
+                self.doc.process_insert(line_number)
+            elif command == Commands.Edit:
+                line_number = cast(int, params)
+                self.doc.process_edit(line_number)
+            elif command == Commands.Lorem:
+                line_number = cast(int, params)
+                self.doc.process_lorem(line_number)
+            elif command == Commands.Undo:
+                self.doc.process_undo()
+            elif command == Commands.Empty:
+                pass
+            elif command == Commands.Help:
+                self.outputter(HELP_TEXT)
+            elif command == Commands.Unknown:
+                self.outputter("Unknown command")
+                self.outputter(HELP_TEXT)
+                if self.halt_on_error:
+                    raise Exception(f"Unknown command {user_command_text}")
+            else:
+                self.outputter("1i to insert at line 1.  E to save and quit. Q to just quit.")
+        return 0
+
 
 def read_file(path):
     lines: list[str] = []
+
     with open(path, "r") as file:
         for line in file:
             if line.endswith("\n"):
@@ -141,7 +142,7 @@ def read_file(path):
     return lines
 
 
-def extract_one_range(value:str)->Optional[LineRange]:
+def extract_one_range(value: str) -> Optional[LineRange]:
     value = value.strip()
     if "," in value:
         parts = value.split(",")
@@ -154,21 +155,26 @@ def extract_one_range(value:str)->Optional[LineRange]:
     raise TypeError("Could not extract range from value")
     return None
 
-def ends_with_any(value:str, suffixes:Iterable[str])->bool:
+
+def ends_with_any(value: str, suffixes: Iterable[str]) -> bool:
+    if not value:
+        return False
     for suffix in suffixes:
+        if not suffix:
+            continue
         if value.endswith(suffix):
             return True
     return False
 
 
-def get_command_length(value:str, suffixes:Iterable[str])->int:
+def get_command_length(value: str, suffixes: Iterable[str]) -> int:
     for suffix in sorted(suffixes, key=len, reverse=True):
         if value.endswith(suffix):
             return len(suffix)
     return 0
 
 
-def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
+def parse_command(command: str, document_length: int) -> Tuple[Commands, Any]:
     if not command:
         return Commands.Empty, False
     command = command.upper().strip()
@@ -180,7 +186,7 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
     if command.isnumeric():
         target = int(command)
         # edit end if target is greater than document length.
-        return Commands.Edit, target if target<= document_length else document_length
+        return Commands.Edit, target if target <= document_length else document_length
 
     # TODO: maybe use regex.
     front_part_chars = []
@@ -189,7 +195,7 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     for char in command:
         if char in alphabet and not found_first_alpha:
-            found_first_alpha =True
+            found_first_alpha = True
         if found_first_alpha and char in alphabet:
             just_command.append(char)
         if found_first_alpha and not char in alphabet:
@@ -201,19 +207,20 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
     # but nothing after a command.
     front_part = "".join(front_part_chars)
     end_part = command[len(front_part):]
+    if not front_part:
+        raise TypeError("Something has gone wrong.")
 
     # Commands without abbreviations first
     if command in ("UNDO"):
         return Commands.Undo, False
 
-    lorem_commands = ("LOREM")
-    if ends_with_any(command, lorem_commands) or command in lorem_commands:
+    lorem_commands = ("LOREM",)
+    if ends_with_any(front_part, lorem_commands) or front_part in lorem_commands:
         if front_part in lorem_commands:
             return Commands.Lorem, len(LOREM_IPSUM)
 
         line_count = int(front_part.split("LOREM")[0].strip())
         return Commands.Lorem, line_count
-
 
     delete_commands = ("D", "DELETE")
     if ends_with_any(front_part, delete_commands) or front_part in delete_commands:
@@ -221,11 +228,10 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
             return Commands.Delete, LineRange(start=1, end=document_length)
 
         command_length = get_command_length(front_part, delete_commands)
-        range_text = front_part[0:len(front_part)-command_length]
+        range_text = front_part[0:len(front_part) - command_length]
         line_range = extract_one_range(range_text)
         if line_range:
             return Commands.Delete, line_range
-
 
     # Commands with Abbreviations
     list_commands = ("L", "LIST")
@@ -233,12 +239,12 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
         if front_part in list_commands:
             return Commands.List, LineRange(start=0, end=document_length)
 
-        range_text = front_part[0:len(front_part)-1]
+        range_text = front_part[0:len(front_part) - 1]
         line_range = extract_one_range(range_text)
         if line_range:
             return Commands.List, line_range
 
-    page_command = ("P" , "PAGE")
+    page_command = ("P", "PAGE")
     if ends_with_any(front_part, page_command) or front_part in page_command:
         # This just increments the pointer
         return Commands.Page, False
@@ -251,14 +257,12 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
         if "INSERT" in front_part:
             line_number = int(front_part.split("INSERT")[0].strip())
             return Commands.Insert, line_number
-        else: # "I" in front_part:
+        else:  # "I" in front_part:
             line_number = int(front_part.split("I")[0].strip())
             return Commands.Insert, line_number
 
         # line_number = int(command[0:len(command) - 1])
         # return Commands.Insert, line_number
-
-
 
     if command in ("Q", "QUIT"):
         return Commands.Quit, False
@@ -268,7 +272,16 @@ def parse_command(command:str, document_length:int)->Tuple[Commands, Any]:
 
     return Commands.Unknown, False
 
+
 if __name__ == '__main__':
-    go()
+    def run():
+        def input_handler(prompt: str = "*") -> Generator[str, None, None]:
+            while True:
+                answer = questionary.text("*").ask()
+                yield answer
+
+        dedlin = Dedlin(input_handler(), print)
+        dedlin.go()
 
 
+    run()
