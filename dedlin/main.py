@@ -11,6 +11,7 @@ import questionary
 from dedlin.basic_types import Command, Commands, Printable
 from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
+from dedlin.file_system import read_file, save_and_overwrite
 from dedlin.help_text import HELP_TEXT
 from dedlin.parsers import parse_command
 from dedlin.rich_output import RichPrinter
@@ -57,18 +58,8 @@ class Dedlin:
 
     def go(self, file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
-        if file_name:
-            self.file_path = Path(file_name)
-            print(f"Editing {self.file_path.absolute()}")
-            if not self.file_path.exists():
-                with open(
-                    str(self.file_path.absolute()), "w", encoding="utf-8"
-                ) as file:
-                    pass
-            lines = read_file(self.file_path)
-        else:
-            path = None
-            lines = []
+        self.file_path = Path(file_name) if file_name else None
+        lines = read_file(self.file_path)
 
         self.doc = Document(
             inputter=simple_input,
@@ -117,9 +108,9 @@ class Dedlin:
                 )
             elif command.command in (Commands.Exit, Commands.Quit, Commands.Save):
                 if (
-                    command.command == Commands.Quit
-                    and self.doc.dirty
-                    and self.quit_safety
+                        command.command == Commands.Quit
+                        and self.doc.dirty
+                        and self.quit_safety
                 ):
                     # hack!
                     self.outputter("Save changes? (y/n) ", end="")
@@ -144,9 +135,9 @@ class Dedlin:
             elif command.command == Commands.Replace:
                 self.outputter("Replacing")
                 for line in self.doc.replace(
-                    command.line_range,
-                    target=command.phrases.first,
-                    replacement=command.phrases.second,
+                        command.line_range,
+                        target=command.phrases.first,
+                        replacement=command.phrases.second,
                 ):
                     self.outputter(line, end="")
             elif command.command == Commands.Lorem:
@@ -182,25 +173,12 @@ class Dedlin:
 
     def save_document(self):
         """Save the document to the file"""
-        if not self.file_path:
-            raise TypeError("No file path")
-        with open(str(self.file_path), "w", encoding="utf-8") as file:
-            file.seek(0)
-            file.writelines(self.doc.lines)
+        save_and_overwrite(self.file_path, self.doc.lines)
         self.doc.dirty = False
 
-
-def read_file(path):
-    """Read a file and return a list of lines"""
-    lines: list[str] = []
-
-    with open(path, "r", encoding="utf-8") as file:
-        for line in file:
-            if line.endswith("\n"):
-                lines.append(line)
-            else:
-                lines.append(line + "\n")
-    return lines
+    def save_macro(self):
+        """Save the document to the file"""
+        save_and_overwrite(Path("history.ed"), [_.original_text for _ in self.history])
 
 
 def run(file_name: Optional[str] = None):
