@@ -11,6 +11,7 @@ import questionary
 from dedlin.basic_types import Commands, Printable
 from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
+from dedlin.help_text import HELP_TEXT
 from dedlin.parsers import parse_command
 
 
