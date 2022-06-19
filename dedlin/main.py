@@ -13,32 +13,6 @@ from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.parsers import parse_command
 
-HELP_TEXT = """
-Command format: [number],[number] [command] [parameter] [parameter]
-
-Display Commands
-[start],[end] List - display lines, set current to end of range
-[start],[end] Page - repeat to flipt through entire document
-[start],[end] Search [text]
-
-Edit Commands
-[line number] Insert - insert line at line number
-[line number] Edit - edit number
-[start],[end] Delete - delete range
-[target] Transfer [file name] - inserts file contents to target
-[start],[end] Replace "[text]", "[text]" - replace text in range
-
-Reorder Commands
-[start],[end] Move [target line number]
-[start],[end] Copy [target line number]
-[start],[end] Sort
-[start],[end] Shuffle 
-
-File System Commands
-Quit
-Exit [file name]
-
-"""
 
 
 def command_handler(prompt: str = "*") -> Generator[str, None, None]:

@@ -14,23 +14,36 @@ class Commands(Enum):
     """Enum of commands that can be executed on a document."""
 
     Empty = auto()
+    # display
     List = auto()
     Page = auto()
+    Search = auto()
+
+    # edit commands
+    Insert = auto()
+    Edit = auto()
+    Lorem = auto()
+    Delete = auto()
+    Replace = auto()
+
+    # file and exit
     Quit = auto()
     Exit = auto()
     Save = auto()
-    Insert = auto()
-    Edit = auto()
-    Delete = auto()
-    Help = auto()
-    Lorem = auto()
-    Undo = auto()
-    Unknown = auto()
+
+    # reorder commands
+    Move = auto()
     Shuffle = auto()
     Sort = auto()
     Reverse = auto()
-    Search = auto()
-    Replace = auto()
+
+    # other
+    Help = auto()
+    Undo = auto()
+    Unknown = auto()
+
+
+
 
 
 @dataclass(frozen=True)
