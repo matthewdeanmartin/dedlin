@@ -37,14 +37,14 @@ class Document:
 
     def list(self, line_range: Optional[LineRange]) -> Generator[str, None, None]:
         """Display lines specified by range"""
-        if line_range is None:
+        if line_range is None or line_range.start == 0 and line_range.end == 0:
             # everything, not an arbitrary cutoff
             line_range = LineRange(1, len(self.lines))
 
-        self.current_line = line_range.start -1
+        self.current_line = line_range.start
 
         # slice handles the case where the range is beyond the end of the document
-        for line_text in self.lines[line_range.start -1 : line_range.end]:
+        for line_text in self.lines[line_range.start - 1 : line_range.end + 1]:
             yield f"   {self.current_line} : {line_text}"
             self.current_line += 1
 
@@ -81,7 +81,7 @@ class Document:
                 line_text = line_text.replace(target, replacement)
                 self.lines[self.current_line] = line_text
                 self.dirty = True  # this is ugly
-                self.dirty = True # this is ugly
+                self.dirty = True  # this is ugly
                 yield f"   {self.current_line} : {line_text}"
             self.current_line += 1
 
@@ -191,7 +191,7 @@ class Document:
         logger.debug(f"Edited {line_number}")
         if self.current_line > len(self.lines):
             return None
-        return self.current_line +1
+        return self.current_line + 1
 
     def insert(self, line_number: int) -> None:
         """Insert a new line at line_number"""

@@ -17,6 +17,9 @@ Edit Commands
 [range] Lorem - insert lorem ipsum text
 
 Meta Commands
+HISTORY [file] - list all commands run
+MACRO [file] - run macro
+REDO - redo last command
 UNDO - undo last command that changed state
 HELP - display this
 

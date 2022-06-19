@@ -8,11 +8,12 @@ from typing import Generator, Optional
 
 import questionary
 
-from dedlin.basic_types import Commands, Printable
+from dedlin.basic_types import Command, Commands, Printable
 from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.help_text import HELP_TEXT
 from dedlin.parsers import parse_command
+from dedlin.rich_output import RichPrinter
 
 
 def command_handler(prompt: str = "*") -> Generator[str, None, None]:
@@ -52,6 +53,7 @@ class Dedlin:
 
         self.echo = False
         self.file_path: Optional[Path] = None
+        self.history: list[Command] = []
 
     def go(self, file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
@@ -59,7 +61,9 @@ class Dedlin:
             self.file_path = Path(file_name)
             print(f"Editing {self.file_path.absolute()}")
             if not self.file_path.exists():
-                with open(str(self.file_path.absolute()), "w", encoding="utf-8") as file:
+                with open(
+                    str(self.file_path.absolute()), "w", encoding="utf-8"
+                ) as file:
                     pass
             lines = read_file(self.file_path)
         else:
@@ -80,13 +84,25 @@ class Dedlin:
             command = parse_command(
                 user_command_text, document_length=len(self.doc.lines)
             )
+
             if command is None:
                 self.outputter("Unknown command", end="\n")
                 continue
 
+            if not command.validate():
+                self.outputter(f"Invalid command {command}")
+
+            self.history.append(command)
+            if command.command == Commands.Redo:
+                command = self.history[-2]
+                self.history.append(command)
+
             if self.echo:
                 self.outputter(command.original_text)
-            if command.command == Commands.Empty:
+            if command.command == Commands.History:
+                for command in self.history:
+                    self.outputter(command.original_text)
+            elif command.command == Commands.Empty:
                 pass
             elif command.command == Commands.List:
                 for line in self.doc.list(command.line_range):
@@ -100,7 +116,11 @@ class Dedlin:
                     f"Deleted lines {command.line_range.start} to {command.line_range.end}"
                 )
             elif command.command in (Commands.Exit, Commands.Quit, Commands.Save):
-                if command.command == Commands.Quit and self.doc.dirty and self.quit_safety:
+                if (
+                    command.command == Commands.Quit
+                    and self.doc.dirty
+                    and self.quit_safety
+                ):
                     # hack!
                     self.outputter("Save changes? (y/n) ", end="")
                     if next(self.inputter) == "y":
@@ -124,9 +144,9 @@ class Dedlin:
             elif command.command == Commands.Replace:
                 self.outputter("Replacing")
                 for line in self.doc.replace(
-                        command.line_range,
-                        target=command.phrases.first,
-                        replacement=command.phrases.second,
+                    command.line_range,
+                    target=command.phrases.first,
+                    replacement=command.phrases.second,
                 ):
                     self.outputter(line, end="")
             elif command.command == Commands.Lorem:
@@ -162,6 +182,8 @@ class Dedlin:
 
     def save_document(self):
         """Save the document to the file"""
+        if not self.file_path:
+            raise TypeError("No file path")
         with open(str(self.file_path), "w", encoding="utf-8") as file:
             file.seek(0)
             file.writelines(self.doc.lines)
@@ -183,7 +205,14 @@ def read_file(path):
 
 def run(file_name: Optional[str] = None):
     """Set up everything except things from command line"""
-    dedlin = Dedlin(command_handler(), print)
+    rich_printer = RichPrinter()
+
+    def printer(text, end="\n"):
+        rich_printer.print(text, end=end)
+
+    dedlin = Dedlin(
+        command_handler(), printer if file_name and file_name.endswith(".py") else print
+    )
     dedlin.go(file_name)
 
 

@@ -17,10 +17,18 @@ def extract_one_range(value: str) -> Optional[LineRange]:
         start = try_parse_int(start_string)
         end = try_parse_int(parts[1]) if len(parts) > 1 else start
         repeat = try_parse_int(parts[2]) if len(parts) > 2 else 1
-        return LineRange(start=start, end=end, repeat=repeat)
+        candidate = LineRange(start=start, end=end, repeat=repeat)
+        if not candidate.validate():
+            print("Candidate invalid:", candidate)
+            return None
+        return candidate
     if value.isnumeric():
         start = int(value)
-        return LineRange(start=start, end=start, repeat=1)
+        candidate = LineRange(start=start, end=start, repeat=1)
+        if not candidate.validate():
+            print("Candidate invalid:", candidate)
+            return None
+        return candidate
     return None
 
 
@@ -95,8 +103,6 @@ def parse_simple_command(command: str, original_text: str) -> Optional[Command]:
     return None
 
 
-
-
 def parse_search_replace(
     command_forms: Tuple[str, str],
     command_code: Commands,
@@ -122,6 +128,26 @@ def parse_search_replace(
             phrases=phrases,
             original_text=original_text,
         )
+    return None
+
+
+BARE_COMMANDS = {
+    Commands.History: ("H", "HISTORY"),
+    Commands.Redo: ("REDO",),
+    Commands.Undo: ("UNDO",),
+    Commands.Exit: ("E", "EXIT"),  # BUG, this takes argument.
+    Commands.Quit: ("Q", "QUIT"),
+}
+
+
+def bare_command(command) -> Optional[Command]:
+    """Parse a command that has no line range or phrases"""
+    for command_code, command_forms in BARE_COMMANDS.items():
+        if command in command_forms:
+            return Command(
+                command_code,
+                original_text=command,
+            )
     return None
 
 
@@ -217,7 +243,7 @@ def parse_command(command: str, document_length: int) -> Command:
     list_commands = ("L", "LIST")
     if ends_with_any(front_part, list_commands) or command in list_commands:
         if front_part in list_commands:
-            line_range = LineRange(start=0, end=document_length)
+            line_range = LineRange(start=1, end=document_length)
         else:
             range_text = front_part[0 : len(front_part) - 1]
             line_range = extract_one_range(range_text)
@@ -228,7 +254,7 @@ def parse_command(command: str, document_length: int) -> Command:
     page_command = ("P", "PAGE")
     if ends_with_any(front_part, page_command) or front_part in page_command:
         if front_part in list_commands:
-            line_range = LineRange(start=0, end=document_length)
+            line_range = LineRange(start=1, end=document_length)
         else:
             range_text = front_part[0 : len(front_part) - 1]
             line_range = extract_one_range(range_text)
@@ -264,10 +290,8 @@ def parse_command(command: str, document_length: int) -> Command:
     if candidate:
         return candidate
 
-    if command in ("Q", "QUIT"):
-        return Command(Commands.Quit, original_text=original_text)
-
-    if command in ("E", "EXIT"):
-        return Command(Commands.Exit, original_text=original_text)
+    candidate = bare_command(command)
+    if candidate:
+        return candidate
 
     return Command(Commands.Unknown, original_text=original_text)

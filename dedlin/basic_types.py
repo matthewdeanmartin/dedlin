@@ -37,13 +37,15 @@ class Commands(Enum):
     Sort = auto()
     Reverse = auto()
 
+    # Commands and Macros
+    History = auto()
+    Redo = auto()
+    Macro = auto()
+
     # other
     Help = auto()
     Undo = auto()
     Unknown = auto()
-
-
-
 
 
 @dataclass(frozen=True)
@@ -86,6 +88,14 @@ class Command:
     phrases: Optional[Phrases] = None
     original_text: Optional[str] = field(default=None, compare=False)
 
+    def validate(self):
+        """Check if ranges are sensible"""
+        if self.line_range:
+            line_range_is_valid = self.line_range.validate()
+            if not line_range_is_valid:
+                return False
+        return True
+
 
 def command_generator(macro_path: Path) -> Generator[str, None, None]:
     """Turn a file into a bunch of commands"""
@@ -94,7 +104,7 @@ def command_generator(macro_path: Path) -> Generator[str, None, None]:
             yield line
 
 
-def try_parse_int(value)->Optional[int]:
+def try_parse_int(value) -> Optional[int]:
     try:
         return int(value)
     except ValueError:

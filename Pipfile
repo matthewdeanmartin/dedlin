@@ -6,9 +6,11 @@ name = "pypi"
 [packages]
 questionary = "*"
 pywin32 = "*"
+rich = "*"
 
 [dev-packages]
 pytest = "*"
+
 
 [requires]
 python_version = "3.9"
