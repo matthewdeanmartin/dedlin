@@ -57,7 +57,7 @@ class Dedlin:
         self.file_path: Optional[Path] = None
         self.history: list[Command] = []
 
-    def go(self, file_name: Optional[str] = None) -> int:
+    def entry_point(self, file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
         self.file_path = Path(file_name) if file_name else None
         lines = read_or_create_file(self.file_path)
@@ -85,14 +85,14 @@ class Dedlin:
                 self.outputter(f"Invalid command {command}")
 
             self.history.append(command)
-            if command.command == Commands.Redo:
+            if command.command == Commands.REDO:
                 command = self.history[-2]
                 self.history.append(command)
 
             if self.echo:
                 self.outputter(command.original_text)
 
-            if command.command == Commands.Browse:
+            if command.command == Commands.BROWSE:
                 if self.doc.dirty:
                     # Trying out VIM-like behavior
                     self.outputter(
@@ -100,28 +100,30 @@ class Dedlin:
                         " You should be happy I don't run fdisk."
                     )
                 page_as_rows = fetch_page_as_rows(command.phrases.first)
-                self.doc.lines = list(page_as_rows)
+                self.doc.lines = page_as_rows
+
                 self.doc.dirty = True
-                self.doc.list()
-            elif command.command == Commands.History:
+                for line in self.doc.list():
+                    self.outputter(line)
+            elif command.command == Commands.HISTORY:
                 for command in self.history:
                     self.outputter(command.original_text)
-            elif command.command == Commands.Empty:
+            elif command.command == Commands.EMPTY:
                 pass
-            elif command.command == Commands.List:
+            elif command.command == Commands.LIST:
                 for line in self.doc.list(command.line_range):
                     self.outputter(line, end="")
-            elif command.command == Commands.Page:
+            elif command.command == Commands.PAGE:
                 for line, end in self.doc.page():
                     self.outputter(line, end=end)
-            elif command.command == Commands.Delete:
+            elif command.command == Commands.DELETE:
                 self.doc.delete(command.line_range)
                 self.outputter(
                     f"Deleted lines {command.line_range.start} to {command.line_range.end}"
                 )
-            elif command.command in (Commands.Exit, Commands.Quit):
+            elif command.command in (Commands.EXIT, Commands.QUIT):
                 if (
-                    command.command == Commands.Quit
+                    command.command == Commands.QUIT
                     and self.doc.dirty
                     and self.quit_safety
                 ):
@@ -132,20 +134,20 @@ class Dedlin:
                         return 0
                 else:
                     self.save_document(command.phrases)
-                if command.command in (Commands.Quit, Commands.Exit):
+                if command.command in (Commands.QUIT, Commands.EXIT):
                     return 0
-            elif command.command == Commands.Insert:
+            elif command.command == Commands.INSERT:
                 line_number = command.line_range.start if command.line_range else 1
                 self.outputter("Control C to exit insert mode")
                 self.doc.insert(line_number)
-            elif command.command == Commands.Edit:
+            elif command.command == Commands.EDIT:
                 self.outputter("[Control C], [Enter] to exit edit mode")
                 line_number = command.line_range.start if command.line_range else 1
                 while line_number:
                     line_number = self.doc.edit(line_number)
-            elif command.command == Commands.Search:
+            elif command.command == Commands.SEARCH:
                 self.doc.search(command.line_range, value=command.phrases.first)
-            elif command.command == Commands.Replace:
+            elif command.command == Commands.REPLACE:
                 self.outputter("Replacing")
                 for line in self.doc.replace(
                     command.line_range,
@@ -153,25 +155,25 @@ class Dedlin:
                     replacement=command.phrases.second,
                 ):
                     self.outputter(line, end="")
-            elif command.command == Commands.Lorem:
+            elif command.command == Commands.LOREM:
                 self.doc.lorem(command.line_range)
-            elif command.command == Commands.Undo:
+            elif command.command == Commands.UNDO:
                 self.doc.undo()
                 self.outputter("Undone")
-            elif command.command == Commands.Sort:
+            elif command.command == Commands.SORT:
                 self.doc.sort()
                 self.outputter("Sorted")
-            elif command.command == Commands.Reverse:
+            elif command.command == Commands.REVERSE:
                 self.doc.reverse()
                 self.outputter("Reversed")
-            elif command.command == Commands.Shuffle:
+            elif command.command == Commands.SHUFFLE:
                 self.doc.shuffle()
                 self.outputter("Shuffled")
-            elif command.command == Commands.Empty:
+            elif command.command == Commands.EMPTY:
                 pass
-            elif command.command == Commands.Help:
+            elif command.command == Commands.HELP:
                 self.outputter(HELP_TEXT)
-            elif command.command == Commands.Unknown:
+            elif command.command == Commands.UNKNOWN:
                 self.outputter("Unknown command")
                 self.outputter(HELP_TEXT)
                 if self.halt_on_error:
@@ -201,12 +203,12 @@ def run(file_name: Optional[str] = None):
     rich_printer = RichPrinter()
 
     def printer(text, end="\n"):
-        rich_printer.print(text, end=end)
+        rich_printer.print(text, end="")
 
     dedlin = Dedlin(
         command_handler(), printer if file_name and file_name.endswith(".py") else print
     )
-    dedlin.go(file_name)
+    dedlin.entry_point(file_name)
 
 
 if __name__ == "__main__":

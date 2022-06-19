@@ -149,7 +149,27 @@ disable=raw-checker-failed,
         suppressed-message,
         useless-suppression,
         deprecated-pragma,
-        use-symbolic-message-instead
+        use-symbolic-message-instead,
+
+        # can't care
+        fixme,
+        too-many-lines,
+        too-many-branches,
+        import-error,
+        too-many-statements,
+        useless-import-alias,
+        too-many-locals,
+        consider-using-from-import, # pylint is wrong
+        duplicate-code,
+        too-many-arguments,
+        logging-fstring-interpolation,
+        too-many-instance-attributes,
+        too-many-return-statements,
+        unnecessary-direct-lambda-call,
+        too-few-public-methods,
+        logging-not-lazy,
+        line-too-long,
+
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

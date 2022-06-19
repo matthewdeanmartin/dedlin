@@ -13,25 +13,28 @@ def test_parse_command_insert_default():
 
     for insert in ("I", "Insert", "insert", "i", "INSERT"):
         assert parse_command(insert, 3) == Command(
-            Commands.Insert, # LineRange(start=1, end=1), # Phrases("")
+            Commands.INSERT,  # LineRange(start=1, end=1), # Phrases("")
         ), insert
+
 
 def test_parse_command_insert_specific_rage():
 
     for insert in ("I", "Insert", "insert", "i", "INSERT"):
 
         assert parse_command(f"2{insert}", 3) == Command(
-            Commands.Insert, LineRange(start=2, end=2), # Phrases("")
+            Commands.INSERT,
+            LineRange(start=2, end=2),  # Phrases("")
         ), f"2{insert}"
         assert parse_command(f"2 {insert}", 3) == Command(
-            Commands.Insert, LineRange(start=2, end=2), # Phrases("")
+            Commands.INSERT,
+            LineRange(start=2, end=2),  # Phrases("")
         ), f"2 {insert}"
 
 
 def test_parse_command_edit():
-    assert parse_command("1", 3) == Command(Commands.Edit, LineRange(start=1, end=1))
-    assert parse_command("2", 3) == Command(Commands.Edit, LineRange(start=2, end=2))
-    assert parse_command("3", 3) == Command(Commands.Edit, LineRange(start=3, end=3))
+    assert parse_command("1", 3) == Command(Commands.EDIT, LineRange(start=1, end=1))
+    assert parse_command("2", 3) == Command(Commands.EDIT, LineRange(start=2, end=2))
+    assert parse_command("3", 3) == Command(Commands.EDIT, LineRange(start=3, end=3))
 
     # for edit in ("E", "Edit", "edit", "e", "EDIT"):
     # assert parse_command(f"1{edit}", 3) == (Commands.Edit, 1), f"1{edit}"
@@ -39,19 +42,19 @@ def test_parse_command_edit():
 
 
 def test_parse_command_delete():
-    assert parse_command("D", 3) == Command(Commands.Delete, LineRange(start=1, end=3))
+    assert parse_command("D", 3) == Command(Commands.DELETE, LineRange(start=1, end=3))
     for edit in ("D", "Delete", "delete", "d", "DELETE"):
         assert parse_command(f"1{edit}", 3) == Command(
-            Commands.Delete, LineRange(start=1, end=1)
+            Commands.DELETE, LineRange(start=1, end=1)
         ), f"1{edit}"
         assert parse_command(f"1 {edit}", 3) == Command(
-            Commands.Delete, LineRange(start=1, end=1)
+            Commands.DELETE, LineRange(start=1, end=1)
         ), f"1 {edit}"
         assert parse_command(f"1,2 {edit}", 3) == Command(
-            Commands.Delete, LineRange(start=1, end=2)
+            Commands.DELETE, LineRange(start=1, end=2)
         ), f"1,2 {edit}"
         assert parse_command(f"1,2{edit}", 3) == Command(
-            Commands.Delete, LineRange(start=1, end=2)
+            Commands.DELETE, LineRange(start=1, end=2)
         ), f"1,2{edit}"
 
 

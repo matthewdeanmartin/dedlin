@@ -3,7 +3,6 @@ Abstract document class.
 """
 import logging
 import random
-from pathlib import Path
 from typing import Callable, Generator, Optional, Tuple
 
 from dedlin.basic_types import LineRange
@@ -39,7 +38,7 @@ class Document:
         self, line_range: Optional[LineRange] = None
     ) -> Generator[str, None, None]:
         """Display lines specified by range"""
-        if line_range is None or line_range.start == 0 and line_range.end == 0:
+        if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
             line_range = LineRange(1, len(self.lines))
 

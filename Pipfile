@@ -8,10 +8,12 @@ questionary = "*"
 pywin32 = "*"
 rich = "*"
 requests = "*"
+html2text = "*"
+docopt-ng = "*"
 
 [dev-packages]
 pytest = "*"
-
+pytest-cov = "*"
 
 [requires]
 python_version = "3.9"

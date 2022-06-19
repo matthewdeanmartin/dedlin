@@ -4,6 +4,9 @@ from pathlib import Path
 from dedlin.basic_types import command_generator
 from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
+from dedlin.utils.file_utils import locate_file
+
+ANIMALS_FILE = Path(locate_file("sample_files/animals.txt", __file__))
 
 
 def test_lorem_ed():
@@ -11,13 +14,13 @@ def test_lorem_ed():
 
     logging.config.dictConfig(LOGGING_CONFIG)
 
-    lines_path = Path("sample_files/animals.txt")
-    macro_path = Path("sample_macros/lorem.ed")
+    lines_path = ANIMALS_FILE
+    macro_path = Path(locate_file("sample_macros/lorem.ed", __file__))
 
     dedlin = Dedlin(command_generator(macro_path), print)
     dedlin.halt_on_error = True
     dedlin.quit_safety = False
-    dedlin.go(str(lines_path.absolute()))
+    dedlin.entry_point(str(lines_path.absolute()))
     assert dedlin.doc.lines
 
 
@@ -26,13 +29,13 @@ def test_shuffle_sort_reverse_ed():
 
     logging.config.dictConfig(LOGGING_CONFIG)
 
-    lines_path = Path("sample_files/animals.txt")
-    macro_path = Path("sample_macros/randomize.ed")
+    lines_path = ANIMALS_FILE
+    macro_path = Path(locate_file("sample_macros/randomize.ed", __file__))
 
     dedlin = Dedlin(command_generator(macro_path), print)
     dedlin.halt_on_error = True
     dedlin.quit_safety = False
-    dedlin.go(str(lines_path.absolute()))
+    dedlin.entry_point(str(lines_path.absolute()))
     assert dedlin.doc.lines
 
 
@@ -41,11 +44,11 @@ def test_degenerate_ed():
 
     logging.config.dictConfig(LOGGING_CONFIG)
 
-    macro_path = Path("sample_macros/degenerate.ed")
+    macro_path = Path(locate_file("sample_macros/degenerate.ed", __file__))
 
     dedlin = Dedlin(command_generator(macro_path), print)
     dedlin.halt_on_error = False
-    dedlin.go()
+    dedlin.entry_point()
     assert not dedlin.doc.lines
 
 
@@ -54,8 +57,8 @@ def test_search_ed():
 
     logging.config.dictConfig(LOGGING_CONFIG)
 
-    lines_path = Path("sample_files/animals.txt")
-    macro_path = Path("sample_macros/grep.ed")
+    lines_path = ANIMALS_FILE
+    macro_path = Path(locate_file("sample_macros/grep.ed", __file__))
     thing = []
 
     def capture(line, end="\n"):
@@ -63,7 +66,7 @@ def test_search_ed():
 
     dedlin = Dedlin(command_generator(macro_path), capture)
     dedlin.halt_on_error = True
-    dedlin.go(str(lines_path.absolute()))
+    dedlin.entry_point(str(lines_path.absolute()))
     for line in thing:
         assert "cat" in line
 
@@ -73,8 +76,8 @@ def test_replace_ed():
 
     logging.config.dictConfig(LOGGING_CONFIG)
 
-    lines_path = Path("sample_files/animals.txt")
-    macro_path = Path("sample_macros/sed.ed")
+    lines_path = ANIMALS_FILE
+    macro_path = Path(locate_file("sample_macros/sed.ed", __file__))
     thing = []
 
     def capture(line, end="\n"):
@@ -83,7 +86,7 @@ def test_replace_ed():
     dedlin = Dedlin(command_generator(macro_path), capture)
     dedlin.halt_on_error = True
     dedlin.quit_safety = False
-    dedlin.go(str(lines_path.absolute()))
+    dedlin.entry_point(str(lines_path.absolute()))
     for line in dedlin.doc.lines:
         assert "giraffe" not in line
     assert "butt\n" in dedlin.doc.lines

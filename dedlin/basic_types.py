@@ -13,40 +13,40 @@ logger = logging.getLogger(__name__)
 class Commands(Enum):
     """Enum of commands that can be executed on a document."""
 
-    Empty = auto()
+    EMPTY = auto()
     # display
-    List = auto()
-    Page = auto()
-    Search = auto()
+    LIST = auto()
+    PAGE = auto()
+    SEARCH = auto()
 
     # edit commands
-    Insert = auto()
-    Edit = auto()
-    Lorem = auto()
-    Delete = auto()
-    Replace = auto()
+    INSERT = auto()
+    EDIT = auto()
+    LOREM = auto()
+    DELETE = auto()
+    REPLACE = auto()
 
     # file and exit
-    Quit = auto()
-    Exit = auto()
-    Transfer = auto()
-    Browse = auto()
+    QUIT = auto()
+    EXIT = auto()
+    TRANSFER = auto()
+    BROWSE = auto()
 
     # reorder commands
-    Move = auto()
-    Shuffle = auto()
-    Sort = auto()
-    Reverse = auto()
+    MOVE = auto()
+    SHUFFLE = auto()
+    SORT = auto()
+    REVERSE = auto()
 
     # Commands and Macros
-    History = auto()
-    Redo = auto()
-    Macro = auto()
+    HISTORY = auto()
+    REDO = auto()
+    MACRO = auto()
 
     # other
-    Help = auto()
-    Undo = auto()
-    Unknown = auto()
+    HELP = auto()
+    UNDO = auto()
+    UNKNOWN = auto()
 
 
 @dataclass(frozen=True)
@@ -106,6 +106,7 @@ def command_generator(macro_path: Path) -> Generator[str, None, None]:
 
 
 def try_parse_int(value) -> Optional[int]:
+    """ "Parse int without raising errors"""
     try:
         return int(value)
     except ValueError:

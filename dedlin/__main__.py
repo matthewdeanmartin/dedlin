@@ -6,13 +6,13 @@ import sys
 from dedlin.main import run
 
 
-def go():
+def entry_point():
     """Entrypoint for python -m dedlin"""
     args = sys.argv[1:]
-    if args:
-        file = args[0]
-    sys.exit(run(str(file)))
+    file = args[0] if args else ""
+
+    sys.exit(run(file))
 
 
 if __name__ == "__main__":
-    go()
+    entry_point()

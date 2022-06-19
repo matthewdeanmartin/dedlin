@@ -32,7 +32,7 @@ clean: clean-pyc clean-test
 test: clean .build_history/pylint .build_history/bandit Pipfile.lock
 	@echo "Running unit tests"
 	$(VENV) python -m unittest discover
-	$(VENV) py.test tests --cov=dedlin --cov-report=term-missing --cov-fail-under 75
+	$(VENV) py.test tests --cov=dedlin --cov-report=html --cov-fail-under 70
 
 .build_history:
 	@mkdir -p .build_history
@@ -71,10 +71,10 @@ bandit: .build_history/bandit
 
 .build_history/pylint: .build_history .build_history/isort .build_history/black $(FILES)
 	@echo "Linting with pylint"
-	$(VENV) pylint dedlin
+	$(VENV) pylint dedlin --fail-under 9.7
 	@touch .build_history/pylint
 
 # for when using -j (jobs, run in parallel)
 .NOTPARALLEL: .build_history/isort .build_history/black
 
-check: test pylint bandit pre-commit
+check: tests pylint bandit pre-commit
