@@ -94,6 +94,13 @@ def command_generator(macro_path: Path) -> Generator[str, None, None]:
             yield line
 
 
+def try_parse_int(value)->Optional[int]:
+    try:
+        return int(value)
+    except ValueError:
+        return None
+
+
 class Printable(Protocol):
     """Something that acts like print()"""
 

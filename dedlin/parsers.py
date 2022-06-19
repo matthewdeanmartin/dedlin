@@ -4,7 +4,7 @@ Code that turns strings to command objects
 
 from typing import Iterable, Optional, Tuple
 
-from dedlin.basic_types import Command, Commands, LineRange, Phrases
+from dedlin.basic_types import Command, Commands, LineRange, Phrases, try_parse_int
 from dedlin.lorem_data import LOREM_IPSUM
 
 
@@ -13,9 +13,10 @@ def extract_one_range(value: str) -> Optional[LineRange]:
     value = value.strip()
     if "," in value:
         parts = value.split(",")
-        start = int(parts[0])
-        end = int(parts[1]) if len(parts) > 1 else start
-        repeat = int(parts[2]) if len(parts) > 2 else 1
+        start_string = parts[0]
+        start = try_parse_int(start_string)
+        end = try_parse_int(parts[1]) if len(parts) > 1 else start
+        repeat = try_parse_int(parts[2]) if len(parts) > 2 else 1
         return LineRange(start=start, end=end, repeat=repeat)
     if value.isnumeric():
         start = int(value)
@@ -94,6 +95,8 @@ def parse_simple_command(command: str, original_text: str) -> Optional[Command]:
     return None
 
 
+
+
 def parse_search_replace(
     command_forms: Tuple[str, str],
     command_code: Commands,
@@ -107,10 +110,11 @@ def parse_search_replace(
         if front_part in command_forms:
             line_range = None
         elif long_command in front_part:
-            line_number = int(front_part.split(long_command)[0].strip())
+            line_number_string = front_part.split(long_command)[0].strip()
+            line_number = try_parse_int(line_number_string)
             line_range = LineRange(start=line_number, end=line_number)
         else:
-            line_number = int(front_part.split(abbreviation)[0].strip())
+            line_number = try_parse_int(front_part.split(abbreviation)[0].strip())
             line_range = LineRange(start=line_number, end=line_number)
         return Command(
             command_code,
@@ -124,13 +128,13 @@ def parse_search_replace(
 def parse_command(command: str, document_length: int) -> Command:
     """Parse a command"""
     original_text = command
-    original_text_upper = command.upper()
     if not command:
         return Command(
             command=Commands.Empty,
             original_text=original_text,
         )
 
+    original_text_upper = command.upper()
     command = command.upper().strip()
 
     if not command or command.startswith("#"):
@@ -188,7 +192,7 @@ def parse_command(command: str, document_length: int) -> Command:
             line_count = len(LOREM_IPSUM)
             line_range = LineRange(start=1, end=line_count, repeat=1)
         else:
-            line_count = int(front_part.split("LOREM")[0].strip())
+            line_count = try_parse_int(front_part.split("LOREM")[0].strip())
             line_range = LineRange(start=1, end=line_count, repeat=1)
         return Command(
             Commands.Lorem,
@@ -237,10 +241,10 @@ def parse_command(command: str, document_length: int) -> Command:
         if front_part in insert_commands:
             line_range = None
         elif "INSERT" in front_part:
-            line_number = int(front_part.split("INSERT")[0].strip())
+            line_number = try_parse_int(front_part.split("INSERT")[0].strip())
             line_range = LineRange(start=line_number, end=line_number)
         else:  # "I" in front_part:
-            line_number = int(front_part.split("I")[0].strip())
+            line_number = try_parse_int(front_part.split("I")[0].strip())
             line_range = LineRange(start=line_number, end=line_number)
         return Command(
             Commands.Insert, line_range=line_range, original_text=original_text

@@ -46,13 +46,17 @@ class Dedlin:
         self.doc: Optional[Document] = None
         self.halt_on_error = False
         self.echo = False
+        self.file_path:Optional[Path] = None
 
     def go(self, file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
         if file_name:
-            path = Path(file_name)
-            print(f"Editing {path.absolute()}")
-            lines = read_file(path)
+            self.file_path = Path(file_name)
+            print(f"Editing {self.file_path.absolute()}")
+            if not self.file_path.exists():
+                with open(str(self.file_path.absolute()), "w", encoding="utf-8") as file:
+                    pass
+            lines = read_file(self.file_path)
         else:
             path = None
             lines = []
@@ -61,7 +65,6 @@ class Dedlin:
             inputter=simple_input,
             editor=input_with_prefill,
             lines=lines,
-            file_name=path,
         )
         while True:
             try:
@@ -91,20 +94,26 @@ class Dedlin:
                 self.outputter(
                     f"Deleted lines {command.line_range.start} to {command.line_range.end}"
                 )
-            elif command.command == Commands.Save:
-                with open(path, "w", encoding="utf-8") as file:
-                    file.writelines(self.doc.lines)
-                return 0
-            elif command.command == Commands.Quit:
-                return 0
+            elif command.command in (Commands.Exit, Commands.Quit, Commands.Save):
+                if command.command == Commands.Quit and self.doc.dirty:
+                    # hack!
+                    self.outputter("Save changes? (y/n) ", end="")
+                    if next(self.inputter) =="y":
+                        self.save_document()
+                        return 0
+                else:
+                    self.save_document()
+                if command.command in (Commands.Quit, Commands.Exit):
+                    return 0
             elif command.command == Commands.Insert:
                 line_number = command.line_range.start if command.line_range else 1
-                self.outputter("Control C to exit edit mode")
+                self.outputter("Control C to exit insert mode")
                 self.doc.insert(line_number)
             elif command.command == Commands.Edit:
-                self.outputter("Control C to exit edit mode")
+                self.outputter("[Control C], [Enter] to exit edit mode")
                 line_number = command.line_range.start if command.line_range else 1
-                self.doc.edit(line_number)
+                while line_number:
+                    line_number = self.doc.edit(line_number)
             elif command.command == Commands.Search:
                 self.doc.search(command.line_range, value=command.phrases.first)
             elif command.command == Commands.Replace:
@@ -138,12 +147,20 @@ class Dedlin:
                 self.outputter(HELP_TEXT)
                 if self.halt_on_error:
                     raise Exception(f"Unknown command {user_command_text}")
+
             else:
                 # possibly not reachable now.
                 self.outputter(
                     "1i to insert at line 1.  E to save and quit. Q to just quit."
                 )
         return 0
+
+    def save_document(self):
+        """Save the document to the file"""
+        with open(str(self.file_path), "w", encoding="utf-8") as file:
+            file.seek(0)
+            file.writelines(self.doc.lines)
+        self.doc.dirty = False
 
 
 def read_file(path):

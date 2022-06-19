@@ -25,16 +25,15 @@ class Document:
         inputter: Callable[[int], Generator[Optional[str], None, None]],
         editor: Callable[[str, str], str],
         lines: list[str],
-        file_name: Optional[Path] = None,
     ):
         """Set up initial state"""
         self.inputter = inputter
         self.editer = editor
         self.lines: list[str] = lines
         self.current_line: int = 0
-        self.file_name: Optional[Path] = file_name
         self.previous_lines = lines
         self.previous_current_line = 0
+        self.dirty = False
 
     def list(self, line_range: Optional[LineRange]) -> Generator[str, None, None]:
         """Display lines specified by range"""
@@ -42,10 +41,10 @@ class Document:
             # everything, not an arbitrary cutoff
             line_range = LineRange(1, len(self.lines))
 
-        self.current_line = line_range.start
+        self.current_line = line_range.start -1
 
         # slice handles the case where the range is beyond the end of the document
-        for line_text in self.lines[line_range.start : line_range.end]:
+        for line_text in self.lines[line_range.start -1 : line_range.end]:
             yield f"   {self.current_line} : {line_text}"
             self.current_line += 1
 
@@ -81,6 +80,8 @@ class Document:
             if target in line_text:
                 line_text = line_text.replace(target, replacement)
                 self.lines[self.current_line] = line_text
+                self.dirty = True  # this is ugly
+                self.dirty = True # this is ugly
                 yield f"   {self.current_line} : {line_text}"
             self.current_line += 1
 
@@ -105,6 +106,7 @@ class Document:
         self.lines = (
             self.lines[0 : target_line - 1] + to_copy + self.lines[target_line - 1 :]
         )
+        self.dirty = True  # this is ugly
         self.current_line = target_line
         logger.debug(f"Copied {line_range} to {target_line}")
 
@@ -128,6 +130,7 @@ class Document:
             deleted = 0
             for index in range(line_range.start - 1, line_range.end):
                 self.lines.pop(index - deleted)
+                self.dirty = True  # this is ugly
                 deleted += 1
         else:
             front = self.lines[0 : target_line - 1]
@@ -139,6 +142,7 @@ class Document:
                 line_range.start + target_line, line_range.end + line_range.count()
             ):
                 self.lines.pop(index - deleted)
+                self.dirty = True  # this is ugly
                 deleted += 1
         self.current_line = target_line
         logger.debug(f"Moving {line_range} to {target_line}")
@@ -151,6 +155,7 @@ class Document:
         self.backup()
         for index in range(line_range.end - 1, line_range.start - 2, -1):
             self.lines.pop(index)
+            self.dirty = True  # this is ugly
         self.current_line = line_range.start - 1
         logger.debug(f"Deleted {line_range}")
 
@@ -160,20 +165,28 @@ class Document:
         self.current_line = line_range.start
         for index in range(line_range.start, line_range.end):
             self.lines.insert(index, value)
+            self.dirty = True  # this is ugly
             self.current_line += 1
         logger.debug(f"Filled {line_range} with {value}")
 
-    def edit(self, line_number: int) -> None:
+    def edit(self, line_number: int) -> Optional[int]:
         """Edit line"""
         self.backup()
         line_text = self.lines[line_number - 1]
 
-        new_line = self.editer(
-            f"   {line_number} : ", line_text[0 : len(line_text) - 1]
-        )
+        try:
+            new_line = self.editer(
+                f"   {line_number} : ", line_text[0 : len(line_text) - 1]
+            )
+        except KeyboardInterrupt:
+            return None
         self.lines[line_number - 1] = new_line + "\n"
+        self.dirty = True  # this is ugly
         self.current_line = line_number
         logger.debug(f"Edited {line_number}")
+        if self.current_line > len(self.lines):
+            return None
+        return self.current_line +1
 
     def insert(self, line_number: int) -> None:
         """Insert a new line at line_number"""
@@ -190,6 +203,7 @@ class Document:
                 user_input_text = None
             if user_input_text:
                 self.lines.insert(line_number - 1, user_input_text + "\n")
+                self.dirty = True  # this is ugly
                 self.current_line = line_number
                 line_number += 1
         logger.debug(f"Inserted at {line_number}")
@@ -208,6 +222,7 @@ class Document:
         for i in range(0, lines_to_generate):
             if i < len(LOREM_IPSUM):
                 self.lines.append(LOREM_IPSUM[i])
+                self.dirty = True  # this is ugly
         logger.debug(f"Generated {lines_to_generate} lines")
 
     def undo(self) -> None:
@@ -220,18 +235,21 @@ class Document:
         """Sort lines"""
         self.backup()
         self.lines.sort()
+        self.dirty = True  # this is ugly
         logger.debug("Sorted")
 
     def reverse(self) -> None:
         """Reverse lines"""
         self.backup()
         self.lines = list(reversed(self.lines))
+        self.dirty = True  # this is ugly
         logger.debug("Reversed")
 
     def shuffle(self) -> None:
         """Shuffle lines"""
         self.backup()
         random.shuffle(self.lines)
+        self.dirty = True  # this is ugly
         logger.debug("Shuffled")
 
     def backup(self) -> None:

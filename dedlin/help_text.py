@@ -8,7 +8,7 @@ Display Commands
 [range] Search "[text]"
 
 Edit Commands
-[line] - Bare number defaults to Insert at that line
+[line] - Bare number defaults to Edit at that line
 [line] Insert - insert line at line number
 [line] Edit - edit number
 [range] Delete - delete range
