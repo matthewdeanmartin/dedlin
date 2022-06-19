@@ -100,6 +100,7 @@ class Document:
         """Copy lines to target_line"""
         if not line_range:
             line_range = LineRange(1, len(self.lines))
+
         to_copy = self.lines[line_range.start - 1 : line_range.end].copy()
         # doesn't seem efficient but no obvious built-in way to do this
         self.backup()
@@ -151,6 +152,10 @@ class Document:
         """Delete lines"""
         if not line_range:
             line_range = LineRange(1, len(self.lines))
+
+        self.list(line_range)
+
+        # TODO: prompt for confirmation
 
         self.backup()
         for index in range(line_range.end - 1, line_range.start - 2, -1):

@@ -1,5 +1,20 @@
 BASIC FUNCTIONALITY
 - Missing parser for MOVE
+- support for "." to mean current line
+- support for "$" to mean last line
+- support for Append - as alias for insert to last line
+- support for "Exit {file_name}"
+- display * on List/Page for "current line"
+- ? to enable/disable safety prompts
+  - save
+  - replace
+  - delete
+- Fix bug on repeated inserts/edits (I forget which)
+- "Fix" to reload last command.
+- HISTORY to list all commands in session
+- SAVE MACRO to save an .ed file
+- RUN MACO to run an .ed file
+
 
 ENGLISH SUPPORT
 - Spell check
