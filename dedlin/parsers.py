@@ -8,7 +8,7 @@ from dedlin.basic_types import Command, Commands, LineRange, Phrases, try_parse_
 from dedlin.lorem_data import LOREM_IPSUM
 
 
-def extract_one_range(value: str) -> Optional[LineRange]:
+def extract_one_range(value: str, document_length: int = 0) -> Optional[LineRange]:
     """Extract a single line range from a string"""
     value = value.strip()
     if "," in value:
@@ -17,7 +17,10 @@ def extract_one_range(value: str) -> Optional[LineRange]:
         start = try_parse_int(start_string)
         end = try_parse_int(parts[1]) if len(parts) > 1 else start
         repeat = try_parse_int(parts[2]) if len(parts) > 2 else 1
+        if start == 1 and end == 0:
+            end = document_length
         candidate = LineRange(start=start, end=end, repeat=repeat)
+
         if not candidate.validate():
             print("Candidate invalid:", candidate)
             return None
@@ -78,28 +81,56 @@ def get_command_length(value: str, suffixes: Iterable[str]) -> int:
 
 def parse_simple_command(command: str, original_text: str) -> Optional[Command]:
     """Parse a command that has no line range or phrases"""
+    # TODO: the biggest generic parser should replace all of these
+
     # Commands without abbreviations first
     if command in ("UNDO",):
         return Command(
             Commands.Undo,
             original_text=original_text,
         )
+    return None
 
-    if command in ("SHUFFLE",):
-        return Command(
-            Commands.Shuffle,
-            original_text=original_text,
-        )
-    if command in ("SORT",):
-        return Command(
-            Commands.Sort,
-            original_text=original_text,
-        )
-    if command in ("REVERSE",):
-        return Command(
-            Commands.Reverse,
-            original_text=original_text,
-        )
+
+RANGE_ONLY = {
+    Commands.Delete: ("D", "DELETE"),
+    Commands.List: ("L", "LIST"),
+    Commands.Page: ("P", "PAGE"),
+    Commands.Search: ("S", "SEARCH"),  # 1 phrase
+    Commands.Replace: ("R", "REPLACE"),  # 2 phrases
+    Commands.Exit: ("X", "EXIT"),
+    Commands.Transfer: ("T", "TRANSFER"),
+    Commands.History: ("HISTORY",),
+    Commands.Macro: ("MACRO",),
+}
+
+
+def parse_range_only(
+    just_command: str,
+    front_part: str,
+    original_text: str,
+    document_length: int,
+    phrases: Optional[Phrases],
+) -> Optional[Command]:
+    """Parse a command that has a line range"""
+    # TODO: the biggest generic parser should replace all of these
+    for command_code, command_forms in RANGE_ONLY.items():
+        if just_command in command_forms:
+            if front_part in command_forms:
+                line_range: Optional[LineRange] = LineRange(
+                    start=1, end=document_length
+                )
+            else:
+                command_length = get_command_length(front_part, command_forms)
+                range_text = front_part[0 : len(front_part) - command_length]
+                line_range = extract_one_range(range_text)
+
+            return Command(
+                command_code,
+                line_range=line_range,
+                phrases=phrases,
+                original_text=original_text,
+            )
     return None
 
 
@@ -137,6 +168,9 @@ BARE_COMMANDS = {
     Commands.Undo: ("UNDO",),
     Commands.Exit: ("E", "EXIT"),  # BUG, this takes argument.
     Commands.Quit: ("Q", "QUIT"),
+    Commands.Shuffle: ("SHUFFLE",),
+    Commands.Sort: ("SORT",),
+    Commands.Reverse: ("REVERSE",),
 }
 
 
@@ -212,6 +246,7 @@ def parse_command(command: str, document_length: int) -> Command:
     if candidate:
         return candidate
 
+    # Meaning of range shifted, need to fix.
     lorem_commands = ("LOREM",)
     if ends_with_any(front_part, lorem_commands) or front_part in lorem_commands:
         if front_part in lorem_commands:
@@ -226,42 +261,13 @@ def parse_command(command: str, document_length: int) -> Command:
             original_text=original_text,
         )
 
-    delete_commands = ("D", "DELETE")
-    if ends_with_any(front_part, delete_commands) or front_part in delete_commands:
-        if front_part in delete_commands:
-            line_range: Optional[LineRange] = LineRange(start=1, end=document_length)
-        else:
-            command_length = get_command_length(front_part, delete_commands)
-            range_text = front_part[0 : len(front_part) - command_length]
-            line_range = extract_one_range(range_text)
+    candidate = parse_range_only(
+        just_command, front_part, original_text, document_length, phrases
+    )
+    if candidate:
+        return candidate
 
-        return Command(
-            Commands.Delete, line_range=line_range, original_text=original_text
-        )
-
-    # Commands with Abbreviations
-    list_commands = ("L", "LIST")
-    if ends_with_any(front_part, list_commands) or command in list_commands:
-        if front_part in list_commands:
-            line_range = LineRange(start=1, end=document_length)
-        else:
-            range_text = front_part[0 : len(front_part) - 1]
-            line_range = extract_one_range(range_text)
-        return Command(
-            Commands.List, line_range=line_range, original_text=original_text
-        )
-
-    page_command = ("P", "PAGE")
-    if ends_with_any(front_part, page_command) or front_part in page_command:
-        if front_part in list_commands:
-            line_range = LineRange(start=1, end=document_length)
-        else:
-            range_text = front_part[0 : len(front_part) - 1]
-            line_range = extract_one_range(range_text)
-        return Command(
-            Commands.Page, line_range=line_range, original_text=original_text
-        )
-
+    # This where range is 1 row
     insert_commands = ("I", "INSERT")
     if ends_with_any(front_part, insert_commands) or front_part in insert_commands:
         if front_part in insert_commands:
@@ -275,20 +281,6 @@ def parse_command(command: str, document_length: int) -> Command:
         return Command(
             Commands.Insert, line_range=line_range, original_text=original_text
         )
-
-    command_forms = ("S", "SEARCH")
-    candidate = parse_search_replace(
-        command_forms, Commands.Search, front_part, phrases, original_text
-    )
-    if candidate:
-        return candidate
-
-    command_forms = ("R", "REPLACE")
-    candidate = parse_search_replace(
-        command_forms, Commands.Replace, front_part, phrases, original_text
-    )
-    if candidate:
-        return candidate
 
     candidate = bare_command(command)
     if candidate:

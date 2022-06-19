@@ -35,7 +35,9 @@ class Document:
         self.previous_current_line = 0
         self.dirty = False
 
-    def list(self, line_range: Optional[LineRange]) -> Generator[str, None, None]:
+    def list(
+        self, line_range: Optional[LineRange] = None
+    ) -> Generator[str, None, None]:
         """Display lines specified by range"""
         if line_range is None or line_range.start == 0 and line_range.end == 0:
             # everything, not an arbitrary cutoff

@@ -7,6 +7,7 @@ name = "pypi"
 questionary = "*"
 pywin32 = "*"
 rich = "*"
+requests = "*"
 
 [dev-packages]
 pytest = "*"

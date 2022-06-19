@@ -8,13 +8,14 @@ from typing import Generator, Optional
 
 import questionary
 
-from dedlin.basic_types import Command, Commands, Printable
+from dedlin.basic_types import Command, Commands, Phrases, Printable
 from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
-from dedlin.file_system import read_file, save_and_overwrite, read_or_create_file
+from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.help_text import HELP_TEXT
 from dedlin.parsers import parse_command
 from dedlin.rich_output import RichPrinter
+from dedlin.web import fetch_page_as_rows
 
 
 def command_handler(prompt: str = "*") -> Generator[str, None, None]:
@@ -60,7 +61,7 @@ class Dedlin:
         """Entry point for Dedlin"""
         self.file_path = Path(file_name) if file_name else None
         lines = read_or_create_file(self.file_path)
-        
+
         self.doc = Document(
             inputter=simple_input,
             editor=input_with_prefill,
@@ -90,7 +91,19 @@ class Dedlin:
 
             if self.echo:
                 self.outputter(command.original_text)
-            if command.command == Commands.History:
+
+            if command.command == Commands.Browse:
+                if self.doc.dirty:
+                    # Trying out VIM-like behavior
+                    self.outputter(
+                        "I'm blowing away your unsaved document, because fuck you!"
+                        " You should be happy I don't run fdisk."
+                    )
+                page_as_rows = fetch_page_as_rows(command.phrases.first)
+                self.doc.lines = list(page_as_rows)
+                self.doc.dirty = True
+                self.doc.list()
+            elif command.command == Commands.History:
                 for command in self.history:
                     self.outputter(command.original_text)
             elif command.command == Commands.Empty:
@@ -106,11 +119,11 @@ class Dedlin:
                 self.outputter(
                     f"Deleted lines {command.line_range.start} to {command.line_range.end}"
                 )
-            elif command.command in (Commands.Exit, Commands.Quit, Commands.Save):
+            elif command.command in (Commands.Exit, Commands.Quit):
                 if (
-                        command.command == Commands.Quit
-                        and self.doc.dirty
-                        and self.quit_safety
+                    command.command == Commands.Quit
+                    and self.doc.dirty
+                    and self.quit_safety
                 ):
                     # hack!
                     self.outputter("Save changes? (y/n) ", end="")
@@ -118,7 +131,7 @@ class Dedlin:
                         self.save_document()
                         return 0
                 else:
-                    self.save_document()
+                    self.save_document(command.phrases)
                 if command.command in (Commands.Quit, Commands.Exit):
                     return 0
             elif command.command == Commands.Insert:
@@ -135,9 +148,9 @@ class Dedlin:
             elif command.command == Commands.Replace:
                 self.outputter("Replacing")
                 for line in self.doc.replace(
-                        command.line_range,
-                        target=command.phrases.first,
-                        replacement=command.phrases.second,
+                    command.line_range,
+                    target=command.phrases.first,
+                    replacement=command.phrases.second,
                 ):
                     self.outputter(line, end="")
             elif command.command == Commands.Lorem:
@@ -171,8 +184,10 @@ class Dedlin:
                 )
         return 0
 
-    def save_document(self):
+    def save_document(self, phrases: Optional[Phrases] = None):
         """Save the document to the file"""
+        if self.file_path is not None and phrases is not None:
+            self.file_path = Path(phrases.first)
         save_and_overwrite(self.file_path, self.doc.lines)
         self.doc.dirty = False
 

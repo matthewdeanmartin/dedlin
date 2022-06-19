@@ -57,13 +57,16 @@ def test_search_ed():
     lines_path = Path("sample_files/animals.txt")
     macro_path = Path("sample_macros/grep.ed")
     thing = []
+
     def capture(line, end="\n"):
         thing.append(line)
+
     dedlin = Dedlin(command_generator(macro_path), capture)
     dedlin.halt_on_error = True
     dedlin.go(str(lines_path.absolute()))
     for line in thing:
         assert "cat" in line
+
 
 def test_replace_ed():
     LOGGING_CONFIG = configure_logging()

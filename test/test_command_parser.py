@@ -1,5 +1,5 @@
-from dedlin.basic_types import LineRange, Command, Phrases
-from dedlin.main import parse_command, Commands
+from dedlin.basic_types import Command, LineRange, Phrases
+from dedlin.main import Commands, parse_command
 from dedlin.parsers import extract_one_range, extract_phrases
 
 
@@ -9,14 +9,22 @@ def test_extract_one_range():
     assert extract_one_range("1,2") == LineRange(start=1, end=2)
 
 
-def test_parse_command_insert():
+def test_parse_command_insert_default():
+
     for insert in ("I", "Insert", "insert", "i", "INSERT"):
-        assert parse_command(insert, 3) == Command(Commands.Insert, None), insert
+        assert parse_command(insert, 3) == Command(
+            Commands.Insert, # LineRange(start=1, end=1), # Phrases("")
+        ), insert
+
+def test_parse_command_insert_specific_rage():
+
+    for insert in ("I", "Insert", "insert", "i", "INSERT"):
+
         assert parse_command(f"2{insert}", 3) == Command(
-            Commands.Insert, LineRange(start=2, end=2)
+            Commands.Insert, LineRange(start=2, end=2), # Phrases("")
         ), f"2{insert}"
         assert parse_command(f"2 {insert}", 3) == Command(
-            Commands.Insert, LineRange(start=2, end=2)
+            Commands.Insert, LineRange(start=2, end=2), # Phrases("")
         ), f"2 {insert}"
 
 
@@ -55,6 +63,7 @@ def test_parse_phrases_quoted():
     assert extract_phrases('"cat frog" "log dog"') == Phrases(
         first="cat frog", second="log dog"
     )
+
 
 def test_parse_extract_phrases():
     assert extract_phrases("cat") == Phrases(first="cat")

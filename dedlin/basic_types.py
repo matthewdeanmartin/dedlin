@@ -29,7 +29,8 @@ class Commands(Enum):
     # file and exit
     Quit = auto()
     Exit = auto()
-    Save = auto()
+    Transfer = auto()
+    Browse = auto()
 
     # reorder commands
     Move = auto()

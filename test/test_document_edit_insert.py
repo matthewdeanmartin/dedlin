@@ -1,6 +1,7 @@
+from test.fakes import fake_edit, fake_input
+
 from dedlin.basic_types import LineRange
 from dedlin.document import Document
-from test.fakes import fake_input, fake_edit
 
 
 def test_document_edit():

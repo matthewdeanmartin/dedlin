@@ -8,19 +8,19 @@ from typing import Optional
 
 
 def read_or_create_file(path):
+    """Attempt to read file, create if it doesn't exist"""
     if path:
         print(f"Editing {path.absolute()}")
         if not path.exists():
-            with open(
-                    str(path.absolute()), "w", encoding="utf-8"
-            ) as file:
+            with open(str(path.absolute()), "w", encoding="utf-8") as file:
                 pass
         lines = read_file(path)
     else:
         lines = []
     return lines
 
-def read_file(path:Optional[Path]) -> list[str]:
+
+def read_file(path: Optional[Path]) -> list[str]:
     """Read a file and return a list of lines"""
     lines: list[str] = []
 
@@ -32,7 +32,8 @@ def read_file(path:Optional[Path]) -> list[str]:
                 lines.append(line + "\n")
     return lines
 
-def save_and_overwrite(path:Path, lines:list[str]):
+
+def save_and_overwrite(path: Path, lines: list[str]):
     """Save a file and overwrite it"""
     if not path:
         raise TypeError("No file path")
