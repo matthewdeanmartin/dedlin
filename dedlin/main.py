@@ -11,7 +11,7 @@ import questionary
 from dedlin.basic_types import Command, Commands, Printable
 from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
-from dedlin.file_system import read_file, save_and_overwrite
+from dedlin.file_system import read_file, save_and_overwrite, read_or_create_file
 from dedlin.help_text import HELP_TEXT
 from dedlin.parsers import parse_command
 from dedlin.rich_output import RichPrinter
@@ -59,8 +59,8 @@ class Dedlin:
     def go(self, file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
         self.file_path = Path(file_name) if file_name else None
-        lines = read_file(self.file_path)
-
+        lines = read_or_create_file(self.file_path)
+        
         self.doc = Document(
             inputter=simple_input,
             editor=input_with_prefill,
