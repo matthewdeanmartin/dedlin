@@ -15,7 +15,6 @@ from dedlin.help_text import HELP_TEXT
 from dedlin.parsers import parse_command
 
 
-
 def command_handler(prompt: str = "*") -> Generator[str, None, None]:
     """Wrapper around questionary for command input"""
     # possibly should merge with simple_input?
@@ -44,9 +43,15 @@ class Dedlin:
         self.inputter = inputter
         self.outputter = outputter
         self.doc: Optional[Document] = None
+
         self.halt_on_error = False
+        """Stop on errors, useful for macros."""
+
+        self.quit_safety = True
+        """Disable checking document.dirty on quit. Useful for unit tests."""
+
         self.echo = False
-        self.file_path:Optional[Path] = None
+        self.file_path: Optional[Path] = None
 
     def go(self, file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
@@ -95,10 +100,10 @@ class Dedlin:
                     f"Deleted lines {command.line_range.start} to {command.line_range.end}"
                 )
             elif command.command in (Commands.Exit, Commands.Quit, Commands.Save):
-                if command.command == Commands.Quit and self.doc.dirty:
+                if command.command == Commands.Quit and self.doc.dirty and self.quit_safety:
                     # hack!
                     self.outputter("Save changes? (y/n) ", end="")
-                    if next(self.inputter) =="y":
+                    if next(self.inputter) == "y":
                         self.save_document()
                         return 0
                 else:
@@ -119,9 +124,9 @@ class Dedlin:
             elif command.command == Commands.Replace:
                 self.outputter("Replacing")
                 for line in self.doc.replace(
-                    command.line_range,
-                    target=command.phrases.first,
-                    replacement=command.phrases.second,
+                        command.line_range,
+                        target=command.phrases.first,
+                        replacement=command.phrases.second,
                 ):
                     self.outputter(line, end="")
             elif command.command == Commands.Lorem:

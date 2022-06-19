@@ -16,6 +16,7 @@ def test_lorem_ed():
 
     dedlin = Dedlin(command_generator(macro_path), print)
     dedlin.halt_on_error = True
+    dedlin.quit_safety = False
     dedlin.go(str(lines_path.absolute()))
     assert dedlin.doc.lines
 
@@ -30,6 +31,7 @@ def test_shuffle_sort_reverse_ed():
 
     dedlin = Dedlin(command_generator(macro_path), print)
     dedlin.halt_on_error = True
+    dedlin.quit_safety = False
     dedlin.go(str(lines_path.absolute()))
     assert dedlin.doc.lines
 
@@ -77,6 +79,7 @@ def test_replace_ed():
 
     dedlin = Dedlin(command_generator(macro_path), capture)
     dedlin.halt_on_error = True
+    dedlin.quit_safety = False
     dedlin.go(str(lines_path.absolute()))
     for line in dedlin.doc.lines:
         assert "giraffe" not in line
