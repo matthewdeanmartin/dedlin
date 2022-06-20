@@ -56,9 +56,13 @@ class Dedlin:
         self.echo = False
         self.file_path: Optional[Path] = None
         self.history: list[Command] = []
+        self.macro_file_name: Optional[Path] = None
 
-    def entry_point(self, file_name: Optional[str] = None) -> int:
+    def entry_point(self,
+                    file_name: Optional[str] = None,
+                    macro_file_name:Optional[str]=None) -> int:
         """Entry point for Dedlin"""
+        self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
         lines = read_or_create_file(self.file_path)
 
@@ -198,7 +202,11 @@ class Dedlin:
         save_and_overwrite(Path("history.ed"), [_.original_text for _ in self.history])
 
 
-def run(file_name: Optional[str] = None):
+def run(file_name: Optional[str] = None,
+        macro_file_name: Optional[str] = None,
+        echo: bool = False,
+        halt_on_error: bool = False,
+        quit_safety: bool = False):
     """Set up everything except things from command line"""
     rich_printer = RichPrinter()
 
@@ -208,7 +216,11 @@ def run(file_name: Optional[str] = None):
     dedlin = Dedlin(
         command_handler(), printer if file_name and file_name.endswith(".py") else print
     )
-    dedlin.entry_point(file_name)
+    dedlin.halt_on_error = halt_on_error
+    dedlin.echo = echo
+    dedlin.quit_safety = quit_safety
+
+    dedlin.entry_point(file_name, macro_file_name)
 
 
 if __name__ == "__main__":

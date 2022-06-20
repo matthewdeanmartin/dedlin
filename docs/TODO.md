@@ -1,9 +1,9 @@
 BASIC FUNCTIONALITY
-- Missing parser for MOVE
+- Missing parser for MOVE and COPY
 - support for "." to mean current line
 - support for "$" to mean last line
 - support for Append - as alias for insert to last line
-- support for "Exit {file_name}"
+- support for "Exit {file_name}" (almost! Needs tests)
 - display * on List/Page for "current line"
 - ? to enable/disable safety prompts
   - save
@@ -11,7 +11,8 @@ BASIC FUNCTIONALITY
   - delete
 - Fix bug on repeated inserts/edits (I forget which)
 - "Fix" to reload last command.
-- HISTORY to list all commands in session
+- Save history to ~/.dedlin_history if config says so.
+- Support Config file
 - SAVE MACRO to save an .ed file
 - RUN MACO to run an .ed file
 

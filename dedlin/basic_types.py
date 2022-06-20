@@ -34,6 +34,7 @@ class Commands(Enum):
 
     # reorder commands
     MOVE = auto()
+    COPY = auto()
     SHUFFLE = auto()
     SORT = auto()
     REVERSE = auto()
