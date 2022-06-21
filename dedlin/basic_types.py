@@ -4,12 +4,12 @@ Basic classes and mypy types
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from pathlib import Path
-from typing import Generator, Optional, Protocol
+from typing import Optional, Protocol
 
 logger = logging.getLogger(__name__)
 
 
+# noinspection PyArgumentList
 class Commands(Enum):
     """Enum of commands that can be executed on a document."""
 
@@ -97,13 +97,6 @@ class Command:
             if not line_range_is_valid:
                 return False
         return True
-
-
-def command_generator(macro_path: Path) -> Generator[str, None, None]:
-    """Turn a file into a bunch of commands"""
-    with open(str(macro_path), "r", encoding="utf-8") as file:
-        for line in file:
-            yield line
 
 
 def try_parse_int(value) -> Optional[int]:

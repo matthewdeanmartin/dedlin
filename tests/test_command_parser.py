@@ -44,18 +44,10 @@ def test_parse_command_edit():
 def test_parse_command_delete():
     assert parse_command("D", 3) == Command(Commands.DELETE, LineRange(start=1, end=3))
     for edit in ("D", "Delete", "delete", "d", "DELETE"):
-        assert parse_command(f"1{edit}", 3) == Command(
-            Commands.DELETE, LineRange(start=1, end=1)
-        ), f"1{edit}"
-        assert parse_command(f"1 {edit}", 3) == Command(
-            Commands.DELETE, LineRange(start=1, end=1)
-        ), f"1 {edit}"
-        assert parse_command(f"1,2 {edit}", 3) == Command(
-            Commands.DELETE, LineRange(start=1, end=2)
-        ), f"1,2 {edit}"
-        assert parse_command(f"1,2{edit}", 3) == Command(
-            Commands.DELETE, LineRange(start=1, end=2)
-        ), f"1,2{edit}"
+        assert parse_command(f"1{edit}", 3) == Command(Commands.DELETE, LineRange(start=1, end=1)), f"1{edit}"
+        assert parse_command(f"1 {edit}", 3) == Command(Commands.DELETE, LineRange(start=1, end=1)), f"1 {edit}"
+        assert parse_command(f"1,2 {edit}", 3) == Command(Commands.DELETE, LineRange(start=1, end=2)), f"1,2 {edit}"
+        assert parse_command(f"1,2{edit}", 3) == Command(Commands.DELETE, LineRange(start=1, end=2)), f"1,2{edit}"
 
 
 def test_parse_phrases_space_delimited():
@@ -63,9 +55,7 @@ def test_parse_phrases_space_delimited():
 
 
 def test_parse_phrases_quoted():
-    assert extract_phrases('"cat frog" "log dog"') == Phrases(
-        first="cat frog", second="log dog"
-    )
+    assert extract_phrases('"cat frog" "log dog"') == Phrases(first="cat frog", second="log dog")
 
 
 def test_parse_extract_phrases():

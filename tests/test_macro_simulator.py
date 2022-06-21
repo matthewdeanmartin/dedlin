@@ -1,3 +1,6 @@
+"""
+Simulates user entry from a macro file using command_generator
+"""
 import logging.config
 from pathlib import Path
 
@@ -87,6 +90,11 @@ def test_replace_ed():
     dedlin.halt_on_error = True
     dedlin.quit_safety = False
     dedlin.entry_point(str(lines_path.absolute()))
+    # already gone by this point
+    # assert "giraffe\n" in dedlin.doc.lines
+    found = False
     for line in dedlin.doc.lines:
-        assert "giraffe" not in line
+        assert "giraffe\n" not in line
+        found = True
+    assert found
     assert "butt\n" in dedlin.doc.lines

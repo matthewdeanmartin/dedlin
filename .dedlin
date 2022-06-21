@@ -1,0 +1,9 @@
+# Dedlin config
+
+
+[cross_platform]
+line_endings = "windows"
+
+[history]
+# Use ~/.delin_history to keep in single place.
+folder_location = .dedlin_history

@@ -9,6 +9,7 @@ from typing import Generator, Optional
 import questionary
 
 from dedlin.basic_types import Command, Commands, Phrases, Printable
+from dedlin.command_sources import command_generator, interactive_command_handler
 from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
@@ -16,14 +17,6 @@ from dedlin.help_text import HELP_TEXT
 from dedlin.parsers import parse_command
 from dedlin.rich_output import RichPrinter
 from dedlin.web import fetch_page_as_rows
-
-
-def command_handler(prompt: str = "*") -> Generator[str, None, None]:
-    """Wrapper around questionary for command input"""
-    # possibly should merge with simple_input?
-    while True:
-        answer = questionary.text(prompt).ask()
-        yield answer
 
 
 def simple_input(start_line_number: int) -> Generator[str, None, None]:
@@ -58,9 +51,7 @@ class Dedlin:
         self.history: list[Command] = []
         self.macro_file_name: Optional[Path] = None
 
-    def entry_point(self,
-                    file_name: Optional[str] = None,
-                    macro_file_name:Optional[str]=None) -> int:
+    def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
@@ -77,9 +68,7 @@ class Dedlin:
             except StopIteration:
                 break  # it on down now
 
-            command = parse_command(
-                user_command_text, document_length=len(self.doc.lines)
-            )
+            command = parse_command(user_command_text, document_length=len(self.doc.lines))
 
             if command is None:
                 self.outputter("Unknown command", end="\n")
@@ -107,8 +96,6 @@ class Dedlin:
                 self.doc.lines = page_as_rows
 
                 self.doc.dirty = True
-                for line in self.doc.list():
-                    self.outputter(line)
             elif command.command == Commands.HISTORY:
                 for command in self.history:
                     self.outputter(command.original_text)
@@ -122,21 +109,15 @@ class Dedlin:
                     self.outputter(line, end=end)
             elif command.command == Commands.DELETE:
                 self.doc.delete(command.line_range)
-                self.outputter(
-                    f"Deleted lines {command.line_range.start} to {command.line_range.end}"
-                )
+                self.outputter(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
             elif command.command in (Commands.EXIT, Commands.QUIT):
-                if (
-                    command.command == Commands.QUIT
-                    and self.doc.dirty
-                    and self.quit_safety
-                ):
+                if command.command == Commands.QUIT and self.doc.dirty and self.quit_safety:
                     # hack!
                     self.outputter("Save changes? (y/n) ", end="")
                     if next(self.inputter) == "y":
                         self.save_document()
                         return 0
-                else:
+                elif command.command == Commands.EXIT:
                     self.save_document(command.phrases)
                 if command.command in (Commands.QUIT, Commands.EXIT):
                     return 0
@@ -185,9 +166,7 @@ class Dedlin:
 
             else:
                 # possibly not reachable now.
-                self.outputter(
-                    "1i to insert at line 1.  E to save and quit. Q to just quit."
-                )
+                self.outputter("1i to insert at line 1.  E to save and quit. Q to just quit.")
         return 0
 
     def save_document(self, phrases: Optional[Phrases] = None):
@@ -202,25 +181,31 @@ class Dedlin:
         save_and_overwrite(Path("history.ed"), [_.original_text for _ in self.history])
 
 
-def run(file_name: Optional[str] = None,
-        macro_file_name: Optional[str] = None,
-        echo: bool = False,
-        halt_on_error: bool = False,
-        quit_safety: bool = False):
+def run(
+    file_name: Optional[str] = None,
+    macro_file_name: Optional[str] = None,
+    echo: bool = False,
+    halt_on_error: bool = False,
+    quit_safety: bool = False,
+):
     """Set up everything except things from command line"""
+
     rich_printer = RichPrinter()
 
     def printer(text, end="\n"):
         rich_printer.print(text, end="")
 
-    dedlin = Dedlin(
-        command_handler(), printer if file_name and file_name.endswith(".py") else print
-    )
+    if macro_file_name:
+        command_handler = command_generator(Path(macro_file_name))
+    else:
+        command_handler = interactive_command_handler()
+    dedlin = Dedlin(command_handler, printer if file_name and file_name.endswith(".py") else print)
     dedlin.halt_on_error = halt_on_error
     dedlin.echo = echo
     dedlin.quit_safety = quit_safety
 
     dedlin.entry_point(file_name, macro_file_name)
+    return dedlin
 
 
 if __name__ == "__main__":

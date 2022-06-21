@@ -24,7 +24,7 @@ def read_file(path: Optional[Path]) -> list[str]:
     """Read a file and return a list of lines"""
     lines: list[str] = []
 
-    with open(path, "r", encoding="utf-8") as file:
+    with open(path, encoding="utf-8") as file:
         for line in file:
             if line.endswith("\n"):
                 lines.append(line)

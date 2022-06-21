@@ -11,7 +11,5 @@ def locate_file(file_name: str, executing_file: str) -> str:
 
     Succeeds regardless to context of execution
     """
-    file_path = os.path.join(
-        os.path.dirname(os.path.abspath(executing_file)), file_name
-    )
+    file_path = os.path.join(os.path.dirname(os.path.abspath(executing_file)), file_name)
     return file_path

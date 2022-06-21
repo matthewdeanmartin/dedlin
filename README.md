@@ -8,7 +8,7 @@ This is not intended to be backwards compatible with anything. Changes will be m
 to make it less user hostile.
 
 I plan to make this closer to a "mono-parse", i.e. all commands
-parse to the same rigid syntax structure: `range,repeat,command,phrase,phrase` 
+parse to the same rigid syntax structure: `range,repeat,command,phrase,phrase`
 
 ## Implemented Commands
 ### Command Structure

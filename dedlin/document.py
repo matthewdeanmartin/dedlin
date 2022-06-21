@@ -11,6 +11,7 @@ from dedlin.lorem_data import LOREM_IPSUM
 logger = logging.getLogger(__name__)
 
 
+# noinspection PyShadowingBuiltins
 def print(*args, **kwargs):
     """Discourage accidental usage of print"""
     raise Exception("Don't call UI from here.")
@@ -34,9 +35,7 @@ class Document:
         self.previous_current_line = 0
         self.dirty = False
 
-    def list(
-        self, line_range: Optional[LineRange] = None
-    ) -> Generator[str, None, None]:
+    def list(self, line_range: Optional[LineRange] = None) -> Generator[str, None, None]:
         """Display lines specified by range"""
         if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
@@ -49,9 +48,7 @@ class Document:
             yield f"   {self.current_line} : {line_text}"
             self.current_line += 1
 
-    def search(
-        self, line_range: LineRange, value: str, case_sensitive: bool = False
-    ) -> Generator[str, None, None]:
+    def search(self, line_range: LineRange, value: str, case_sensitive: bool = False) -> Generator[str, None, None]:
         """Display lines that have value in line"""
         self.current_line = line_range.start
 
@@ -86,7 +83,7 @@ class Document:
                 yield f"   {self.current_line} : {line_text}"
             self.current_line += 1
 
-    def page(self, page_size: int = 5) -> Generator[Tuple[str, str], None, None]:
+    def page(self, page_size: int = 5) -> Generator[tuple[str, str], None, None]:
         """Display lines in pages"""
         line_number = 1
         for line_text in self.lines[self.current_line : self.current_line + page_size]:
@@ -105,9 +102,7 @@ class Document:
         to_copy = self.lines[line_range.start - 1 : line_range.end].copy()
         # doesn't seem efficient but no obvious built-in way to do this
         self.backup()
-        self.lines = (
-            self.lines[0 : target_line - 1] + to_copy + self.lines[target_line - 1 :]
-        )
+        self.lines = self.lines[0 : target_line - 1] + to_copy + self.lines[target_line - 1 :]
         self.dirty = True  # this is ugly
         self.current_line = target_line
         logger.debug(f"Copied {line_range} to {target_line}")
@@ -140,9 +135,7 @@ class Document:
             self.lines = front + to_copy + back
 
             deleted = 0
-            for index in range(
-                line_range.start + target_line, line_range.end + line_range.count()
-            ):
+            for index in range(line_range.start + target_line, line_range.end + line_range.count()):
                 self.lines.pop(index - deleted)
                 self.dirty = True  # this is ugly
                 deleted += 1
@@ -181,9 +174,7 @@ class Document:
         line_text = self.lines[line_number - 1]
 
         try:
-            new_line = self.editer(
-                f"   {line_number} : ", line_text[0 : len(line_text) - 1]
-            )
+            new_line = self.editer(f"   {line_number} : ", line_text[0 : len(line_text) - 1])
         except KeyboardInterrupt:
             return None
         self.lines[line_number - 1] = new_line + "\n"

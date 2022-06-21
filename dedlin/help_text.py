@@ -12,9 +12,14 @@ Edit Commands
 [line] Insert - insert line at line number
 [line] Edit - edit number
 [range] Delete - delete range
-[target line] Transfer [file name] - inserts file contents to target
 [range] Replace "[text]", "[text]" - replace text in range
 [range] Lorem - insert lorem ipsum text
+[range] Split [file name] [file name] [file name]- split file into two or three files
+
+Data Source Commands
+[target line] Transfer [file name] - inserts file contents to target
+[range] Browse [URL] - fetch web page as HTML, convert to text
+
 
 Meta Commands
 HISTORY [file] - list all commands run

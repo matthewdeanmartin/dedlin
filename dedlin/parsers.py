@@ -5,7 +5,6 @@ Code that turns strings to command objects
 from typing import Iterable, Optional, Tuple
 
 from dedlin.basic_types import Command, Commands, LineRange, Phrases, try_parse_int
-from dedlin.lorem_data import LOREM_IPSUM
 
 
 def extract_one_range(value: str, document_length: int = 0) -> Optional[LineRange]:
@@ -93,6 +92,7 @@ def parse_simple_command(command: str, original_text: str) -> Optional[Command]:
 
 
 RANGE_ONLY = {
+    Commands.LOREM: ("LOREM",),
     Commands.DELETE: ("D", "DELETE"),
     Commands.LIST: ("L", "LIST"),
     Commands.PAGE: ("P", "PAGE"),
@@ -118,9 +118,7 @@ def parse_range_only(
     for command_code, command_forms in RANGE_ONLY.items():
         if just_command in command_forms:
             if front_part in command_forms:
-                line_range: Optional[LineRange] = LineRange(
-                    start=1, end=1 if document_length == 0 else document_length
-                )
+                line_range: Optional[LineRange] = LineRange(start=1, end=1 if document_length == 0 else document_length)
             else:
                 command_length = get_command_length(front_part, command_forms)
                 range_text = front_part[0 : len(front_part) - command_length]
@@ -136,7 +134,7 @@ def parse_range_only(
 
 
 def parse_search_replace(
-    command_forms: Tuple[str, str],
+    command_forms: tuple[str, str],
     command_code: Commands,
     front_part: str,
     phrases: Optional[Phrases],
@@ -248,23 +246,21 @@ def parse_command(command: str, document_length: int) -> Command:
         return candidate
 
     # Meaning of range shifted, need to fix.
-    lorem_commands = ("LOREM",)
-    if ends_with_any(front_part, lorem_commands) or front_part in lorem_commands:
-        if front_part in lorem_commands:
-            line_count = len(LOREM_IPSUM)
-            line_range = LineRange(start=1, end=line_count, repeat=1)
-        else:
-            line_count = try_parse_int(front_part.split("LOREM", maxsplit=1)[0].strip())
-            line_range = LineRange(start=1, end=line_count, repeat=1)
-        return Command(
-            Commands.LOREM,
-            line_range=line_range,
-            original_text=original_text,
-        )
+    # lorem_commands = ("LOREM",)
+    # if ends_with_any(front_part, lorem_commands) or front_part in lorem_commands:
+    #     if front_part in lorem_commands:
+    #         line_count = len(LOREM_IPSUM)
+    #         line_range = LineRange(start=1, end=line_count, repeat=1)
+    #     else:
+    #         line_count = try_parse_int(front_part.split("LOREM", maxsplit=1)[0].strip())
+    #         line_range = LineRange(start=1, end=line_count, repeat=1)
+    #     return Command(
+    #         Commands.LOREM,
+    #         line_range=line_range,
+    #         original_text=original_text,
+    #     )
 
-    candidate = parse_range_only(
-        just_command, front_part, original_text, document_length, phrases
-    )
+    candidate = parse_range_only(just_command, front_part, original_text, document_length, phrases)
     if candidate:
         return candidate
 
@@ -274,16 +270,12 @@ def parse_command(command: str, document_length: int) -> Command:
         if front_part in insert_commands:
             line_range = None
         elif "INSERT" in front_part:
-            line_number = try_parse_int(
-                front_part.split("INSERT", maxsplit=1)[0].strip()
-            )
+            line_number = try_parse_int(front_part.split("INSERT", maxsplit=1)[0].strip())
             line_range = LineRange(start=line_number, end=line_number)
         else:  # "I" in front_part:
             line_number = try_parse_int(front_part.split("I", maxsplit=1)[0].strip())
             line_range = LineRange(start=line_number, end=line_number)
-        return Command(
-            Commands.INSERT, line_range=line_range, original_text=original_text
-        )
+        return Command(Commands.INSERT, line_range=line_range, original_text=original_text)
 
     candidate = bare_command(command)
     if candidate:
