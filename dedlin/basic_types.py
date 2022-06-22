@@ -69,6 +69,14 @@ class LineRange:
             logger.warning(f"Invalid line range: {self}")
         return validate
 
+    def format(self):
+        if self.start == self.end and self.repeat == 1:
+            range_part = str(self.start)
+        else:
+            range_part = f"{self.start},{self.end}"
+
+        repeat_part = f",{self.repeat}" if self.repeat != 1 else ""
+        return range_part + repeat_part
 
 @dataclass(frozen=True)
 class Phrases:
@@ -79,6 +87,27 @@ class Phrases:
     third: str = ""
     fourth: str = ""
     fifth: str = ""
+
+    def format(self):
+        """Round tripable format"""
+        parts = [self.first, self.second, self.third, self.fourth, self.fifth]
+        usable_parts =[]
+        def safe_quote(value:str)->str:
+            """Escape spaces and double quotes"""
+            if " " in value and '"' not in value:
+                return f'"{value}"'
+            if " " in value and '"' in value:
+                value = value.replace('"','\\"')
+                return f'"{value}'
+            return value
+
+        for part in parts:
+            if part:
+                usable_parts.append(part)
+            else:
+                break
+
+        return " ".join(safe_quote(_) for _ in parts if _)
 
 
 @dataclass(frozen=True)
@@ -97,6 +126,11 @@ class Command:
             if not line_range_is_valid:
                 return False
         return True
+
+    def format(self):
+        range_part = self.line_range.format() if self.line_range is not None else ""
+        phrase_part = self.phrases.format() if self.phrases is not None else ""
+        return " ".join([range_part, self.command.name, phrase_part])
 
 
 def try_parse_int(value) -> Optional[int]:

@@ -15,6 +15,7 @@ from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.flash import title_screen
 from dedlin.help_text import HELP_TEXT
+from dedlin.history_feature import write_command_to_history_file
 from dedlin.parsers import parse_command
 from dedlin.rich_output import RichPrinter
 from dedlin.web import fetch_page_as_rows
@@ -80,6 +81,9 @@ class Dedlin:
                 self.outputter(f"Invalid command {command}")
 
             self.history.append(command)
+            write_command_to_history_file(command.format())
+            print(command.format())
+
             if command.command == Commands.REDO:
                 command = self.history[-2]
                 self.history.append(command)

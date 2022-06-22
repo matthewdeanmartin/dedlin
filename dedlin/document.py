@@ -28,7 +28,7 @@ class Document:
     ):
         """Set up initial state"""
         self.inputter = inputter
-        self.editer = editor
+        self.editor = editor
         self.lines: list[str] = lines
         self.current_line: int = 0
         self.previous_lines = lines
@@ -174,7 +174,7 @@ class Document:
         line_text = self.lines[line_number - 1]
 
         try:
-            new_line = self.editer(f"   {line_number} : ", line_text[0 : len(line_text) - 1])
+            new_line = self.editor(f"   {line_number} : ", line_text[0: len(line_text) - 1])
         except KeyboardInterrupt:
             return None
         self.lines[line_number - 1] = new_line + "\n"
