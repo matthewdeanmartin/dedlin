@@ -25,16 +25,15 @@ from dedlin.main import run
 def main():
     """Main function."""
     arguments = docopt(__doc__, version="0.1.0")
-    print(arguments)
-    sys.exit(
-        run(
+    # print(arguments)
+    result = run(
             arguments["<file>"],
             echo=True if arguments["--echo"] else False,
             halt_on_error=True if arguments["--halt_on_error"] else False,
             macro_file_name=arguments["--macro"],
             quit_safety=not arguments["--promptless_quit"],
         )
-    )
+    sys.exit(0)
 
 
 if __name__ == "__main__":

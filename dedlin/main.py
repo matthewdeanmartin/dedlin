@@ -13,6 +13,7 @@ from dedlin.command_sources import command_generator, interactive_command_handle
 from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
+from dedlin.flash import title_screen
 from dedlin.help_text import HELP_TEXT
 from dedlin.parsers import parse_command
 from dedlin.rich_output import RichPrinter
@@ -24,7 +25,8 @@ def simple_input(start_line_number: int) -> Generator[str, None, None]:
     line_number = start_line_number
     while True:
         prompt = f"   {line_number} : "
-        response = questionary.text(prompt).ask(kbi_msg="Exiting insert mode")
+        response = questionary.text(prompt, default="").ask(
+            kbi_msg="Exiting insert mode")
         if response is None:
             break
         yield response
@@ -187,8 +189,10 @@ def run(
     echo: bool = False,
     halt_on_error: bool = False,
     quit_safety: bool = False,
-):
+)->Dedlin:
     """Set up everything except things from command line"""
+    if not macro_file_name:
+        title_screen()
 
     rich_printer = RichPrinter()
 

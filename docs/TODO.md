@@ -15,7 +15,19 @@ BASIC FUNCTIONALITY
 - Support Config file
 - SAVE MACRO to save an .ed file
 - RUN MACO to run an .ed file
-
+- HEAD n - shortcut for 1,n LIST
+- TAIL n - get bottom n lines- shortcut for $-n,$ List
+- PAD n - short cut for FILL $,$+n FILL "text"
+- TRIM - delete front and back if blank
+- DEDUPE - keep order, remove repeating values
+- FIRST - shortcut
+- LAST - 
+- DROP n- shortcupt for n,$LIST
+- POP - shortcut for $,$ DELETE
+- SHIFT - shortcut for 1,1 DELETE
+- range UPPER - make upper case
+- range EACH command, e.g. 1,2 EACH UPPER... how is this different than just range?
+- line PUSH "text" --- inset via command, not interactively.
 
 ENGLISH SUPPORT
 - Spell check

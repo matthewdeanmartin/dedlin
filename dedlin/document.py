@@ -193,12 +193,12 @@ class Document:
 
         user_input_text: Optional[str] = "GO!"
         input_generator = self.inputter(line_number)
-        while user_input_text:
+        while user_input_text is not None:
             try:
                 user_input_text = next(input_generator)
             except StopIteration:
                 user_input_text = None
-            if user_input_text:
+            if user_input_text is not None:
                 self.lines.insert(line_number - 1, user_input_text + "\n")
                 self.dirty = True  # this is ugly
                 self.current_line = line_number

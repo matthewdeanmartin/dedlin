@@ -5,11 +5,12 @@ name = "pypi"
 
 [packages]
 questionary = "*"
-pywin32 = "*"
+pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
 rich = "*"
 requests = "*"
 html2text = "*"
 docopt-ng = "*"
+art = "*"
 
 [dev-packages]
 pytest = "*"
