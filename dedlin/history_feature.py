@@ -41,3 +41,4 @@ class HistoryLog():
         """
         with open(self.history_file, "a") as f:
             f.write(command)
+            f.write("\n")
