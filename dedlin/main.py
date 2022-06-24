@@ -15,7 +15,8 @@ from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.flash import title_screen
 from dedlin.help_text import HELP_TEXT
-from dedlin.history_feature import write_command_to_history_file
+from dedlin.history_feature import HistoryLog
+from dedlin.info_bar import display_info
 from dedlin.parsers import parse_command
 from dedlin.rich_output import RichPrinter
 from dedlin.web import fetch_page_as_rows
@@ -52,6 +53,7 @@ class Dedlin:
         self.echo = False
         self.file_path: Optional[Path] = None
         self.history: list[Command] = []
+        self.history_log = HistoryLog()
         self.macro_file_name: Optional[Path] = None
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
@@ -81,7 +83,7 @@ class Dedlin:
                 self.outputter(f"Invalid command {command}")
 
             self.history.append(command)
-            write_command_to_history_file(command.format())
+            self.history_log.write_command_to_history_file(command.format())
             print(command.format())
 
             if command.command == Commands.REDO:
@@ -108,10 +110,13 @@ class Dedlin:
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.LIST:
-                for line in self.doc.list(command.line_range):
-                    self.outputter(line, end="")
+                for line, end in self.doc.list(command.line_range):
+                    self.outputter(line, end=end)
             elif command.command == Commands.PAGE:
                 for line, end in self.doc.page():
+                    self.outputter(line, end=end)
+            elif command.command == Commands.SPELL:
+                for line, end in self.doc.spell(command.line_range):
                     self.outputter(line, end=end)
             elif command.command == Commands.DELETE:
                 self.doc.delete(command.line_range)
@@ -138,6 +143,9 @@ class Dedlin:
                     line_number = self.doc.edit(line_number)
             elif command.command == Commands.SEARCH:
                 self.doc.search(command.line_range, value=command.phrases.first)
+            elif command.command == Commands.INFO:
+                for info, end in display_info(self.doc):
+                    self.outputter(info, end)
             elif command.command == Commands.REPLACE:
                 self.outputter("Replacing")
                 for line in self.doc.replace(

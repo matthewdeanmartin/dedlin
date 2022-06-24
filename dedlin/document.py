@@ -7,6 +7,7 @@ from typing import Callable, Generator, Optional, Tuple
 
 from dedlin.basic_types import LineRange
 from dedlin.lorem_data import LOREM_IPSUM
+from dedlin.spelling_overlay import check
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class Document:
         self.previous_current_line = 0
         self.dirty = False
 
-    def list(self, line_range: Optional[LineRange] = None) -> Generator[str, None, None]:
+    def list(self, line_range: Optional[LineRange] = None) -> Generator[tuple[str,str], None, None]:
         """Display lines specified by range"""
         if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
@@ -45,7 +46,8 @@ class Document:
 
         # slice handles the case where the range is beyond the end of the document
         for line_text in self.lines[line_range.start - 1 : line_range.end + 1]:
-            yield f"   {self.current_line} : {line_text}"
+            end = "" if line_text[:-1] == "\n" else "\n"
+            yield f"   {self.current_line} : {line_text}", end
             self.current_line += 1
 
     def search(self, line_range: LineRange, value: str, case_sensitive: bool = False) -> Generator[str, None, None]:
@@ -86,9 +88,22 @@ class Document:
     def page(self, page_size: int = 5) -> Generator[tuple[str, str], None, None]:
         """Display lines in pages"""
         line_number = 1
+        # TODO: add asterix to new current line
         for line_text in self.lines[self.current_line : self.current_line + page_size]:
             end = "" if line_text[:-1] == "\n" else "\n"
             yield f"   {self.current_line + line_number} : {line_text}", end
+            line_number += 1
+            if self.current_line >= len(self.lines):
+                break
+        self.current_line = self.current_line + line_number
+
+
+    def spell(self, line_range:LineRange) -> Generator[tuple[str, str], None, None]:
+        """Show spelling errors in range"""
+        line_number = 1
+        for line_text in self.lines[line_range.start-1 : line_range.end]:
+            end = "" if line_text[:-1] == "\n" else "\n"
+            yield f"   {self.current_line + line_number} : {check(line_text)}", end
             line_number += 1
             if self.current_line >= len(self.lines):
                 break

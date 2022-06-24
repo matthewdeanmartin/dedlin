@@ -11,10 +11,12 @@ requests = "*"
 html2text = "*"
 docopt-ng = "*"
 art = "*"
+pyspellchecker = "*"
 
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
+hypothesis = "*"
 
 [requires]
 python_version = "3.9"

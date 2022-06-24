@@ -96,6 +96,7 @@ RANGE_ONLY = {
     Commands.DELETE: ("D", "DELETE"),
     Commands.LIST: ("L", "LIST"),
     Commands.PAGE: ("P", "PAGE"),
+    Commands.SPELL: ("SPELL",),
     Commands.SEARCH: ("S", "SEARCH"),  # 1 phrase
     Commands.REPLACE: ("R", "REPLACE"),  # 2 phrases
     Commands.EXIT: ("X", "EXIT"),

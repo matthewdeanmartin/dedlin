@@ -4,6 +4,9 @@
 [cross_platform]
 line_endings = "windows"
 
+[display]
+info_bar = True
+
 [history]
 # Use ~/.delin_history to keep in single place.
 folder_location = .dedlin_history

@@ -18,6 +18,7 @@ class Commands(Enum):
     LIST = auto()
     PAGE = auto()
     SEARCH = auto()
+    SPELL = auto()
 
     # edit commands
     INSERT = auto()
@@ -48,7 +49,7 @@ class Commands(Enum):
     HELP = auto()
     UNDO = auto()
     UNKNOWN = auto()
-
+    INFO = auto()
 
 @dataclass(frozen=True)
 class LineRange:

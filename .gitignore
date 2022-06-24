@@ -134,3 +134,5 @@ dmypy.json
 .build_history/
 
 tests/ignored_files/
+
+dedlin/.dedlin_history/*.ed

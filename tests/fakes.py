@@ -1,7 +1,7 @@
 from typing import Generator
 
 
-def fake_input(prompt: str) -> Generator[str, None, None]:
+def fake_input(prompt: int) -> Generator[str, None, None]:
     yield "cat"
     yield "dog"
 
