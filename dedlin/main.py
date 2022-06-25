@@ -39,7 +39,7 @@ class Dedlin:
     """Application for Dedlin"""
 
     def __init__(self, inputter: Generator[str, None, None], outputter: Printable):
-        """Set up inital state and some dependency injection"""
+        """Set up initial state and some dependency injection"""
         self.inputter = inputter
         self.command_outputter: Printable = outputter
         self.document_outputter: Printable = outputter
