@@ -109,10 +109,13 @@ class Dedlin:
             if command.command == Commands.BROWSE:
                 if self.doc.dirty:
                     self.command_outputter('Discarding current document')
-                page_as_rows = fetch_page_as_rows(command.phrases.first)
-                self.doc.lines = page_as_rows
+                if command.phrases.first is None:
+                    self.command_outputter("No URL, can't browse")
+                else:
+                    page_as_rows = fetch_page_as_rows(command.phrases.first)
+                    self.doc.lines = page_as_rows
 
-                self.doc.dirty = True
+                    self.doc.dirty = True
             elif command.command == Commands.HISTORY:
                 for command in self.history:
                     self.command_outputter(command.original_text)

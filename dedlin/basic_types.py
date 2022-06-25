@@ -51,6 +51,7 @@ class Commands(Enum):
     UNKNOWN = auto()
     INFO = auto()
 
+
 @dataclass(frozen=True)
 class LineRange:
     """A 1-base range of lines"""
@@ -79,6 +80,7 @@ class LineRange:
         repeat_part = f",{self.repeat}" if self.repeat != 1 else ""
         return range_part + repeat_part
 
+
 @dataclass(frozen=True)
 class Phrases:
     """End part of a command, especially for search/replace"""
@@ -92,13 +94,14 @@ class Phrases:
     def format(self):
         """Round tripable format"""
         parts = [self.first, self.second, self.third, self.fourth, self.fifth]
-        usable_parts =[]
-        def safe_quote(value:str)->str:
+        usable_parts = []
+
+        def safe_quote(value: str) -> str:
             """Escape spaces and double quotes"""
             if " " in value and '"' not in value:
                 return f'"{value}"'
             if " " in value and '"' in value:
-                value = value.replace('"','\\"')
+                value = value.replace('"', '\\"')
                 return f'"{value}'
             return value
 
@@ -134,11 +137,13 @@ class Command:
         return " ".join([range_part, self.command.name, phrase_part])
 
 
-def try_parse_int(value) -> Optional[int]:
+def try_parse_int(value, default_value: Optional[int] = None) -> Optional[int]:
     """ "Parse int without raising errors"""
     try:
         return int(value)
     except ValueError:
+        if default_value is not None:
+            return default_value
         return None
 
 

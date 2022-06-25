@@ -15,18 +15,30 @@ def extract_one_range(value: str, document_length: int = 0) -> Optional[LineRang
         start_string = parts[0]
         start = try_parse_int(start_string)
         end = try_parse_int(parts[1]) if len(parts) > 1 else start
+
         repeat = try_parse_int(parts[2]) if len(parts) > 2 else 1
+
         if start == 1 and end == 0:
             end = 1 if document_length == 0 else document_length
+
+        # TODO: need better parser errors
+        if start is None or end is None or repeat is None:
+            print("Range invalid:", value)
+            return None
+
         candidate = LineRange(start=start, end=end, repeat=repeat)
 
+        # TODO: need better parser errors
         if not candidate.validate():
             print("Candidate invalid:", candidate)
             return None
+
         return candidate
     if value.isnumeric():
         start = int(value)
         candidate = LineRange(start=start, end=start, repeat=1)
+
+        # TODO: need better parser errors
         if not candidate.validate():
             print("Candidate invalid:", candidate)
             return None
@@ -149,9 +161,16 @@ def parse_search_replace(
         elif long_command in front_part:
             line_number_string = front_part.split(long_command)[0].strip()
             line_number = try_parse_int(line_number_string)
+            if line_number is None:
+                print("Bad range", original_text)
+                return None
             line_range = LineRange(start=line_number, end=line_number)
         else:
             line_number = try_parse_int(front_part.split(abbreviation)[0].strip())
+            if line_number is None:
+                print("Bad range", original_text)
+                return None
+
             line_range = LineRange(start=line_number, end=line_number)
         return Command(
             command_code,
@@ -272,9 +291,15 @@ def parse_command(command: str, document_length: int) -> Command:
             line_range = None
         elif "INSERT" in front_part:
             line_number = try_parse_int(front_part.split("INSERT", maxsplit=1)[0].strip())
+            if line_number is None:
+                print("Invalid target", command)
+                return None
             line_range = LineRange(start=line_number, end=line_number)
         else:  # "I" in front_part:
             line_number = try_parse_int(front_part.split("I", maxsplit=1)[0].strip())
+            if line_number is None:
+                print("Invalid target", command)
+                return None
             line_range = LineRange(start=line_number, end=line_number)
         return Command(Commands.INSERT, line_range=line_range, original_text=original_text)
 

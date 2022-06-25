@@ -13,11 +13,13 @@ docopt-ng = "*"
 art = "*"
 pyspellchecker = "*"
 pygments = "*"
+mypy = "*"
 
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
 hypothesis = "*"
+types-requests = "*"
 
 [requires]
 python_version = "3.9"
