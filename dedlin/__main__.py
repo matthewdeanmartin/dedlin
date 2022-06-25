@@ -14,6 +14,7 @@ Options:
   --echo             Echo commands.
   --halt_on_error    End program on error.
   --promptless_quit  Skip prompt on quit.
+  --vim_mode         User hostile, no feedback.
 """
 import sys
 
@@ -32,6 +33,7 @@ def main():
             halt_on_error=True if arguments["--halt_on_error"] else False,
             macro_file_name=arguments["--macro"],
             quit_safety=not arguments["--promptless_quit"],
+            vim_mode=True if arguments["--vim_mode"] else False,
         )
     sys.exit(0)
 

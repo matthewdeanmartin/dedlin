@@ -42,6 +42,8 @@ BEHAVIOR THINGS
 - Config
 - Chatty Mode/Quiet Mode
   - Warnings - Not a range! etc.
+- vi/vim mode where all error messages, warnings, help messages, prompts are suppressed,
+exit is disabled and control-c is disabled.
 
 COMMANDLINE THINGS
 - docopts, e.g.

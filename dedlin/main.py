@@ -41,7 +41,9 @@ class Dedlin:
     def __init__(self, inputter: Generator[str, None, None], outputter: Printable):
         """Set up inital state and some dependency injection"""
         self.inputter = inputter
-        self.outputter = outputter
+        self.command_outputter: Printable = outputter
+        self.document_outputter: Printable = outputter
+
         self.doc: Optional[Document] = None
 
         self.halt_on_error = False
@@ -55,9 +57,20 @@ class Dedlin:
         self.history: list[Command] = []
         self.history_log = HistoryLog()
         self.macro_file_name: Optional[Path] = None
+        self.vim_mode = False
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
+        print(self.vim_mode)
+        if self.vim_mode:
+            self.quit_safety = False
+            self.echo = False
+            self.halt_on_error = False
+
+            self.command_outputter = lambda x, end="": (x, end)
+            print("replacing")
+            self.command_outputter("Cats!", end="\n\n\n\n\n\n")
+
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
         lines = read_or_create_file(self.file_path)
@@ -76,11 +89,11 @@ class Dedlin:
             command = parse_command(user_command_text, document_length=len(self.doc.lines))
 
             if command is None:
-                self.outputter("Unknown command", end="\n")
+                self.command_outputter("Unknown command", end="\n")
                 continue
 
             if not command.validate():
-                self.outputter(f"Invalid command {command}")
+                self.command_outputter(f"Invalid command {command}")
 
             self.history.append(command)
             self.history_log.write_command_to_history_file(command.format())
@@ -91,40 +104,36 @@ class Dedlin:
                 self.history.append(command)
 
             if self.echo:
-                self.outputter(command.original_text)
+                self.command_outputter(command.original_text)
 
             if command.command == Commands.BROWSE:
                 if self.doc.dirty:
-                    # Trying out VIM-like behavior
-                    self.outputter(
-                        "I'm blowing away your unsaved document, because fuck you!"
-                        " You should be happy I don't run fdisk."
-                    )
+                    self.command_outputter('Discarding current document')
                 page_as_rows = fetch_page_as_rows(command.phrases.first)
                 self.doc.lines = page_as_rows
 
                 self.doc.dirty = True
             elif command.command == Commands.HISTORY:
                 for command in self.history:
-                    self.outputter(command.original_text)
+                    self.command_outputter(command.original_text)
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.LIST:
                 for line, end in self.doc.list(command.line_range):
-                    self.outputter(line, end=end)
+                    self.document_outputter(line, end=end)
             elif command.command == Commands.PAGE:
                 for line, end in self.doc.page():
-                    self.outputter(line, end=end)
+                    self.document_outputter(line, end=end)
             elif command.command == Commands.SPELL:
                 for line, end in self.doc.spell(command.line_range):
-                    self.outputter(line, end=end)
+                    self.document_outputter(line, end=end)
             elif command.command == Commands.DELETE:
                 self.doc.delete(command.line_range)
-                self.outputter(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
+                self.command_outputter(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
             elif command.command in (Commands.EXIT, Commands.QUIT):
                 if command.command == Commands.QUIT and self.doc.dirty and self.quit_safety:
                     # hack!
-                    self.outputter("Save changes? (y/n) ", end="")
+                    self.command_outputter("Save changes? (y/n) ", end="")
                     if next(self.inputter) == "y":
                         self.save_document()
                         return 0
@@ -134,10 +143,10 @@ class Dedlin:
                     return 0
             elif command.command == Commands.INSERT:
                 line_number = command.line_range.start if command.line_range else 1
-                self.outputter("Control C to exit insert mode")
+                self.command_outputter("Control C to exit insert mode")
                 self.doc.insert(line_number)
             elif command.command == Commands.EDIT:
-                self.outputter("[Control C], [Enter] to exit edit mode")
+                self.command_outputter("[Control C], [Enter] to exit edit mode")
                 line_number = command.line_range.start if command.line_range else 1
                 while line_number:
                     line_number = self.doc.edit(line_number)
@@ -145,42 +154,41 @@ class Dedlin:
                 self.doc.search(command.line_range, value=command.phrases.first)
             elif command.command == Commands.INFO:
                 for info, end in display_info(self.doc):
-                    self.outputter(info, end)
+                    self.document_outputter(info, end)
             elif command.command == Commands.REPLACE:
-                self.outputter("Replacing")
+                self.command_outputter("Replacing")
                 for line in self.doc.replace(
                     command.line_range,
                     target=command.phrases.first,
                     replacement=command.phrases.second,
                 ):
-                    self.outputter(line, end="")
+                    self.document_outputter(line, end="")
             elif command.command == Commands.LOREM:
                 self.doc.lorem(command.line_range)
             elif command.command == Commands.UNDO:
                 self.doc.undo()
-                self.outputter("Undone")
+                self.command_outputter("Undone")
             elif command.command == Commands.SORT:
                 self.doc.sort()
-                self.outputter("Sorted")
+                self.command_outputter("Sorted")
             elif command.command == Commands.REVERSE:
                 self.doc.reverse()
-                self.outputter("Reversed")
+                self.command_outputter("Reversed")
             elif command.command == Commands.SHUFFLE:
                 self.doc.shuffle()
-                self.outputter("Shuffled")
+                self.command_outputter("Shuffled")
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.HELP:
-                self.outputter(HELP_TEXT)
+                self.command_outputter(HELP_TEXT)
             elif command.command == Commands.UNKNOWN:
-                self.outputter("Unknown command")
-                self.outputter(HELP_TEXT)
+                self.command_outputter(HELP_TEXT)
+                self.command_outputter("Unknown command")
                 if self.halt_on_error:
                     raise Exception(f"Unknown command {user_command_text}")
-
             else:
                 # possibly not reachable now.
-                self.outputter("1i to insert at line 1.  E to save and quit. Q to just quit.")
+                self.command_outputter("1i to insert at line 1.  E to save and quit. Q to just quit.")
         return 0
 
     def save_document(self, phrases: Optional[Phrases] = None):
@@ -201,6 +209,7 @@ def run(
     echo: bool = False,
     halt_on_error: bool = False,
     quit_safety: bool = False,
+    vim_mode:bool = False
 )->Dedlin:
     """Set up everything except things from command line"""
     if not macro_file_name:
@@ -219,7 +228,7 @@ def run(
     dedlin.halt_on_error = halt_on_error
     dedlin.echo = echo
     dedlin.quit_safety = quit_safety
-
+    dedlin.vim_mode = vim_mode
     dedlin.entry_point(file_name, macro_file_name)
     return dedlin
 

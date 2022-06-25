@@ -1,71 +1,87 @@
-dedlin
-------
+# dedlin
 
-This is an interactive line-by-line text editor and a DSL. Line by line text
-editors suck, but they are easy to write and the DSL is mildly interesting.
+Dedlin is an interactive line-by-line text editor and a DSL. Line editors
+suck, but they are easy to write and the DSL is mildly interesting.
 
-This is not intended to be backwards compatible with anything. Changes will be made
-to make it less user hostile.
+This is not intended to be backwards compatible with anything. I have made
+changes to make the app less user hostile, but there is a `--vim` mode
+where all help, warnings, feedback will be suppressed.
 
-I plan to make this closer to a "mono-parse", i.e. all commands
-parse to the same rigid syntax structure: `range,repeat,command,phrase,phrase`
 
-## Implemented Commands
-### Command Structure
-```
-([Range]) [Command] ([Phrase] ([Phrase]))
-Range = Start,(End),(Repeat)
-Command = [Letter]|Command
-Words = "text with spaces" "text with spaces"
-Words = text_without_spaces text_without_spaces
-Where () means optional.
+## Installation
+```bash
+pip install dedlin
 ```
 
-#### Commands
-A command is either a letter or a word, e.g. I or Insert.
+## Usage
+Launch and edit file_name.txt
+```bash
+python -m dedlin file_name.txt
+```
 
-Commands are not case-sensitive.
+Command line help
+```
+> python -m dedlin --help
+Dedlin.
 
-Edit is the default command.
+An improved version of the edlin.
 
-#### Ranges
-A range is a 1 indexed number. In a 3 line file, the range `1,3` represents all rows
+Usage:
+  dedlin <file> [options]
+  dedlin (-h | --help)
+  dedlin --version
 
-Everything up to the first letter is Range.
+Options:
+  -h --help          Show this screen.
+  --version          Show version.
+  --macro=<macro>    Run macro file.
+  --echo             Echo commands.
+  --halt_on_error    End program on error.
+  --promptless_quit  Skip prompt on quit.
+```
 
-If the range is omitted, then either 1 or the entire document is assumed.
+Sample session
+```
+   _          _  _  _       
+ __| | ___  __| || |(_) _ _  
+/ _` |/ -_)/ _` || || || ' \ 
+\__,_|\___|\__,_||_||_||_||_|
+                             
 
-A single number is assumed to be a start.
+Editing /home/mmartin/github/dedlin/sample.txt
+? * 1i
+1 INSERT 
+Control C to exit insert mode
+?    1 :  cabbage
+?    2 :  bread
+?    3 :  carrots
+?    4 :  ghost peppers
+?    5 :  coffee
+?    6 :  tortillas
+?    7 :                                                                                                                                                                                                   
 
-Missing starts are assumed to be 1, so `,3` means `1,3`
+Exiting insert mode
 
-# Concepts
-A document is a series of lines.
+? * SORT
+ SORT 
+Sorted
+? * LIST
+1,6 LIST 
+   1 : bread
+   2 : cabbage
+   3 : carrots
+   4 : coffee
+   5 : ghost peppers
+   6 : tortillas
 
-# Features
-**List, Page, Search.** These will display the document or part of it. Only Page increments the current location.
-Search only displays matching rows.
+? * EXIT
+1,6 EXIT 
 
-**Insert and Edit.** These are the changes that require interactive input.
+```
 
-**Copy, Move, Delete, Sort.** These shuffle around rows.
 
-**Join, Split.** These split or join rows based on an optional character.
-
-**Transfer.** This inserts from disk.
-
-**Undo.** Undoes last step.
-
-**Quit and Exit.** These both save and exit. Exit saves without asking, Quit prompts to save if something has changed.
-
-## Specifications/Source Inspirations
-- [help](http://home.mnet-online.de/willybilly/fdhelp-dos/en/hhstndrd/base/edlin.htm)
-- [help another](https://www.computerhope.com/edlin.htm)
-- [wikipedia](https://en.wikipedia.org/wiki/Edlin)
-- [free dos](https://github.com/FDOS/edlin/blob/master/msgs-en.h)
-- [edlin-w32](https://github.com/yudenisov/edlin-w32)
-- [jsedlin](https://github.com/LHerrmeyer/jsedlin)
-- [edlin-freedos](https://opensource.com/article/21/6/edlin-freedos)
-- [jeffpar's](https://jeffpar.github.io/kbarchive/kb/067/Q67706/)
-- [vscode-edlin](https://github.com/FFengIll/vscode-edlin)
-- [edlin in python](https://github.com/firefish111/edlin/blob/master/main.py)
+# Documentation
+- [User Manual](docs/user_manual.md)
+- [Developer roadmap](docs/TODO.md)
+- [Prior Art](docs/prior_art.md)
+- 
