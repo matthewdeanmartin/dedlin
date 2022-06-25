@@ -4,7 +4,7 @@ Simulates user entry from a macro file using command_generator
 import logging.config
 from pathlib import Path
 
-from dedlin.basic_types import command_generator
+from dedlin.command_sources import command_generator
 from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.utils.file_utils import locate_file

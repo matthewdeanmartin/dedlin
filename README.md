@@ -58,7 +58,7 @@ Control C to exit insert mode
 ?    4 :  ghost peppers
 ?    5 :  coffee
 ?    6 :  tortillas
-?    7 :                                                                                                                                                                                                   
+?    7 :
 
 Exiting insert mode
 
@@ -76,12 +76,10 @@ Sorted
 
 ? * EXIT
 1,6 EXIT 
-
 ```
 
 
 # Documentation
-- [User Manual](docs/user_manual.md)
-- [Developer roadmap](docs/TODO.md)
-- [Prior Art](docs/prior_art.md)
-- 
+- [User Manual](https://github.com/matthewdeanmartin/so_pip/blob/main/docs/user_manual.md)
+- [Developer roadmap](https://github.com/matthewdeanmartin/so_pip/blob/main/docs/TODO.md)
+- [Prior Art](https://github.com/matthewdeanmartin/so_pip/blob/main/docs/prior_art.md)

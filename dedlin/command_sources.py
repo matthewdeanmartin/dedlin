@@ -1,3 +1,8 @@
+"""
+Interactive command input methods.
+
+These handle history, syntax highlighting, and auto-suggestion.
+"""
 from pathlib import Path
 from typing import Generator
 
@@ -6,44 +11,33 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.lexers import PygmentsLexer
-from pygments.lexers import guess_lexer_for_filename
+# from pygments.lexers import guess_lexer_for_filename
 from pygments.styles import get_style_by_name
-from prompt_toolkit.shortcuts import prompt
+#from prompt_toolkit.shortcuts import prompt
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
-thing = guess_lexer_for_filename("cats.py","")
+# thing = guess_lexer_for_filename("cats.py","")
 style = style_from_pygments_cls(get_style_by_name('monokai'))
 
-from prompt_toolkit.completion import Completer, Completion
+# from prompt_toolkit.completion import Completer, Completion
 # from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit import PromptSession
 
 # Create prompt object.
-session = PromptSession(history=InMemoryHistory(),)
+from dedlin.pygments_code import EdLexer
 
-from pygments.lexer import RegexLexer, bygroups
-from pygments.token import *
+SESSION = None
 
-class EdLexer(RegexLexer):
-    name = 'ED'
-    aliases = ['ed']
-    filenames = ['*.ed']
 
-    tokens = {
-        'root': [
-            (r'\s+', Text),
-            (r'#.*?$', Comment),
-            (r'INSERT|DELETE|PAGE|LIST$', Keyword),
-            # (r'(.*?)(\s*)(=)(\s*)(.*?)$',
-            #  bygroups(Name.Attribute, Text, Operator, Text, String))
-        ]
-    }
 
 
 
 def interactive_command_handler(prompt: str = "*") -> Generator[str, None, None]:
     """Wrapper around prompt_toolkit for command input"""
+    global SESSION
+    if SESSION is None:
+        SESSION = PromptSession(history=InMemoryHistory(), )
     while True:
-        text = session.prompt(prompt,
+        text = SESSION.prompt(prompt,
                               lexer=PygmentsLexer(EdLexer),
                               style=style,
                               default="",

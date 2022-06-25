@@ -61,14 +61,12 @@ class Dedlin:
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
-        print(self.vim_mode)
         if self.vim_mode:
             self.quit_safety = False
             self.echo = False
             self.halt_on_error = False
 
             self.command_outputter = lambda x, end="": (x, end)
-            print("replacing")
             self.command_outputter("Cats!", end="\n\n\n\n\n\n")
 
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None

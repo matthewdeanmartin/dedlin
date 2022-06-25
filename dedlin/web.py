@@ -9,9 +9,9 @@ def fetch_page_as_rows(url: str) -> list[str]:
     """Fetch a page as a list of rows"""
     # TODO: handle popular line based formats, e.g. CVS
     response = requests.get(url)
-    h = html2text.HTML2Text()
-    h.ignore_links = True
-    text = h.handle(response.text)
+    handler = html2text.HTML2Text()
+    handler.ignore_links = True
+    text = handler.handle(response.text)
     while "\n\n" in text:
         text = text.replace("\n\n", "\n")
     lines = [_.strip() for _ in text.split("\n")]

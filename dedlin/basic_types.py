@@ -66,12 +66,13 @@ class LineRange:
 
     def validate(self):
         """Check if ranges are sensible"""
-        validate = 1 <= self.start <= self.end and self.end >= 1
+        validate = 1 <= self.start <= self.end and self.end >= 1 and self.repeat>=0
         if not validate:
             logger.warning(f"Invalid line range: {self}")
         return validate
 
     def format(self):
+        """Format the range as a string"""
         if self.start == self.end and self.repeat == 1:
             range_part = str(self.start)
         else:
@@ -132,6 +133,7 @@ class Command:
         return True
 
     def format(self):
+        """Format the command as a string"""
         range_part = self.line_range.format() if self.line_range is not None else ""
         phrase_part = self.phrases.format() if self.phrases is not None else ""
         return " ".join([range_part, self.command.name, phrase_part])

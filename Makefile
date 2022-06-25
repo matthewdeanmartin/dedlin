@@ -79,3 +79,11 @@ bandit: .build_history/bandit
 .NOTPARALLEL: .build_history/isort .build_history/black
 
 check: tests pylint bandit pre-commit
+
+.PHONY: publish
+publish_test:
+	rm -rf dist && poetry version minor && poetry build && twine upload -r testpypi dist/*
+
+.PHONY: publish
+publish_test:
+	rm -rf dist && poetry version minor && poetry build && twine upload dist/*

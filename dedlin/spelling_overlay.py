@@ -19,8 +19,3 @@ def check(line:str):
             replacement = f"{word} (did you mean {correction}?"
             new_line = new_line.replace(word, replacement)
     return new_line
-
-if __name__ == '__main__':
-    line = "So it goes and 'what' and then the other So! wow. rieciept and cieling."
-    print(line)
-    print(check(line))
