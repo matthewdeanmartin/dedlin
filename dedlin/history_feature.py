@@ -6,8 +6,8 @@ from pathlib import Path
 from dedlin.utils.file_utils import locate_file
 
 
-class HistoryLog():
-    def __init__(self)->None:
+class HistoryLog:
+    def __init__(self) -> None:
         self.history_file = self.initialize_history_folder() / self.make_sequential_history_file_name()
 
     def initialize_history_folder(self):
@@ -19,7 +19,6 @@ class HistoryLog():
             history_folder.mkdir()
         return history_folder
 
-
     def count_files_in_history_folder(self):
         """
         Count the number of files in the history folder
@@ -27,13 +26,11 @@ class HistoryLog():
         history_folder = self.initialize_history_folder()
         return len(list(history_folder.glob("*.ed")))
 
-
     def make_sequential_history_file_name(self):
         """
         Make a sequential history file name
         """
         return f"history{self.count_files_in_history_folder()}.ed"
-
 
     def write_command_to_history_file(self, command: str):
         """

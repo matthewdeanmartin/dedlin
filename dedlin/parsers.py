@@ -2,7 +2,7 @@
 Code that turns strings to command objects
 """
 
-from typing import Iterable, Optional, Tuple
+from typing import Iterable, Optional
 
 from dedlin.basic_types import Command, Commands, LineRange, Phrases, try_parse_int
 

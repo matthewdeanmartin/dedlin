@@ -57,6 +57,7 @@ def test_parse_phrases_space_delimited():
 def test_parse_phrases_quoted():
     assert extract_phrases('"cat frog" "log dog"') == Phrases(first="cat frog", second="log dog")
 
+
 def test_phrases_format():
     thing = Phrases(first="cat frog", second="log dog")
     result = thing.format()
@@ -64,7 +65,8 @@ def test_phrases_format():
 
     thing = Phrases(first="cat", second="log")
     result = thing.format()
-    assert result == 'cat log'
+    assert result == "cat log"
+
 
 def test_parse_extract_phrases():
     assert extract_phrases("cat") == Phrases(first="cat")

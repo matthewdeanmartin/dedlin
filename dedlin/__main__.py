@@ -28,13 +28,13 @@ def main():
     arguments = docopt(__doc__, version="0.1.0")
     # print(arguments)
     result = run(
-            arguments["<file>"],
-            echo=True if arguments["--echo"] else False,
-            halt_on_error=True if arguments["--halt_on_error"] else False,
-            macro_file_name=arguments["--macro"],
-            quit_safety=not arguments["--promptless_quit"],
-            vim_mode=True if arguments["--vim_mode"] else False,
-        )
+        arguments["<file>"],
+        echo=True if arguments["--echo"] else False,
+        halt_on_error=True if arguments["--halt_on_error"] else False,
+        macro_file_name=arguments["--macro"],
+        quit_safety=not arguments["--promptless_quit"],
+        vim_mode=True if arguments["--vim_mode"] else False,
+    )
     sys.exit(0)
 
 

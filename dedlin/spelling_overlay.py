@@ -3,10 +3,10 @@ Create overlay of spelling markers
 """
 from spellchecker import SpellChecker
 
-
 spell = SpellChecker()
 
-def check(line:str):
+
+def check(line: str):
     """
     Add a 'did you mean' suggestion to each incorrect word
     """

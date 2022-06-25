@@ -27,8 +27,7 @@ def simple_input(start_line_number: int) -> Generator[str, None, None]:
     line_number = start_line_number
     while True:
         prompt = f"   {line_number} : "
-        response = questionary.text(prompt, default="").ask(
-            kbi_msg="Exiting insert mode")
+        response = questionary.text(prompt, default="").ask(kbi_msg="Exiting insert mode")
         if response is None:
             break
         yield response
@@ -106,7 +105,7 @@ class Dedlin:
 
             if command.command == Commands.BROWSE:
                 if self.doc.dirty:
-                    self.command_outputter('Discarding current document')
+                    self.command_outputter("Discarding current document")
                 if command.phrases.first is None:
                     self.command_outputter("No URL, can't browse")
                 else:
@@ -210,8 +209,8 @@ def run(
     echo: bool = False,
     halt_on_error: bool = False,
     quit_safety: bool = False,
-    vim_mode:bool = False
-)->Dedlin:
+    vim_mode: bool = False,
+) -> Dedlin:
     """Set up everything except things from command line"""
     if not macro_file_name:
         title_screen()

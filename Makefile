@@ -78,12 +78,12 @@ bandit: .build_history/bandit
 # for when using -j (jobs, run in parallel)
 .NOTPARALLEL: .build_history/isort .build_history/black
 
-check: tests pylint bandit pre-commit
+check: test pylint bandit pre-commit
 
 .PHONY: publish
 publish_test:
 	rm -rf dist && poetry version minor && poetry build && twine upload -r testpypi dist/*
 
 .PHONY: publish
-publish_test:
-	rm -rf dist && poetry version minor && poetry build && twine upload dist/*
+publish: test
+	echo "rm -rf dist && poetry version minor && poetry build && twine upload dist/*"

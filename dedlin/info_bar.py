@@ -6,6 +6,6 @@ from typing import Generator
 from dedlin.document import Document
 
 
-def display_info(document:Document)-> Generator[tuple[str,str], None,None]:
+def display_info(document: Document) -> Generator[tuple[str, str], None, None]:
     all_text = "".join(document.lines)
     yield "okay, yo", "\n"

@@ -66,7 +66,7 @@ class LineRange:
 
     def validate(self):
         """Check if ranges are sensible"""
-        validate = 1 <= self.start <= self.end and self.end >= 1 and self.repeat>=0
+        validate = 1 <= self.start <= self.end and self.end >= 1 and self.repeat >= 0
         if not validate:
             logger.warning(f"Invalid line range: {self}")
         return validate

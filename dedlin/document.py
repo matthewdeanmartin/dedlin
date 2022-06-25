@@ -3,7 +3,7 @@ Abstract document class.
 """
 import logging
 import random
-from typing import Callable, Generator, Optional, Tuple
+from typing import Callable, Generator, Optional
 
 from dedlin.basic_types import LineRange
 from dedlin.lorem_data import LOREM_IPSUM
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 # noinspection PyShadowingBuiltins
+# pylint: disable=redefined-builtin
 def print(*args, **kwargs):
     """Discourage accidental usage of print"""
     raise Exception("Don't call UI from here.")
@@ -36,8 +37,7 @@ class Document:
         self.previous_current_line = 0
         self.dirty = False
 
-
-    def list(self, line_range: Optional[LineRange] = None) -> Generator[tuple[str,str], None, None]:
+    def list(self, line_range: Optional[LineRange] = None) -> Generator[tuple[str, str], None, None]:
         """Display lines specified by range"""
         if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
@@ -98,11 +98,10 @@ class Document:
                 break
         self.current_line = self.current_line + line_number
 
-
-    def spell(self, line_range:LineRange) -> Generator[tuple[str, str], None, None]:
+    def spell(self, line_range: LineRange) -> Generator[tuple[str, str], None, None]:
         """Show spelling errors in range"""
         line_number = 1
-        for line_text in self.lines[line_range.start-1 : line_range.end]:
+        for line_text in self.lines[line_range.start - 1 : line_range.end]:
             end = "" if line_text[:-1] == "\n" else "\n"
             yield f"   {self.current_line + line_number} : {check(line_text)}", end
             line_number += 1
@@ -190,7 +189,7 @@ class Document:
         line_text = self.lines[line_number - 1]
 
         try:
-            new_line = self.editor(f"   {line_number} : ", line_text[0: len(line_text) - 1])
+            new_line = self.editor(f"   {line_number} : ", line_text[0 : len(line_text) - 1])
         except KeyboardInterrupt:
             return None
         self.lines[line_number - 1] = new_line + "\n"
