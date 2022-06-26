@@ -37,7 +37,7 @@ class Document:
         self.previous_current_line = 0
         self.dirty = False
 
-    def list(self, line_range: Optional[LineRange] = None) -> Generator[tuple[str, str], None, None]:
+    def list_doc(self, line_range: Optional[LineRange] = None) -> Generator[tuple[str, str], None, None]:
         """Display lines specified by range"""
         if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
@@ -90,7 +90,7 @@ class Document:
         """Display lines in pages"""
         line_number = 1
         # TODO: add asterix to new current line
-        for line_text in self.lines[self.current_line : self.current_line + page_size]:
+        for line_text in self.lines[self.current_line - 1 : self.current_line + page_size]:
             end = "" if line_text[:-1] == "\n" else "\n"
             yield f"   {self.current_line + line_number} : {line_text}", end
             line_number += 1
@@ -101,13 +101,13 @@ class Document:
     def spell(self, line_range: LineRange) -> Generator[tuple[str, str], None, None]:
         """Show spelling errors in range"""
         line_number = 1
+
+        # reset current line to start of range.
+        self.current_line = line_range.start
         for line_text in self.lines[line_range.start - 1 : line_range.end]:
             end = "" if line_text[:-1] == "\n" else "\n"
-            yield f"   {self.current_line + line_number} : {check(line_text)}", end
-            line_number += 1
-            if self.current_line >= len(self.lines):
-                break
-        self.current_line = self.current_line + line_number
+            yield f"   {self.current_line} : {check(line_text)}", end
+            self.current_line += 1
 
     def copy(self, line_range: Optional[LineRange], target_line: int) -> None:
         """Copy lines to target_line"""
@@ -162,7 +162,7 @@ class Document:
         if not line_range:
             line_range = LineRange(1, len(self.lines))
 
-        self.list(line_range)
+        self.list_doc(line_range)
 
         # TODO: prompt for confirmation
 
@@ -200,7 +200,20 @@ class Document:
             return None
         return self.current_line + 1
 
-    def insert(self, line_number: int) -> None:
+    def push(self, line_number: int, lines: list[str]) -> None:
+        """Noninteractively insert line or lines"""
+        self.backup()
+        for line in lines:
+            self.lines.insert(line_number - 1, line + "\n")
+            self.dirty = True  # this is ugly
+            self.current_line = line_number
+            line_number += 1
+            logger.debug(f"Pushed at {line_number}")
+
+    def insert(
+        self,
+        line_number: int,
+    ) -> None:
         """Insert a new line at line_number"""
         self.backup()
         if line_number < 0:

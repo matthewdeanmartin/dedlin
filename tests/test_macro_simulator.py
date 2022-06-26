@@ -69,6 +69,7 @@ def test_search_ed():
 
     dedlin = Dedlin(command_generator(macro_path), capture)
     dedlin.halt_on_error = True
+    dedlin.quiet = True
     dedlin.entry_point(str(lines_path.absolute()))
     for line in thing:
         assert "cat" in line

@@ -19,9 +19,11 @@ class Commands(Enum):
     PAGE = auto()
     SEARCH = auto()
     SPELL = auto()
+    CURRENT = auto()
 
     # edit commands
     INSERT = auto()
+    PUSH = auto()
     EDIT = auto()
     LOREM = auto()
     DELETE = auto()
@@ -87,14 +89,18 @@ class Phrases:
     """End part of a command, especially for search/replace"""
 
     first: str
-    second: str = ""
-    third: str = ""
-    fourth: str = ""
-    fifth: str = ""
+    second: Optional[str] = None
+    third: Optional[str] = None
+    fourth: Optional[str] = None
+    fifth: Optional[str] = None
+
+    def as_list(self) -> list[str]:
+        """Convert to a list_doc of strings"""
+        return list(filter(lambda _: _ is not None, [self.first, self.second, self.third, self.fourth, self.fifth]))
 
     def format(self):
         """Round tripable format"""
-        parts = [self.first, self.second, self.third, self.fourth, self.fifth]
+        parts = self.as_list()
         usable_parts = []
 
         def safe_quote(value: str) -> str:

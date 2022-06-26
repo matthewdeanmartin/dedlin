@@ -6,7 +6,7 @@ import requests
 
 
 def fetch_page_as_rows(url: str) -> list[str]:
-    """Fetch a page as a list of rows"""
+    """Fetch a page as a list_doc of rows"""
     # TODO: handle popular line based formats, e.g. CVS
     response = requests.get(url)
     handler = html2text.HTML2Text()

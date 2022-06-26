@@ -1,5 +1,5 @@
 # What is a line editor?
-A line editor edits a list of text items. Some things are more like a list of lines 
+A line editor edits a list of text items. Some things are more like a list of lines
 than other things.
 
 ### Line-like
@@ -13,7 +13,7 @@ than other things.
 that span many lines of text.
 - Most programming languages, which like English have semantic blocks and lines
 that run past the edge of the screen
-- ASCII art. While creating it, you might insert rows, but once complete you 
+- ASCII art. While creating it, you might insert rows, but once complete you
 have a block of rows that must stay together.
 
 ## Commands
@@ -28,7 +28,7 @@ Where `[repeat][Command]` is a command and how many times it should be executed
 Where `[Word][...]` are string positional arguments of the command.
 
 ### Command types
-Commands either 
+Commands either
 
 - display lines
 - interactively change lines, insert, edit

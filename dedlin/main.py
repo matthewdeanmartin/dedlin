@@ -8,13 +8,13 @@ from typing import Generator, Optional
 
 import questionary
 
+import dedlin.help_text as help_text
 from dedlin.basic_types import Command, Commands, Phrases, Printable
 from dedlin.command_sources import command_generator, interactive_command_handler
 from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.flash import title_screen
-import dedlin.help_text as help_text
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
 from dedlin.parsers import parse_command
@@ -51,22 +51,29 @@ class Dedlin:
         self.quit_safety = True
         """Disable checking document.dirty on quit. Useful for unit tests."""
 
+        self.quiet = False
+        """Supress most output, except from commands specifically for outputting to the screen."""
+
+        self.vim_mode = False
+        """Like quiet, except let's really try to make it unpleasant to learn and use"""
+
         self.echo = False
+        """Write cleaned up text of command to screen"""
+
         self.file_path: Optional[Path] = None
         self.history: list[Command] = []
         self.history_log = HistoryLog()
         self.macro_file_name: Optional[Path] = None
-        self.vim_mode = False
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
         if self.vim_mode:
             self.quit_safety = False
-            self.echo = False
             self.halt_on_error = False
 
+        if self.vim_mode or self.quiet:
+            self.echo = False
             self.command_outputter = lambda x, end="": (x, end)
-
 
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
@@ -83,7 +90,9 @@ class Dedlin:
             except StopIteration:
                 break  # it on down now
 
-            command = parse_command(user_command_text, document_length=len(self.doc.lines))
+            command = parse_command(
+                user_command_text, current_line=self.doc.current_line, document_length=len(self.doc.lines)
+            )
 
             if command is None:
                 self.command_outputter("Unknown command", end="\n")
@@ -119,7 +128,7 @@ class Dedlin:
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.LIST:
-                for line, end in self.doc.list(command.line_range):
+                for line, end in self.doc.list_doc(command.line_range):
                     self.document_outputter(line, end=end)
             elif command.command == Commands.PAGE:
                 for line, end in self.doc.page():
@@ -145,13 +154,17 @@ class Dedlin:
                 line_number = command.line_range.start if command.line_range else 1
                 self.command_outputter("Control C to exit insert mode")
                 self.doc.insert(line_number)
+            elif command.command == Commands.PUSH:
+                line_number = command.line_range.start if command.line_range else 1
+                self.doc.push(line_number, command.phrases.as_list())
             elif command.command == Commands.EDIT:
                 self.command_outputter("[Control C], [Enter] to exit edit mode")
                 line_number = command.line_range.start if command.line_range else 1
                 while line_number:
                     line_number = self.doc.edit(line_number)
             elif command.command == Commands.SEARCH:
-                self.doc.search(command.line_range, value=command.phrases.first)
+                for text in self.doc.search(command.line_range, value=command.phrases.first):
+                    self.document_outputter(text)
             elif command.command == Commands.INFO:
                 for info, end in display_info(self.doc):
                     self.document_outputter(info, end)
@@ -177,6 +190,9 @@ class Dedlin:
             elif command.command == Commands.SHUFFLE:
                 self.doc.shuffle()
                 self.command_outputter("Shuffled")
+            elif command.command == Commands.CURRENT:
+                self.doc.current_line = command.line_range.start
+                # self.command_outputter("Current line set to {}".format(command.line_range.start))
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.HELP:
@@ -196,8 +212,12 @@ class Dedlin:
                 if self.halt_on_error:
                     raise Exception(f"Unknown command {user_command_text}")
             else:
-                # possibly not reachable now.
-                self.command_outputter("1i to insert at line 1.  E to save and quit. Q to just quit.")
+                self.command_outputter(f"Command {command.command} not implemented")
+
+            if not self.quiet:
+                self.command_outputter(
+                    f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---"
+                )
         return 0
 
     def save_document(self, phrases: Optional[Phrases] = None):

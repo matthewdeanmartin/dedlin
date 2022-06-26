@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dedlin"
-version = "1.4.0"
+version = "1.5.0"
 description = "Line editor, edlin clone with many improvements"
 authors = ["Matthew Martin <matthewdeanmartin@gmail.com>"]
 keywords = ["editor", "edlin", "line editor",]
@@ -46,6 +46,7 @@ rich = "*"
 
 # Natural language support
 pyspellchecker = "*"
+textstat = "*"
 
 # syntax highlighting
 pygments = "*"

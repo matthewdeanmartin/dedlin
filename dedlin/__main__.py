@@ -25,15 +25,14 @@ from dedlin.main import run
 
 def main():
     """Main function."""
-    arguments = docopt(__doc__, version="0.1.0")
-    # print(arguments)
-    result = run(
+    arguments = docopt(__doc__, version="1.4.0")
+    _ = run(
         arguments["<file>"],
-        echo=True if arguments["--echo"] else False,
-        halt_on_error=True if arguments["--halt_on_error"] else False,
+        echo=bool(arguments["--echo"]),
+        halt_on_error=bool(arguments["--halt_on_error"]),
         macro_file_name=arguments["--macro"],
         quit_safety=not arguments["--promptless_quit"],
-        vim_mode=True if arguments["--vim_mode"] else False,
+        vim_mode=bool(arguments["--vim_mode"]),
     )
     sys.exit(0)
 

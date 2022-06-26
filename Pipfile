@@ -13,9 +13,10 @@ docopt-ng = "*"
 art = "*"
 pyspellchecker = "*"
 pygments = "*"
-mypy = "*"
+textstat = "*"
 
 [dev-packages]
+mypy = "*"
 pytest = "*"
 pytest-cov = "*"
 hypothesis = "*"

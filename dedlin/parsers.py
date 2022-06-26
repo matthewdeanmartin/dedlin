@@ -7,14 +7,28 @@ from typing import Iterable, Optional
 from dedlin.basic_types import Command, Commands, LineRange, Phrases, try_parse_int
 
 
-def extract_one_range(value: str, document_length: int = 0) -> Optional[LineRange]:
-    """Extract a single line range from a string"""
+def extract_one_range(value: str, current_line: int, document_length: int) -> Optional[LineRange]:
+    """Extract a single line range from a string
+    . = current line
+    $ = last line
+    """
     value = value.strip()
     if "," in value:
         parts = value.split(",")
         start_string = parts[0]
-        start = try_parse_int(start_string)
-        end = try_parse_int(parts[1]) if len(parts) > 1 else start
+        if start_string == ".":
+            start = current_line
+        elif start_string == "$":
+            start = document_length
+        else:
+            start = try_parse_int(start_string)
+        end_string = parts[1]
+        if end_string == ".":
+            end = current_line
+        elif end_string == "$":
+            end = document_length
+        else:
+            end = try_parse_int(parts[1]) if len(parts) > 1 else start
 
         repeat = try_parse_int(parts[2]) if len(parts) > 2 else 1
 
@@ -34,6 +48,10 @@ def extract_one_range(value: str, document_length: int = 0) -> Optional[LineRang
             return None
 
         return candidate
+    if value == ".":
+        return LineRange(start=current_line, end=current_line, repeat=1)
+    if value == "$":
+        return LineRange(start=document_length, end=document_length, repeat=1)
     if value.isnumeric():
         start = int(value)
         candidate = LineRange(start=start, end=start, repeat=1)
@@ -52,7 +70,7 @@ def extract_phrases(value: str) -> Optional[Phrases]:
     if '"' in value and '\\"' not in value:
         parts = [_ for _ in value.split('"') if _.strip() != ""]
         if len(parts) == 1:
-            return Phrases(parts[0], "")
+            return Phrases(parts[0], None)
         if len(parts) > 1:
             return Phrases(parts[0], parts[1])
 
@@ -60,7 +78,7 @@ def extract_phrases(value: str) -> Optional[Phrases]:
     if '"' not in value:
         parts = [_ for _ in value.split(" ") if _.strip() != ""]
         if len(parts) == 1:
-            return Phrases(parts[0].strip(), "")
+            return Phrases(parts[0].strip(), None)
         if len(parts) > 1:
             return Phrases(parts[0].strip(), parts[1].strip())
 
@@ -116,6 +134,7 @@ RANGE_ONLY = {
     Commands.HISTORY: ("HISTORY",),
     Commands.MACRO: ("MACRO",),
     Commands.BROWSE: ("BROWSE",),
+    Commands.CURRENT: ("CURRENT",),
 }
 
 
@@ -123,6 +142,7 @@ def parse_range_only(
     just_command: str,
     front_part: str,
     original_text: str,
+    current_line: int,
     document_length: int,
     phrases: Optional[Phrases],
 ) -> Optional[Command]:
@@ -135,7 +155,7 @@ def parse_range_only(
             else:
                 command_length = get_command_length(front_part, command_forms)
                 range_text = front_part[0 : len(front_part) - command_length]
-                line_range = extract_one_range(range_text)
+                line_range = extract_one_range(range_text, current_line, document_length)
 
             return Command(
                 command_code,
@@ -145,11 +165,14 @@ def parse_range_only(
             )
     return None
 
+
 COMMANDS_WITH_PHRASES = {
     Commands.SEARCH: ("S", "SEARCH"),  # 1 phrase
     Commands.REPLACE: ("R", "REPLACE"),  # 2 phrases
     Commands.HELP: ("HELP",),
+    Commands.PUSH: ("PUSH",),
 }
+
 
 def parse_search_replace(
     front_part: str,
@@ -162,7 +185,7 @@ def parse_search_replace(
             if len(command_forms) == 2:
                 abbreviation, long_command = command_forms
             else:
-                abbreviation, long_command = None, command_forms
+                abbreviation, long_command = None, command_forms[0]
 
             line_range = None
             if front_part in command_forms:
@@ -214,7 +237,7 @@ def bare_command(command) -> Optional[Command]:
     return None
 
 
-def parse_command(command: str, document_length: int) -> Command:
+def parse_command(command: str, current_line: int, document_length: int) -> Command:
     """Parse a command"""
     original_text = command
     if not command:
@@ -275,7 +298,6 @@ def parse_command(command: str, document_length: int) -> Command:
     if candidate:
         return candidate
 
-
     # Meaning of range shifted, need to fix.
     # lorem_commands = ("LOREM",)
     # if ends_with_any(front_part, lorem_commands) or front_part in lorem_commands:
@@ -291,7 +313,7 @@ def parse_command(command: str, document_length: int) -> Command:
     #         original_text=original_text,
     #     )
 
-    candidate = parse_range_only(just_command, front_part, original_text, document_length, phrases)
+    candidate = parse_range_only(just_command, front_part, original_text, current_line, document_length, phrases)
     if candidate:
         return candidate
 
@@ -321,6 +343,5 @@ def parse_command(command: str, document_length: int) -> Command:
     candidate = bare_command(command)
     if candidate:
         return candidate
-
 
     return Command(Commands.UNKNOWN, original_text=original_text)

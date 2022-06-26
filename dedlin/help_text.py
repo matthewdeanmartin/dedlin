@@ -1,3 +1,5 @@
+"""Internal help text system"""
+
 HELP_TEXT = """Command format: [start],[end],[repeat] [command] "[search]" "[replace]"
 [start],[end] is abbreviated to [range]
 
@@ -7,9 +9,9 @@ HELP_TEXT = """Command format: [start],[end],[repeat] [command] "[search]" "[rep
 1  - Edit line 1
 2INSERT - Insert at line 2
 2,4DELETE - Delete lines 2 to 4
-REPLACE cat dog - Replace cat with dog 
+REPLACE cat dog - Replace cat with dog
 
-For more help, type 
+For more help, type
 HELP display|edit|files|data|reorder|meta|data|all"""
 
 SPECIFIC_HELP = {
@@ -30,7 +32,7 @@ SPECIFIC_HELP = {
 [target line] Transfer [file name] - inserts file contents to target
 [range] Browse [URL] - fetch web page as HTML, convert to text""",
     "META": """Meta Commands
-HISTORY [file] - list all commands run
+HISTORY [file] - list_doc all commands run
 MACRO [file] - run macro
 REDO - redo last command
 UNDO - undo last command that changed state
@@ -43,5 +45,5 @@ HELP - display this""",
     "FILE": """File System Commands
 Quit - Exits, unless the file has been modified
 Exit [file name] - Saves file and exits
-"""
+""",
 }

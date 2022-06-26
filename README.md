@@ -42,15 +42,15 @@ Options:
 
 Sample session
 ```
-   _          _  _  _       
- __| | ___  __| || |(_) _ _  
-/ _` |/ -_)/ _` || || || ' \ 
+   _          _  _  _
+ __| | ___  __| || |(_) _ _
+/ _` |/ -_)/ _` || || || ' \
 \__,_|\___|\__,_||_||_||_||_|
-                             
+
 
 Editing /home/mmartin/github/dedlin/sample.txt
 ? * 1i
-1 INSERT 
+1 INSERT
 Control C to exit insert mode
 ?    1 :  cabbage
 ?    2 :  bread
@@ -63,10 +63,10 @@ Control C to exit insert mode
 Exiting insert mode
 
 ? * SORT
- SORT 
+ SORT
 Sorted
 ? * LIST
-1,6 LIST 
+1,6 LIST
    1 : bread
    2 : cabbage
    3 : carrots
@@ -75,7 +75,7 @@ Sorted
    6 : tortillas
 
 ? * EXIT
-1,6 EXIT 
+1,6 EXIT
 ```
 
 

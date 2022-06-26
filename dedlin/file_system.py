@@ -21,7 +21,7 @@ def read_or_create_file(path: Path) -> list[str]:
 
 
 def read_file(path: Optional[Path]) -> list[str]:
-    """Read a file and return a list of lines"""
+    """Read a file and return a list_doc of lines"""
     lines: list[str] = []
 
     with open(path, encoding="utf-8") as file:
