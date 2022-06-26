@@ -103,7 +103,8 @@ class Dedlin:
 
             self.history.append(command)
             self.history_log.write_command_to_history_file(command.format())
-            print(command.format())
+            if self.echo:
+                self.command_outputter(command.format())
 
             if command.command == Commands.REDO:
                 command = self.history[-2]
