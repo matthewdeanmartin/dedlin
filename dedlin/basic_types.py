@@ -145,7 +145,7 @@ class Command:
         return " ".join([range_part, self.command.name, phrase_part])
 
 
-def try_parse_int(value, default_value: Optional[int] = None) -> Optional[int]:
+def try_parse_int(value:str, default_value: Optional[int] = None) -> Optional[int]:
     """ "Parse int without raising errors"""
     try:
         return int(value)

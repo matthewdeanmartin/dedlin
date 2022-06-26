@@ -226,7 +226,7 @@ BARE_COMMANDS = {
 }
 
 
-def bare_command(command) -> Optional[Command]:
+def bare_command(command:str) -> Optional[Command]:
     """Parse a command that has no line range or phrases"""
     for command_code, command_forms in BARE_COMMANDS.items():
         if command in command_forms:

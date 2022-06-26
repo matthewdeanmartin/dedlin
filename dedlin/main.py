@@ -12,6 +12,7 @@ import dedlin.help_text as help_text
 from dedlin.basic_types import Command, Commands, Phrases, Printable
 from dedlin.command_sources import command_generator, interactive_command_handler
 from dedlin.document import Document
+from dedlin.document_sources import simple_input
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.flash import title_screen
@@ -22,16 +23,7 @@ from dedlin.rich_output import RichPrinter
 from dedlin.web import fetch_page_as_rows
 
 
-def simple_input(start_line_number: int) -> Generator[str, None, None]:
-    """Wrapper around questionary for insert"""
-    line_number = start_line_number
-    while True:
-        prompt = f"   {line_number} : "
-        response = questionary.text(prompt, default="").ask(kbi_msg="Exiting insert mode")
-        if response is None:
-            break
-        yield response
-        line_number += 1
+
 
 
 class Dedlin:
