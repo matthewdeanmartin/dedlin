@@ -145,39 +145,49 @@ def parse_range_only(
             )
     return None
 
+COMMANDS_WITH_PHRASES = {
+    Commands.SEARCH: ("S", "SEARCH"),  # 1 phrase
+    Commands.REPLACE: ("R", "REPLACE"),  # 2 phrases
+    Commands.HELP: ("HELP",),
+}
 
 def parse_search_replace(
-    command_forms: tuple[str, str],
-    command_code: Commands,
     front_part: str,
     phrases: Optional[Phrases],
     original_text: str,
 ) -> Optional[Command]:
     """Parse a command that has a line range and phrases"""
-    if ends_with_any(front_part, command_forms) or front_part in command_forms:
-        abbreviation, long_command = command_forms
-        if front_part in command_forms:
-            line_range = None
-        elif long_command in front_part:
-            line_number_string = front_part.split(long_command)[0].strip()
-            line_number = try_parse_int(line_number_string)
-            if line_number is None:
-                print("Bad range", original_text)
-                return None
-            line_range = LineRange(start=line_number, end=line_number)
-        else:
-            line_number = try_parse_int(front_part.split(abbreviation)[0].strip())
-            if line_number is None:
-                print("Bad range", original_text)
-                return None
+    for command_code, command_forms in COMMANDS_WITH_PHRASES.items():
+        if ends_with_any(front_part, command_forms) or front_part in command_forms:
+            if len(command_forms) == 2:
+                abbreviation, long_command = command_forms
+            else:
+                abbreviation, long_command = None, command_forms
 
-            line_range = LineRange(start=line_number, end=line_number)
-        return Command(
-            command_code,
-            line_range=line_range,
-            phrases=phrases,
-            original_text=original_text,
-        )
+            line_range = None
+            if front_part in command_forms:
+                line_range = None
+            elif long_command in front_part:
+                line_number_string = front_part.split(long_command)[0].strip()
+                line_number = try_parse_int(line_number_string)
+                if line_number is None:
+                    print("Bad range", original_text)
+                    return None
+                line_range = LineRange(start=line_number, end=line_number)
+            elif abbreviation is not None:
+                line_number = try_parse_int(front_part.split(abbreviation)[0].strip())
+                if line_number is None:
+                    print("Bad range", original_text)
+                    return None
+
+                line_range = LineRange(start=line_number, end=line_number)
+
+            return Command(
+                command_code,
+                line_range=line_range,
+                phrases=phrases,
+                original_text=original_text,
+            )
     return None
 
 
@@ -265,6 +275,7 @@ def parse_command(command: str, document_length: int) -> Command:
     if candidate:
         return candidate
 
+
     # Meaning of range shifted, need to fix.
     # lorem_commands = ("LOREM",)
     # if ends_with_any(front_part, lorem_commands) or front_part in lorem_commands:
@@ -281,6 +292,10 @@ def parse_command(command: str, document_length: int) -> Command:
     #     )
 
     candidate = parse_range_only(just_command, front_part, original_text, document_length, phrases)
+    if candidate:
+        return candidate
+
+    candidate = parse_search_replace(front_part, phrases, original_text)
     if candidate:
         return candidate
 
@@ -306,5 +321,6 @@ def parse_command(command: str, document_length: int) -> Command:
     candidate = bare_command(command)
     if candidate:
         return candidate
+
 
     return Command(Commands.UNKNOWN, original_text=original_text)

@@ -14,7 +14,7 @@ from dedlin.document import Document
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.flash import title_screen
-from dedlin.help_text import HELP_TEXT
+import dedlin.help_text as help_text
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
 from dedlin.parsers import parse_command
@@ -66,7 +66,7 @@ class Dedlin:
             self.halt_on_error = False
 
             self.command_outputter = lambda x, end="": (x, end)
-            self.command_outputter("Cats!", end="\n\n\n\n\n\n")
+
 
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
@@ -180,10 +180,19 @@ class Dedlin:
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.HELP:
-                self.command_outputter(HELP_TEXT)
+                if not command.phrases or command.phrases.first is None:
+                    self.command_outputter(help_text.HELP_TEXT)
+                    # display | edit | files | data | reorder | meta | data | all
+                elif command.phrases and command.phrases.first.upper() == "ALL":
+                    for text in help_text.SPECIFIC_HELP.values():
+                        self.command_outputter("")
+                        self.command_outputter(text)
+                elif command.phrases and command.phrases.first.upper() in help_text.SPECIFIC_HELP:
+                    self.command_outputter(help_text.SPECIFIC_HELP[command.phrases.first.upper()])
+                else:
+                    self.command_outputter("Don't have help for that category")
             elif command.command == Commands.UNKNOWN:
-                self.command_outputter(HELP_TEXT)
-                self.command_outputter("Unknown command")
+                self.command_outputter("Unknown command, type HELP for help")
                 if self.halt_on_error:
                     raise Exception(f"Unknown command {user_command_text}")
             else:

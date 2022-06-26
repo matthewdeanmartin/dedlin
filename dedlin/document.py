@@ -83,7 +83,7 @@ class Document:
                 self.lines[self.current_line] = line_text
                 self.dirty = True  # this is ugly
                 self.dirty = True  # this is ugly
-                yield f"   {self.current_line} : {line_text}"
+                yield f"   {self.current_line + 1 } : {line_text}"
             self.current_line += 1
 
     def page(self, page_size: int = 5) -> Generator[tuple[str, str], None, None]:
