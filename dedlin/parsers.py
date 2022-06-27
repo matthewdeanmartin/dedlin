@@ -256,8 +256,9 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
         )
 
         # bare number is insert.
-    if command.isnumeric():
-        target = int(command)
+    candidate_int = try_parse_int(command)
+    if candidate_int is not None:
+        target = candidate_int
         # edit end if target is greater than document length.
         target = target if target <= document_length else document_length
         return Command(

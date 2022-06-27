@@ -4,8 +4,8 @@ Runs a macro file as specified in the command line or `MACRO {file}` command
 import logging.config
 from pathlib import Path
 
+from dedlin.__main__ import run
 from dedlin.logging_utils import configure_logging
-from dedlin.main import Dedlin, run
 from dedlin.utils.file_utils import locate_file
 
 ANIMALS_FILE = Path(locate_file("sample_files/animals.txt", __file__))

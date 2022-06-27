@@ -27,7 +27,7 @@ class Document:
         inputter: Callable[[int], Generator[Optional[str], None, None]],
         editor: Callable[[str, str], str],
         lines: list[str],
-    ):
+    )->None:
         """Set up initial state"""
         self.inputter = inputter
         self.editor = editor

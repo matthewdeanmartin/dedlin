@@ -4,7 +4,7 @@ Main code.
 Handles UI and links command parser to the document object
 """
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, Optional, Callable
 
 import questionary
 
@@ -29,9 +29,12 @@ from dedlin.web import fetch_page_as_rows
 class Dedlin:
     """Application for Dedlin"""
 
-    def __init__(self, inputter: Generator[str, None, None], outputter: Printable):
+    def __init__(self, inputter: Generator[str, None, None],
+                 document_inputter: Callable[[int], Generator[Optional[str], None, None]],
+                 outputter: Printable)->None:
         """Set up initial state and some dependency injection"""
-        self.inputter = inputter
+        self.command_inputter = inputter
+        self.document_inputter =document_inputter
         self.command_outputter: Printable = outputter
         self.document_outputter: Printable = outputter
 
@@ -72,13 +75,13 @@ class Dedlin:
         lines = read_or_create_file(self.file_path)
 
         self.doc = Document(
-            inputter=simple_input,
+            inputter=self.document_inputter,
             editor=input_with_prefill,
             lines=lines,
         )
         while True:
             try:
-                user_command_text = next(self.inputter)
+                user_command_text = next(self.command_inputter)
             except StopIteration:
                 break  # it on down now
 
@@ -136,7 +139,7 @@ class Dedlin:
                 if command.command == Commands.QUIT and self.doc.dirty and self.quit_safety:
                     # hack!
                     self.command_outputter("Save changes? (y/n) ", end="")
-                    if next(self.inputter) == "y":
+                    if next(self.command_inputter) == "y":
                         self.save_document()
                         return 0
                 elif command.command == Commands.EXIT:
@@ -225,35 +228,3 @@ class Dedlin:
         save_and_overwrite(Path("history.ed"), [_.original_text for _ in self.history])
 
 
-def run(
-    file_name: Optional[str] = None,
-    macro_file_name: Optional[str] = None,
-    echo: bool = False,
-    halt_on_error: bool = False,
-    quit_safety: bool = False,
-    vim_mode: bool = False,
-) -> Dedlin:
-    """Set up everything except things from command line"""
-    if not macro_file_name:
-        title_screen()
-
-    rich_printer = RichPrinter()
-
-    def printer(text, end="\n"):
-        rich_printer.print(text, end="")
-
-    if macro_file_name:
-        command_handler = command_generator(Path(macro_file_name))
-    else:
-        command_handler = interactive_command_handler()
-    dedlin = Dedlin(command_handler, printer if file_name and file_name.endswith(".py") else print)
-    dedlin.halt_on_error = halt_on_error
-    dedlin.echo = echo
-    dedlin.quit_safety = quit_safety
-    dedlin.vim_mode = vim_mode
-    dedlin.entry_point(file_name, macro_file_name)
-    return dedlin
-
-
-if __name__ == "__main__":
-    run()

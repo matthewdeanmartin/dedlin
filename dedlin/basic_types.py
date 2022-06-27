@@ -4,7 +4,7 @@ Basic classes and mypy types
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, Protocol
+from typing import Optional, Protocol, runtime_checkable
 
 logger = logging.getLogger(__name__)
 
@@ -62,18 +62,18 @@ class LineRange:
     end: int
     repeat: int = 1
 
-    def count(self):
+    def count(self)->int:
         """How many rows on a 1-based index"""
         return self.end - self.start + 1
 
-    def validate(self):
+    def validate(self)->bool:
         """Check if ranges are sensible"""
         validate = 1 <= self.start <= self.end and self.end >= 1 and self.repeat >= 0
         if not validate:
             logger.warning(f"Invalid line range: {self}")
         return validate
 
-    def format(self):
+    def format(self)->str:
         """Format the range as a string"""
         if self.start == self.end and self.repeat == 1:
             range_part = str(self.start)
@@ -98,7 +98,7 @@ class Phrases:
         """Convert to a list_doc of strings"""
         return list(filter(lambda _: _ is not None, [self.first, self.second, self.third, self.fourth, self.fifth]))
 
-    def format(self):
+    def format(self)->str:
         """Round tripable format"""
         parts = self.as_list()
         usable_parts = []
@@ -130,7 +130,7 @@ class Command:
     phrases: Optional[Phrases] = None
     original_text: Optional[str] = field(default=None, compare=False)
 
-    def validate(self):
+    def validate(self)->bool:
         """Check if ranges are sensible"""
         if self.line_range:
             line_range_is_valid = self.line_range.validate()
@@ -138,7 +138,7 @@ class Command:
                 return False
         return True
 
-    def format(self):
+    def format(self)->str:
         """Format the command as a string"""
         range_part = self.line_range.format() if self.line_range is not None else ""
         phrase_part = self.phrases.format() if self.phrases is not None else ""
@@ -154,7 +154,7 @@ def try_parse_int(value:str, default_value: Optional[int] = None) -> Optional[in
             return default_value
         return None
 
-
+@runtime_checkable
 class Printable(Protocol):
     """Something that acts like print()"""
 

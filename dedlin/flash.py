@@ -4,7 +4,7 @@ Flashy stuff
 from art import tprint
 
 
-def title_screen():
+def title_screen()->None:
     """Flashy title screen"""
     print("\033[H\033[J", end="")
     tprint("dedlin", font="small", chr_ignore=True)
