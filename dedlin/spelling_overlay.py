@@ -6,7 +6,7 @@ from spellchecker import SpellChecker
 spell = SpellChecker()
 
 
-def check(line: str)->str:
+def check(line: str) -> str:
     """
     Add a 'did you mean' suggestion to each incorrect word
     """

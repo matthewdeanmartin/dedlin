@@ -30,14 +30,14 @@ def configure_logging() -> dict[str, Any]:
         },
     }
 
-    debug_level_modules:list[str] = [
+    debug_level_modules: list[str] = [
         "__main__",
         "dedlin",
         "dedlin.document",
     ]
 
     info_level_modules: list[str] = []
-    warn_level_modules:list[str] = [
+    warn_level_modules: list[str] = [
         "psycopg2",
     ]
 

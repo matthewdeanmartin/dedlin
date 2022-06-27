@@ -22,14 +22,14 @@ from typing import Optional
 
 from docopt import docopt
 
-from dedlin.command_sources import interactive_command_handler, command_generator
+from dedlin.command_sources import command_generator, interactive_command_handler
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.flash import title_screen
 from dedlin.main import Dedlin
 from dedlin.rich_output import RichPrinter
 
 
-def main()->None:
+def main() -> None:
     """Main function."""
     arguments = docopt(__doc__, version="1.4.0")
     _ = run(
@@ -44,12 +44,12 @@ def main()->None:
 
 
 def run(
-        file_name: Optional[str] = None,
-        macro_file_name: Optional[str] = None,
-        echo: bool = False,
-        halt_on_error: bool = False,
-        quit_safety: bool = False,
-        vim_mode: bool = False,
+    file_name: Optional[str] = None,
+    macro_file_name: Optional[str] = None,
+    echo: bool = False,
+    halt_on_error: bool = False,
+    quit_safety: bool = False,
+    vim_mode: bool = False,
 ) -> Dedlin:
     """Set up everything except things from command line"""
     if not macro_file_name:
@@ -64,9 +64,7 @@ def run(
         command_handler = command_generator(Path(macro_file_name))
     else:
         command_handler = interactive_command_handler()
-    dedlin = Dedlin(command_handler,
-                    input_with_prefill,
-                    printer if file_name and file_name.endswith(".py") else print)
+    dedlin = Dedlin(command_handler, input_with_prefill, printer if file_name and file_name.endswith(".py") else print)
     dedlin.halt_on_error = halt_on_error
     dedlin.echo = echo
     dedlin.quit_safety = quit_safety

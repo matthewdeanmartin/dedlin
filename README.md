@@ -80,6 +80,6 @@ Sorted
 
 
 # Documentation
-- [User Manual](https://github.com/matthewdeanmartin/so_pip/blob/main/docs/user_manual.md)
-- [Developer roadmap](https://github.com/matthewdeanmartin/so_pip/blob/main/docs/TODO.md)
-- [Prior Art](https://github.com/matthewdeanmartin/so_pip/blob/main/docs/prior_art.md)
+- [User Manual](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/user_manual.md)
+- [Developer roadmap](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/TODO.md)
+- [Prior Art](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/prior_art.md)

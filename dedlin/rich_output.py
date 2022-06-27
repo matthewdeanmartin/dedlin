@@ -12,7 +12,7 @@ class RichPrinter:
         """Set up initial state"""
         self.console = Console()
 
-    def print(self, text:str, end: Optional[str]) -> None:
+    def print(self, text: str, end: Optional[str]) -> None:
         """Syntax highlighting"""
         if text and text.endswith("\n"):
             text = text[:-1]

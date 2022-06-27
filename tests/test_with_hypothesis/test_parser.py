@@ -1,19 +1,20 @@
 # This test code was written by the `hypothesis.extra.ghostwriter` module
 # and is provided under the Creative Commons Zero public domain dedication.
 
-import dedlin.parsers
 from collections import ChainMap
+
+from hypothesis import given
+from hypothesis import strategies as st
+
+import dedlin.parsers
 from dedlin.parsers import LineRange, Phrases
-from hypothesis import given, strategies as st
 
 # TODO: replace st.nothing() with appropriate strategies
 
 
 @given(
     command=st.sampled_from(dedlin.basic_types.Commands),
-    line_range=st.one_of(
-        st.none(), st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers()))
-    ),
+    line_range=st.one_of(st.none(), st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers()))),
     phrases=st.one_of(
         st.none(),
         st.builds(
@@ -48,9 +49,7 @@ def test_fuzz_LineRange(start, end, repeat):
     fifth=st.one_of(st.none(), st.text()),
 )
 def test_fuzz_Phrases(first, second, third, fourth, fifth):
-    dedlin.parsers.Phrases(
-        first=first, second=second, third=third, fourth=fourth, fifth=fifth
-    )
+    dedlin.parsers.Phrases(first=first, second=second, third=third, fourth=fourth, fifth=fifth)
 
 
 @given(command=st.text())
@@ -77,9 +76,7 @@ def test_fuzz_ends_with_any(value, suffixes):
 
 @given(value=st.text(), current_line=st.integers(), document_length=st.integers())
 def test_fuzz_extract_one_range(value, current_line, document_length):
-    dedlin.parsers.extract_one_range(
-        value=value, current_line=current_line, document_length=document_length
-    )
+    dedlin.parsers.extract_one_range(value=value, current_line=current_line, document_length=document_length)
 
 
 @given(value=st.text())
@@ -106,9 +103,7 @@ def test_fuzz_get_command_length(value, suffixes):
 
 @given(command=st.text(), current_line=st.integers(), document_length=st.integers())
 def test_fuzz_parse_command(command, current_line, document_length):
-    dedlin.parsers.parse_command(
-        command=command, current_line=current_line, document_length=document_length
-    )
+    dedlin.parsers.parse_command(command=command, current_line=current_line, document_length=document_length)
 
 
 @given(
@@ -128,9 +123,7 @@ def test_fuzz_parse_command(command, current_line, document_length):
         ),
     ),
 )
-def test_fuzz_parse_range_only(
-    just_command, front_part, original_text, current_line, document_length, phrases
-):
+def test_fuzz_parse_range_only(just_command, front_part, original_text, current_line, document_length, phrases):
     dedlin.parsers.parse_range_only(
         just_command=just_command,
         front_part=front_part,
@@ -156,9 +149,7 @@ def test_fuzz_parse_range_only(
     original_text=st.text(),
 )
 def test_fuzz_parse_search_replace(front_part, phrases, original_text):
-    dedlin.parsers.parse_search_replace(
-        front_part=front_part, phrases=phrases, original_text=original_text
-    )
+    dedlin.parsers.parse_search_replace(front_part=front_part, phrases=phrases, original_text=original_text)
 
 
 @given(command=st.text(), original_text=st.text())

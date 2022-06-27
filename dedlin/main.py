@@ -4,37 +4,31 @@ Main code.
 Handles UI and links command parser to the document object
 """
 from pathlib import Path
-from typing import Generator, Optional, Callable
-
-import questionary
+from typing import Callable, Generator, Optional
 
 import dedlin.help_text as help_text
 from dedlin.basic_types import Command, Commands, Phrases, Printable
-from dedlin.command_sources import command_generator, interactive_command_handler
 from dedlin.document import Document
-from dedlin.document_sources import simple_input
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
-from dedlin.flash import title_screen
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
 from dedlin.parsers import parse_command
-from dedlin.rich_output import RichPrinter
 from dedlin.web import fetch_page_as_rows
-
-
-
 
 
 class Dedlin:
     """Application for Dedlin"""
 
-    def __init__(self, inputter: Generator[str, None, None],
-                 document_inputter: Callable[[int], Generator[Optional[str], None, None]],
-                 outputter: Printable)->None:
+    def __init__(
+        self,
+        inputter: Generator[str, None, None],
+        document_inputter: Callable[[int], Generator[Optional[str], None, None]],
+        outputter: Printable,
+    ) -> None:
         """Set up initial state and some dependency injection"""
         self.command_inputter = inputter
-        self.document_inputter =document_inputter
+        self.document_inputter = document_inputter
         self.command_outputter: Printable = outputter
         self.document_outputter: Printable = outputter
 
@@ -226,5 +220,3 @@ class Dedlin:
     def save_macro(self):
         """Save the document to the file"""
         save_and_overwrite(Path("history.ed"), [_.original_text for _ in self.history])
-
-

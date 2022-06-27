@@ -1,14 +1,13 @@
-import dedlin.document
 import typing
-from hypothesis import given, strategies as st
+
+from hypothesis import given
+from hypothesis import strategies as st
+
+import dedlin.document
 
 
 @given(
-    inputter=st.from_type(
-        typing.Callable[
-            [int], typing.Generator[typing.Optional[str], None, None]
-        ]
-    ),
+    inputter=st.from_type(typing.Callable[[int], typing.Generator[typing.Optional[str], None, None]]),
     editor=st.functions(like=lambda *a, **k: None, returns=st.text()),
     lines=st.lists(st.text()),
 )
