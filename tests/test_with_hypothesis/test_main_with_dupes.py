@@ -6,9 +6,12 @@ from pathlib import Path
 
 from hypothesis import example, given
 from hypothesis import strategies as st
+from hypothesis.strategies import just
 
 import dedlin.main
 from dedlin.basic_types import LineRange, Printable
+from dedlin.command_sources import command_generator, interactive_command_handler
+from dedlin.document_sources import simple_input
 from dedlin.main import Document, Phrases
 
 
@@ -67,7 +70,7 @@ def test_fuzz_Phrases(first, second, third, fourth, fifth):
 
 @given(macro_path=st.builds(Path))
 def test_fuzz_command_generator(macro_path):
-    dedlin.main.command_generator(macro_path=macro_path)
+    command_generator(macro_path=macro_path)
 
 
 @given(document=st.builds(Document))
@@ -75,10 +78,10 @@ def test_fuzz_display_info(document):
     dedlin.main.display_info(document=document)
 
 
-# @given(url=st.text())
-@example("http://example.com")
-def test_fuzz_fetch_page_as_rows(url):
-    dedlin.main.fetch_page_as_rows(url=url)
+# # @given(url=st.text())
+# @just("http://example.com")
+# def test_fuzz_fetch_page_as_rows(url):
+#     dedlin.main.fetch_page_as_rows(url=url)
 
 
 # @given(prompt=st.text(), text=st.text())
@@ -88,7 +91,7 @@ def test_fuzz_fetch_page_as_rows(url):
 
 @given(prompt=st.text())
 def test_fuzz_interactive_command_handler(prompt):
-    dedlin.main.interactive_command_handler(prompt=prompt)
+    interactive_command_handler(prompt=prompt)
 
 
 @given(command=st.text(), current_line=st.integers(), document_length=st.integers())
@@ -108,4 +111,4 @@ def test_fuzz_parse_command(command, current_line, document_length):
 
 @given(start_line_number=st.integers())
 def test_fuzz_simple_input(start_line_number):
-    dedlin.main.simple_input(start_line_number=start_line_number)
+    simple_input(start_line_number=start_line_number)
