@@ -4,6 +4,7 @@ It was implemented as `ed` and inspired many good and bad editors thereafter.
 `edlin` is the main inspiration for `dedlin` which was `ed`-like editor.
 
 ## Specifications/Source Inspirations
+- [Video on how to use edlin](https://www.youtube.com/watch?v=CIlJeKuSl9w&t=165s)
 - [help](http://home.mnet-online.de/willybilly/fdhelp-dos/en/hhstndrd/base/edlin.htm)
 - [help another](https://www.computerhope.com/edlin.htm)
 - [wikipedia](https://en.wikipedia.org/wiki/Edlin)

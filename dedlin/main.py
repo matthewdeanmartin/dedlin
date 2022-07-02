@@ -8,8 +8,9 @@ from typing import Callable, Generator, Optional
 
 import dedlin.help_text as help_text
 from dedlin.basic_types import Command, Commands, Phrases, Printable
+from dedlin.command_sources import InteractiveGenerator
 from dedlin.document import Document
-from dedlin.editable_input_prompt import input_with_prefill
+from dedlin.document_sources import SimpleInputter
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
@@ -27,13 +28,15 @@ class Dedlin:
 
     def __init__(
         self,
-        inputter: Generator[Command, None, None],
-        document_inputter: Callable[[int], Generator[Optional[str], None, None]],
+        inputter: InteractiveGenerator,
+        insert_document_inputter: SimpleInputter,
+        edit_document_inputter: Callable[[str, str], Generator[Optional[str], None, None]],
         outputter: Printable,
     ) -> None:
         """Set up initial state and some dependency injection"""
         self.command_inputter = inputter
-        self.document_inputter = document_inputter
+        self.insert_document_inputter = insert_document_inputter
+        self.edit_document_inputter = edit_document_inputter
         self.command_outputter: Printable = outputter
         self.document_outputter: Printable = outputter
 
@@ -74,19 +77,20 @@ class Dedlin:
         lines = read_or_create_file(self.file_path)
 
         self.doc = Document(
-            inputter=self.document_inputter,
-            editor=input_with_prefill,
+            insert_inputter=self.insert_document_inputter,
+            edit_inputter=self.edit_document_inputter,
             lines=lines,
         )
+        command_generator = self.command_inputter.interactive_typed_command_handler(" * ")
         while True:
+            self.command_inputter.document_length = len(self.doc.lines)
+            self.command_inputter.current_line = self.doc.current_line
             try:
-                command = next(self.command_inputter)
+                command = next(command_generator)
+            except KeyboardInterrupt:
+                break
             except StopIteration:
                 break  # it on down now
-
-            # command = parse_command(
-            #     user_command_text, current_line=self.doc.current_line, document_length=len(self.doc.lines)
-            # )
 
             if command is None:
                 self.command_outputter("Unknown command", end="\n")
@@ -136,11 +140,11 @@ class Dedlin:
                 self.command_outputter(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
             elif command.command in (Commands.EXIT, Commands.QUIT):
                 if command.command == Commands.QUIT and self.doc.dirty and self.quit_safety:
-                    # hack!
-                    self.command_outputter("Save changes? (y/n) ", end="")
-                    if next(self.command_inputter) == "y":
-                        self.save_document()
-                        return 0
+                    # TODO: Q & E are a mess.
+                    # self.command_outputter("Save changes? (y/n) ", end="")
+                    # if "y" in next(command_generator):
+                    self.save_document()
+                    return 0
                 elif command.command == Commands.EXIT:
                     self.save_document(command.phrases)
                 if command.command in (Commands.QUIT, Commands.EXIT):
@@ -157,6 +161,8 @@ class Dedlin:
                 line_number = command.line_range.start if command.line_range else 1
                 while line_number:
                     line_number = self.doc.edit(line_number)
+                # New line or else next text will be on the same line
+                self.command_outputter("")
             elif command.command == Commands.SEARCH:
                 for text in self.doc.search(command.line_range, value=command.phrases.first):
                     self.document_outputter(text)

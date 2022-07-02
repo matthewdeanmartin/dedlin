@@ -52,7 +52,7 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
         return LineRange(start=current_line, end=current_line, repeat=1)
     if value == "$":
         return LineRange(start=document_length, end=document_length, repeat=1)
-    if value.isnumeric():
+    if value and all(_ in "0123456789" for _ in value):
         start = int(value)
         candidate = LineRange(start=start, end=start, repeat=1)
 
@@ -135,6 +135,9 @@ RANGE_ONLY = {
     Commands.MACRO: ("MACRO",),
     Commands.BROWSE: ("BROWSE",),
     Commands.CURRENT: ("CURRENT",),
+    Commands.SHUFFLE: ("SHUFFLE",),
+    Commands.SORT: ("SORT",),
+    Commands.REVERSE: ("REVERSE",),
 }
 
 
@@ -220,9 +223,6 @@ BARE_COMMANDS = {
     Commands.UNDO: ("UNDO",),
     Commands.EXIT: ("E", "EXIT"),  # BUG, this takes argument.
     Commands.QUIT: ("Q", "QUIT"),
-    Commands.SHUFFLE: ("SHUFFLE",),
-    Commands.SORT: ("SORT",),
-    Commands.REVERSE: ("REVERSE",),
 }
 
 
@@ -346,3 +346,9 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
         return candidate
 
     return Command(Commands.UNKNOWN, original_text=original_text)
+
+
+if __name__ == "__main__":
+    result = parse_command("1", 1, 3)
+    print(result)
+    print(result.validate())

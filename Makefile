@@ -32,7 +32,7 @@ clean: clean-pyc clean-test
 test: clean .build_history/pylint .build_history/bandit Pipfile.lock
 	@echo "Running unit tests"
 	$(VENV) python -m unittest discover
-	$(VENV) py.test tests --cov=dedlin --cov-report=html --cov-fail-under 70
+	$(VENV) py.test tests --cov=dedlin --cov-report=html --cov-fail-under 25
 
 .build_history:
 	@mkdir -p .build_history

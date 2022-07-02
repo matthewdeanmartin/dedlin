@@ -2,7 +2,7 @@
 Attempt to make basic syntax highlighting work for the dedlin DSL.
 """
 from pygments.lexer import RegexLexer
-from pygments.token import *
+from pygments.token import Comment, Keyword, Text
 
 
 class EdLexer(RegexLexer):

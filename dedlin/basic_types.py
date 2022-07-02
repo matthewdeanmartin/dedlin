@@ -6,8 +6,6 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Optional, Protocol, runtime_checkable
 
-from dpcontracts import invariant, require
-
 logger = logging.getLogger(__name__)
 
 

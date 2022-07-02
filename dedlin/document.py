@@ -8,6 +8,7 @@ from typing import Callable, Generator, Optional
 from dpcontracts import invariant
 
 from dedlin.basic_types import LineRange
+from dedlin.document_sources import SimpleInputter
 from dedlin.lorem_data import LOREM_IPSUM
 from dedlin.spelling_overlay import check
 
@@ -30,13 +31,13 @@ class Document:
 
     def __init__(
         self,
-        inputter: Callable[[int], Generator[Optional[str], None, None]],
-        editor: Callable[[str, str], str],
+        insert_inputter: SimpleInputter,
+        edit_inputter: Callable[[str, str], Generator[Optional[str], None, None]],
         lines: list[str],
     ) -> None:
         """Set up initial state"""
-        self.inputter = inputter
-        self.editor = editor
+        self.insert_inputter = insert_inputter
+        self.edit_inputter = edit_inputter
         self.lines: list[str] = lines
         self.current_line: int = 1 if lines else 0
         self.previous_lines = lines
@@ -55,6 +56,10 @@ class Document:
         for line_text in self.lines[line_range.start - 1 : line_range.end + 1]:
             end = "" if line_text[:-1] == "\n" else "\n"
             yield f"   {self.current_line} : {line_text}", end
+
+            # tiny inefficiency here
+            if self.current_line >= len(self.lines):
+                break
             self.current_line += 1
 
     def search(self, line_range: LineRange, value: str, case_sensitive: bool = False) -> Generator[str, None, None]:
@@ -195,10 +200,15 @@ class Document:
     def edit(self, line_number: int) -> Optional[int]:
         """Edit line"""
         self.backup()
+        if line_number - 1 < 0:
+            raise ValueError("Can't edit negative row.")
+        if line_number - 1 >= len(self.lines):
+            raise ValueError("Can't edit row that doesn't exist.")
+
         line_text = self.lines[line_number - 1]
 
         try:
-            new_line = self.editor(f"   {line_number} : ", line_text[0 : len(line_text) - 1])
+            new_line = next(self.edit_inputter(f"   {line_number} : ", line_text[0 : len(line_text) - 1]))
         except KeyboardInterrupt:
             return None
         self.lines[line_number - 1] = new_line + "\n"
@@ -229,10 +239,15 @@ class Document:
             line_number = len(self.lines) + 1
 
         user_input_text: Optional[str] = "GO!"
-        input_generator = self.inputter(line_number)
+
+        input_generator = self.insert_inputter.generator()
         while user_input_text is not None:
+            prompt = f"  {line_number} : "
+            self.insert_inputter.prompt = prompt
             try:
                 user_input_text = next(input_generator)
+            except KeyboardInterrupt:
+                user_input_text = None
             except StopIteration:
                 user_input_text = None
             if user_input_text is not None:

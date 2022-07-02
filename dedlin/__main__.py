@@ -18,12 +18,12 @@ Options:
 """
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Generator, Optional
 
 from docopt import docopt
 
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
-from dedlin.editable_input_prompt import input_with_prefill
+from dedlin.document_sources import SimpleInputter, input_with_prefill
 from dedlin.flash import title_screen
 from dedlin.main import Dedlin
 from dedlin.rich_output import RichPrinter
@@ -66,7 +66,18 @@ def run(
     else:
         the_interactive_generator = InteractiveGenerator()
         command_handler = the_interactive_generator.interactive_typed_command_handler("* ")
-    dedlin = Dedlin(command_handler, input_with_prefill, printer if file_name and file_name.endswith(".py") else print)
+
+    def document_inputter(prompt: str, text: str = "") -> Generator[str, None, None]:
+        """Get input from the user"""
+        while True:
+            yield input_with_prefill(prompt, text)
+
+    dedlin = Dedlin(
+        inputter=InteractiveGenerator(),
+        insert_document_inputter=SimpleInputter(),
+        edit_document_inputter=document_inputter,
+        outputter=printer if file_name and file_name.endswith(".py") else print,
+    )
     dedlin.halt_on_error = halt_on_error
     dedlin.echo = echo
     dedlin.quit_safety = quit_safety

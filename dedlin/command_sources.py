@@ -30,15 +30,22 @@ SESSION = None
 
 
 class InteractiveGenerator:
-    def __int__(self):
+    """Get a typed command from the user"""
+
+    def __init__(self):
+        """Initialize the generator"""
         self.current_line: int = 0
         self.document_length: int = 0
 
     def interactive_typed_command_handler(self, prompt: str):
         """Wrapper around prompt_toolkit for command input but typed"""
-        user_command_text = next(_interactive_command_handler(prompt))
-        command = parse_command(user_command_text, current_line=self.current_line, document_length=self.document_length)
-        yield command
+        user_command_text = ""
+        while user_command_text is not None:
+            user_command_text = next(_interactive_command_handler(prompt))
+            command = parse_command(
+                user_command_text, current_line=self.current_line, document_length=self.document_length
+            )
+            yield command
 
 
 def _interactive_command_handler(prompt: str = "*") -> Generator[str, None, None]:
@@ -71,20 +78,24 @@ def questionary_command_handler(prompt: str = "*") -> Generator[str, None, None]
 
 
 class CommandGenerator:
+    """Get a typed command from a file"""
+
     def __init__(self):
+        """Initialize the generator"""
         self.current_line: int = 0
         self.document_length: int = 0
 
     def command_generator(self, macro_path: Path) -> Generator[Command, None, None]:
         """Turn a file into a bunch of commands"""
+
         with open(str(macro_path), encoding="utf-8") as file:
             for line in file:
                 command = parse_command(line, current_line=self.current_line, document_length=self.document_length)
                 yield command
 
 
-class CommandStringGenerator:
-    def command_string_generator(self, macro_path: Path) -> Generator[str, None, None]:
-        """Turn a file into a bunch of commands"""
-        with open(str(macro_path), encoding="utf-8") as file:
-            yield from file
+# class CommandStringGenerator:
+#     def command_string_generator(self, macro_path: Path) -> Generator[str, None, None]:
+#         """Turn a file into a bunch of commands"""
+#         with open(str(macro_path), encoding="utf-8") as file:
+#             yield from file

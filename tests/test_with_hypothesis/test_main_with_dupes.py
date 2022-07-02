@@ -11,7 +11,7 @@ from hypothesis.strategies import just
 import dedlin.main
 from dedlin.basic_types import LineRange, Printable
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
-from dedlin.document_sources import simple_input
+from dedlin.document_sources import SimpleInputter
 from dedlin.main import Document, Phrases
 from dedlin.parsers import parse_command
 
@@ -40,22 +40,13 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
     )
 
 
-@given(
-    inputter=st.from_type(typing.Generator[str, None, None]),
-    document_inputter=st.from_type(typing.Generator[str, None, None]),
-    outputter=st.just(print),
-)
-def test_fuzz_Dedlin(inputter, document_inputter, outputter):
-    dedlin.main.Dedlin(inputter=inputter, document_inputter=document_inputter, outputter=outputter)
-
-
-@given(
-    inputter=st.from_type(typing.Callable[[int], typing.Generator[typing.Optional[str], None, None]]),
-    editor=st.functions(like=lambda *a, **k: None, returns=st.text()),
-    lines=st.lists(st.text()),
-)
-def test_fuzz_Document(inputter, editor, lines):
-    dedlin.main.Document(inputter=inputter, editor=editor, lines=lines)
+# @given(
+#     inputter=st.from_type(typing.Callable[[int], typing.Generator[typing.Optional[str], None, None]]),
+#     editor=st.functions(like=lambda *a, **k: None, returns=st.text()),
+#     lines=st.lists(st.text()),
+# )
+# def test_fuzz_Document(inputter, editor, lines):
+#     dedlin.main.Document(inputter=inputter, editor=editor, lines=lines)
 
 
 @given(
@@ -110,8 +101,3 @@ def test_fuzz_parse_command(command, current_line, document_length):
 # @given(path=st.builds(Path), lines=st.lists(st.text()))
 # def test_fuzz_save_and_overwrite(path, lines):
 #     dedlin.main.save_and_overwrite(path=path, lines=lines)
-
-
-@given(start_line_number=st.integers())
-def test_fuzz_simple_input(start_line_number):
-    simple_input(start_line_number=start_line_number)

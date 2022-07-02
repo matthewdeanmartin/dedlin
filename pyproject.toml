@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dedlin"
-version = "1.5.0"
+version = "1.6.0"
 description = "Line editor, edlin clone with many improvements"
 authors = ["Matthew Martin <matthewdeanmartin@gmail.com>"]
 keywords = ["editor", "edlin", "line editor",]
@@ -43,6 +43,9 @@ python = ">=3.8, <4.0"
 questionary = "*"
 pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
 rich = "*"
+
+# run type checks
+dpcontracts = "*"
 
 # Natural language support
 pyspellchecker = "*"
