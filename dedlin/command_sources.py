@@ -14,6 +14,8 @@ from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from pygments.styles import get_style_by_name
 
+from dedlin.basic_types import Command
+from dedlin.parsers import parse_command
 from dedlin.pygments_code import EdLexer
 
 # from prompt_toolkit.shortcuts import prompt
@@ -27,7 +29,19 @@ style = style_from_pygments_cls(get_style_by_name("monokai"))
 SESSION = None
 
 
-def interactive_command_handler(prompt: str = "*") -> Generator[str, None, None]:
+class InteractiveGenerator:
+    def __int__(self):
+        self.current_line: int = 0
+        self.document_length: int = 0
+
+    def interactive_typed_command_handler(self, prompt: str):
+        """Wrapper around prompt_toolkit for command input but typed"""
+        user_command_text = next(_interactive_command_handler(prompt))
+        command = parse_command(user_command_text, current_line=self.current_line, document_length=self.document_length)
+        yield command
+
+
+def _interactive_command_handler(prompt: str = "*") -> Generator[str, None, None]:
     """Wrapper around prompt_toolkit for command input"""
     # pylint: disable=global-statement
     global SESSION
@@ -56,7 +70,21 @@ def questionary_command_handler(prompt: str = "*") -> Generator[str, None, None]
         yield answer
 
 
-def command_generator(macro_path: Path) -> Generator[str, None, None]:
-    """Turn a file into a bunch of commands"""
-    with open(str(macro_path), encoding="utf-8") as file:
-        yield from file
+class CommandGenerator:
+    def __init__(self):
+        self.current_line: int = 0
+        self.document_length: int = 0
+
+    def command_generator(self, macro_path: Path) -> Generator[Command, None, None]:
+        """Turn a file into a bunch of commands"""
+        with open(str(macro_path), encoding="utf-8") as file:
+            for line in file:
+                command = parse_command(line, current_line=self.current_line, document_length=self.document_length)
+                yield command
+
+
+class CommandStringGenerator:
+    def command_string_generator(self, macro_path: Path) -> Generator[str, None, None]:
+        """Turn a file into a bunch of commands"""
+        with open(str(macro_path), encoding="utf-8") as file:
+            yield from file

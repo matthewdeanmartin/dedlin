@@ -1,6 +1,6 @@
 from dedlin.basic_types import Command, LineRange, Phrases
-from dedlin.main import Commands, parse_command
-from dedlin.parsers import extract_one_range, extract_phrases
+from dedlin.main import Commands
+from dedlin.parsers import extract_one_range, extract_phrases, parse_command
 
 
 def test_extract_one_range():

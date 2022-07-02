@@ -8,7 +8,7 @@ from tests.fakes import fake_edit, fake_input
 @given(
     integers(
         min_value=0,
-        max_value=1000000,
+        max_value=0,
     )
 )
 def test_document_insert_anywhere(value: int) -> None:

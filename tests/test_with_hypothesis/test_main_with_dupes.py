@@ -10,9 +10,10 @@ from hypothesis.strategies import just
 
 import dedlin.main
 from dedlin.basic_types import LineRange, Printable
-from dedlin.command_sources import command_generator, interactive_command_handler
+from dedlin.command_sources import CommandGenerator, InteractiveGenerator
 from dedlin.document_sources import simple_input
 from dedlin.main import Document, Phrases
+from dedlin.parsers import parse_command
 
 
 @given(
@@ -70,7 +71,8 @@ def test_fuzz_Phrases(first, second, third, fourth, fifth):
 
 @given(macro_path=st.builds(Path))
 def test_fuzz_command_generator(macro_path):
-    command_generator(macro_path=macro_path)
+    the_generator = CommandGenerator()
+    the_generator.command_generator(macro_path=macro_path)
 
 
 @given(document=st.builds(Document))
@@ -91,12 +93,13 @@ def test_fuzz_display_info(document):
 
 @given(prompt=st.text())
 def test_fuzz_interactive_command_handler(prompt):
-    interactive_command_handler(prompt=prompt)
+    the_generator = InteractiveGenerator()
+    the_generator.interactive_typed_command_handler(prompt=prompt)
 
 
 @given(command=st.text(), current_line=st.integers(), document_length=st.integers())
 def test_fuzz_parse_command(command, current_line, document_length):
-    dedlin.main.parse_command(command=command, current_line=current_line, document_length=document_length)
+    parse_command(command=command, current_line=current_line, document_length=document_length)
 
 
 # @given(path=st.builds(Path))

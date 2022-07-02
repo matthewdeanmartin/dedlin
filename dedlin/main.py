@@ -13,16 +13,21 @@ from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
-from dedlin.parsers import parse_command
 from dedlin.web import fetch_page_as_rows
 
 
 class Dedlin:
-    """Application for Dedlin"""
+    """Application for Dedlin
+
+    This class consumes clean command objects and calls the thing.
+
+    This is a command dispatcher.
+    https://en.wikipedia.org/wiki/Command_pattern
+    """
 
     def __init__(
         self,
-        inputter: Generator[str, None, None],
+        inputter: Generator[Command, None, None],
         document_inputter: Callable[[int], Generator[Optional[str], None, None]],
         outputter: Printable,
     ) -> None:
@@ -75,13 +80,13 @@ class Dedlin:
         )
         while True:
             try:
-                user_command_text = next(self.command_inputter)
+                command = next(self.command_inputter)
             except StopIteration:
                 break  # it on down now
 
-            command = parse_command(
-                user_command_text, current_line=self.doc.current_line, document_length=len(self.doc.lines)
-            )
+            # command = parse_command(
+            #     user_command_text, current_line=self.doc.current_line, document_length=len(self.doc.lines)
+            # )
 
             if command is None:
                 self.command_outputter("Unknown command", end="\n")

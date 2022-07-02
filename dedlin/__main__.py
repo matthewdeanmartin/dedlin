@@ -22,7 +22,7 @@ from typing import Optional
 
 from docopt import docopt
 
-from dedlin.command_sources import command_generator, interactive_command_handler
+from dedlin.command_sources import CommandGenerator, InteractiveGenerator
 from dedlin.editable_input_prompt import input_with_prefill
 from dedlin.flash import title_screen
 from dedlin.main import Dedlin
@@ -61,9 +61,11 @@ def run(
         rich_printer.print(text, end="")
 
     if macro_file_name:
-        command_handler = command_generator(Path(macro_file_name))
+        the_generator = CommandGenerator()
+        command_handler = the_generator.command_generator(Path(macro_file_name))
     else:
-        command_handler = interactive_command_handler()
+        the_interactive_generator = InteractiveGenerator()
+        command_handler = the_interactive_generator.interactive_typed_command_handler("* ")
     dedlin = Dedlin(command_handler, input_with_prefill, printer if file_name and file_name.endswith(".py") else print)
     dedlin.halt_on_error = halt_on_error
     dedlin.echo = echo

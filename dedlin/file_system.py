@@ -9,6 +9,7 @@ from typing import Optional
 
 def read_or_create_file(path: Path) -> list[str]:
     """Attempt to read file, create if it doesn't exist"""
+
     if path:
         print(f"Editing {path.absolute()}")
         if not path.exists():

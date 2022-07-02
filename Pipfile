@@ -14,6 +14,7 @@ art = "*"
 pyspellchecker = "*"
 pygments = "*"
 textstat = "*"
+dpcontracts = "*"
 
 [dev-packages]
 mypy = "*"

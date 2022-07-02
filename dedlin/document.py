@@ -5,6 +5,8 @@ import logging
 import random
 from typing import Callable, Generator, Optional
 
+from dpcontracts import invariant
+
 from dedlin.basic_types import LineRange
 from dedlin.lorem_data import LOREM_IPSUM
 from dedlin.spelling_overlay import check
@@ -19,6 +21,10 @@ def print(*args, **kwargs):
     raise Exception("Don't call UI from here.")
 
 
+@invariant(
+    "Current line must be a valid line",
+    lambda self: 1 <= self.current_line <= len(self.lines) or self.current_line == 0 and not self.lines,
+)
 class Document:
     """Abstract document with as few input/output concerns as possible"""
 
@@ -32,7 +38,7 @@ class Document:
         self.inputter = inputter
         self.editor = editor
         self.lines: list[str] = lines
-        self.current_line: int = 0
+        self.current_line: int = 1 if lines else 0
         self.previous_lines = lines
         self.previous_current_line = 0
         self.dirty = False
@@ -96,7 +102,10 @@ class Document:
             line_number += 1
             if self.current_line >= len(self.lines):
                 break
-        self.current_line = self.current_line + line_number
+        if self.current_line + line_number >= len(self.lines):
+            self.current_line = len(self.lines)
+        else:
+            self.current_line = self.current_line + line_number
 
     def spell(self, line_range: LineRange) -> Generator[tuple[str, str], None, None]:
         """Show spelling errors in range"""
