@@ -152,11 +152,6 @@ def test_fuzz_parse_search_replace(front_part, phrases, original_text):
     dedlin.parsers.parse_search_replace(front_part=front_part, phrases=phrases, original_text=original_text)
 
 
-@given(command=st.text(), original_text=st.text())
-def test_fuzz_parse_simple_command(command, original_text):
-    dedlin.parsers.parse_simple_command(command=command, original_text=original_text)
-
-
 @given(value=st.text(), default_value=st.one_of(st.none(), st.integers()))
 def test_fuzz_try_parse_int(value, default_value):
     dedlin.parsers.try_parse_int(value=value, default_value=default_value)

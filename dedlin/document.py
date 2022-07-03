@@ -7,7 +7,7 @@ from typing import Callable, Generator, Optional
 
 from dpcontracts import invariant
 
-from dedlin.basic_types import LineRange
+from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
 from dedlin.document_sources import SimpleInputter
 from dedlin.lorem_data import LOREM_IPSUM
 from dedlin.spelling_overlay import check
@@ -22,17 +22,19 @@ def print(*args, **kwargs):
     raise Exception("Don't call UI from here.")
 
 
+# What does current line mean when there are 0 lines anyhow? Allow 0 or 1.
+# print(self.current_line) is None and
 @invariant(
-    "Current line must be a valid line",
-    lambda self: 1 <= self.current_line <= len(self.lines) or self.current_line == 0 and not self.lines,
+    f"Current line must be a valid line",
+    lambda self: (1 <= self.current_line <= len(self.lines) or self.current_line in (0, 1) and not self.lines),
 )
 class Document:
     """Abstract document with as few input/output concerns as possible"""
 
     def __init__(
         self,
-        insert_inputter: SimpleInputter,
-        edit_inputter: Callable[[str, str], Generator[Optional[str], None, None]],
+        insert_inputter: StringGeneratorProtocol,
+        edit_inputter: Callable[[Optional[str], str], Generator[Optional[str], None, None]],
         lines: list[str],
     ) -> None:
         """Set up initial state"""
@@ -173,9 +175,11 @@ class Document:
 
     def delete(self, line_range: Optional[LineRange]) -> None:
         """Delete lines"""
+        if not self.lines:
+            logger.debug("No lines to delete")
+            return
         if not line_range:
             line_range = LineRange(1, len(self.lines))
-
         self.list_doc(line_range)
 
         # TODO: prompt for confirmation
@@ -215,7 +219,7 @@ class Document:
         self.dirty = True  # this is ugly
         self.current_line = line_number
         logger.debug(f"Edited {line_number}")
-        if self.current_line > len(self.lines):
+        if self.current_line >= len(self.lines):
             return None
         return self.current_line + 1
 
@@ -232,15 +236,28 @@ class Document:
     def insert(
         self,
         line_number: int,
+        phrases: Optional[Phrases] = None,
     ) -> None:
         """Insert a new line at line_number"""
         self.backup()
         if line_number < 0:
+            logger.debug("Autofixing negative line number")
+            line_number = 1
+        elif line_number > len(self.lines) + 1:
+            logger.debug("Autofixing line number beyond end")
             line_number = len(self.lines) + 1
+
+        if phrases:
+            for phrase in phrases.as_list():
+                self.lines.insert(line_number - 1, phrase + "\n")
+                self.dirty = True
+                self.current_line = line_number
+                line_number += 1
+            return
 
         user_input_text: Optional[str] = "GO!"
 
-        input_generator = self.insert_inputter.generator()
+        input_generator = self.insert_inputter.generate()
         while user_input_text is not None:
             prompt = f"  {line_number} : "
             self.insert_inputter.prompt = prompt

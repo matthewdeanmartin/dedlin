@@ -61,11 +61,14 @@ else:
 
 
 class SimpleInputter:
-    def __init__(self):
+    """Get input from the user"""
+
+    def __init__(self) -> None:
+        """Set up the inputter"""
         self.prompt: str = ""
         self.default: str = ""
 
-    def generator(
+    def generate(
         self,
     ) -> Generator[str, None, None]:
         """Wrapper around questionary for inserting text"""

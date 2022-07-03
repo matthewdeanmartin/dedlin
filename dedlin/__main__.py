@@ -57,15 +57,17 @@ def run(
 
     rich_printer = RichPrinter()
 
-    def printer(text, end="\n"):
+    def printer(text: Optional[str], end: str = "\n") -> None:
+        text = "" if text is None else text
         rich_printer.print(text, end="")
 
     if macro_file_name:
-        the_generator = CommandGenerator()
-        command_handler = the_generator.command_generator(Path(macro_file_name))
+        the_generator = CommandGenerator(Path(macro_file_name))
+        command_handler = the_generator.generate()
     else:
         the_interactive_generator = InteractiveGenerator()
-        command_handler = the_interactive_generator.interactive_typed_command_handler("* ")
+        the_interactive_generator.prompt = " * "
+        command_handler = the_interactive_generator.generate()
 
     def document_inputter(prompt: str, text: str = "") -> Generator[str, None, None]:
         """Get input from the user"""

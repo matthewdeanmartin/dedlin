@@ -18,6 +18,7 @@ SPECIFIC_HELP = {
     "DISPLAY": """Display Commands
 [range] List - display lines, set current to end of range
 [range] Page - repeat to flip through entire document
+[range] Spell - show spelling mistakes
 [range] Search "[text]" """,
     "EDIT": """Edit Commands
 [line] - Bare number defaults to Edit at that line

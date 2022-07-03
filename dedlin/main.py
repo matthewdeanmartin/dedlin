@@ -7,10 +7,16 @@ from pathlib import Path
 from typing import Callable, Generator, Optional
 
 import dedlin.help_text as help_text
-from dedlin.basic_types import Command, Commands, Phrases, Printable
-from dedlin.command_sources import InteractiveGenerator
+from dedlin.basic_types import (
+    Command,
+    CommandGeneratorProtocol,
+    Commands,
+    Phrases,
+    Printable,
+    StringGeneratorProtocol,
+    null_printer,
+)
 from dedlin.document import Document
-from dedlin.document_sources import SimpleInputter
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
@@ -28,9 +34,9 @@ class Dedlin:
 
     def __init__(
         self,
-        inputter: InteractiveGenerator,
-        insert_document_inputter: SimpleInputter,
-        edit_document_inputter: Callable[[str, str], Generator[Optional[str], None, None]],
+        inputter: CommandGeneratorProtocol,
+        insert_document_inputter: StringGeneratorProtocol,
+        edit_document_inputter: Callable[[Optional[str], str], Generator[Optional[str], None, None]],
         outputter: Printable,
     ) -> None:
         """Set up initial state and some dependency injection"""
@@ -70,7 +76,7 @@ class Dedlin:
 
         if self.vim_mode or self.quiet:
             self.echo = False
-            self.command_outputter = lambda x, end="": (x, end)
+            self.command_outputter = null_printer
 
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
@@ -81,7 +87,8 @@ class Dedlin:
             edit_inputter=self.edit_document_inputter,
             lines=lines,
         )
-        command_generator = self.command_inputter.interactive_typed_command_handler(" * ")
+        self.command_inputter.prompt = " * "
+        command_generator = self.command_inputter.generate()
         while True:
             self.command_inputter.document_length = len(self.doc.lines)
             self.command_inputter.current_line = self.doc.current_line
@@ -114,9 +121,9 @@ class Dedlin:
             if command.command == Commands.BROWSE:
                 if self.doc.dirty:
                     self.command_outputter("Discarding current document")
-                if command.phrases.first is None:
+                if command.phrases and command.phrases.first is None:
                     self.command_outputter("No URL, can't browse")
-                else:
+                elif command.phrases:
                     page_as_rows = fetch_page_as_rows(command.phrases.first)
                     self.doc.lines = page_as_rows
 
@@ -126,23 +133,23 @@ class Dedlin:
                     self.command_outputter(command.original_text)
             elif command.command == Commands.EMPTY:
                 pass
-            elif command.command == Commands.LIST:
+            elif command.command == Commands.LIST and command.line_range:
                 for line, end in self.doc.list_doc(command.line_range):
                     self.document_outputter(line, end=end)
             elif command.command == Commands.PAGE:
                 for line, end in self.doc.page():
                     self.document_outputter(line, end=end)
-            elif command.command == Commands.SPELL:
+            elif command.command == Commands.SPELL and command.line_range:
                 for line, end in self.doc.spell(command.line_range):
                     self.document_outputter(line, end=end)
-            elif command.command == Commands.DELETE:
+            elif command.command == Commands.DELETE and command.line_range:
                 self.doc.delete(command.line_range)
                 self.command_outputter(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
             elif command.command in (Commands.EXIT, Commands.QUIT):
                 if command.command == Commands.QUIT and self.doc.dirty and self.quit_safety:
                     # TODO: Q & E are a mess.
                     # self.command_outputter("Save changes? (y/n) ", end="")
-                    # if "y" in next(command_generator):
+                    # if "y" in next(generate):
                     self.save_document()
                     return 0
                 elif command.command == Commands.EXIT:
@@ -152,24 +159,24 @@ class Dedlin:
             elif command.command == Commands.INSERT:
                 line_number = command.line_range.start if command.line_range else 1
                 self.command_outputter("Control C to exit insert mode")
-                self.doc.insert(line_number)
-            elif command.command == Commands.PUSH:
+                self.doc.insert(line_number, command.phrases)
+            elif command.command == Commands.PUSH and command.phrases and command.line_range:
                 line_number = command.line_range.start if command.line_range else 1
                 self.doc.push(line_number, command.phrases.as_list())
             elif command.command == Commands.EDIT:
                 self.command_outputter("[Control C], [Enter] to exit edit mode")
-                line_number = command.line_range.start if command.line_range else 1
-                while line_number:
-                    line_number = self.doc.edit(line_number)
+                edit_line_number: Optional[int] = command.line_range.start if command.line_range else 1
+                while edit_line_number:
+                    edit_line_number = self.doc.edit(edit_line_number)
                 # New line or else next text will be on the same line
                 self.command_outputter("")
-            elif command.command == Commands.SEARCH:
+            elif command.command == Commands.SEARCH and command.line_range and command.phrases:
                 for text in self.doc.search(command.line_range, value=command.phrases.first):
                     self.document_outputter(text)
             elif command.command == Commands.INFO:
                 for info, end in display_info(self.doc):
                     self.document_outputter(info, end)
-            elif command.command == Commands.REPLACE:
+            elif command.command == Commands.REPLACE and command.phrases and command.line_range:
                 self.command_outputter("Replacing")
                 for line in self.doc.replace(
                     command.line_range,
@@ -191,7 +198,7 @@ class Dedlin:
             elif command.command == Commands.SHUFFLE:
                 self.doc.shuffle()
                 self.command_outputter("Shuffled")
-            elif command.command == Commands.CURRENT:
+            elif command.command == Commands.CURRENT and command.line_range:
                 self.doc.current_line = command.line_range.start
                 # self.command_outputter("Current line set to {}".format(command.line_range.start))
             elif command.command == Commands.EMPTY:
@@ -211,7 +218,7 @@ class Dedlin:
             elif command.command == Commands.UNKNOWN:
                 self.command_outputter("Unknown command, type HELP for help")
                 if self.halt_on_error:
-                    raise Exception(f"Unknown command {user_command_text}")
+                    raise Exception(f"Unknown command {command.original_text}")
             else:
                 self.command_outputter(f"Command {command.command} not implemented")
 
@@ -223,10 +230,13 @@ class Dedlin:
 
     def save_document(self, phrases: Optional[Phrases] = None):
         """Save the document to the file"""
-        if self.file_path is not None and phrases is not None:
-            self.file_path = Path(phrases.first)
-        save_and_overwrite(self.file_path, self.doc.lines)
-        self.doc.dirty = False
+
+        # TODO: Refactor and guarantee that the file exists when saved
+        if self.doc:
+            if self.file_path is not None and phrases is not None:
+                self.file_path = Path(phrases.first)
+            save_and_overwrite(self.file_path, self.doc.lines)
+            self.doc.dirty = False
 
     def save_macro(self):
         """Save the document to the file"""

@@ -69,10 +69,14 @@ def extract_phrases(value: str) -> Optional[Phrases]:
     # handle quotes without escapes
     if '"' in value and '\\"' not in value:
         parts = [_ for _ in value.split('"') if _.strip() != ""]
-        if len(parts) == 1:
-            return Phrases(parts[0], None)
-        if len(parts) > 1:
-            return Phrases(parts[0], parts[1])
+
+        kwarg_names = ["first", "second", "third", "fourth", "fifth"]
+        kwargs = {}
+        for part, name in zip(parts, kwarg_names):
+            if part:
+                kwargs[name] = part
+        if kwargs:
+            return Phrases(**kwargs)
 
     # handle unquoted delimited by spaces
     if '"' not in value:
@@ -108,22 +112,11 @@ def get_command_length(value: str, suffixes: Iterable[str]) -> int:
     return 0
 
 
-def parse_simple_command(command: str, original_text: str) -> Optional[Command]:
-    """Parse a command that has no line range or phrases"""
-    # TODO: the biggest generic parser should replace all of these
-
-    # Commands without abbreviations first
-    if command in ("UNDO",):
-        return Command(
-            Commands.UNDO,
-            original_text=original_text,
-        )
-    return None
-
-
 RANGE_ONLY = {
     Commands.LOREM: ("LOREM",),
     Commands.DELETE: ("D", "DELETE"),
+    Commands.EDIT: ("EDIT",),
+    Commands.INSERT: ("I", "INSERT"),
     Commands.LIST: ("L", "LIST"),
     Commands.PAGE: ("P", "PAGE"),
     Commands.SPELL: ("SPELL",),
@@ -295,10 +288,6 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
     if not front_part:
         raise TypeError("Something has gone wrong.")
 
-    candidate = parse_simple_command(front_part, original_text)
-    if candidate:
-        return candidate
-
     # Meaning of range shifted, need to fix.
     # lorem_commands = ("LOREM",)
     # if ends_with_any(front_part, lorem_commands) or front_part in lorem_commands:
@@ -322,24 +311,24 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
     if candidate:
         return candidate
 
-    # This where range is 1 row
-    insert_commands = ("I", "INSERT")
-    if ends_with_any(front_part, insert_commands) or front_part in insert_commands:
-        if front_part in insert_commands:
-            line_range = None
-        elif "INSERT" in front_part:
-            line_number = try_parse_int(front_part.split("INSERT", maxsplit=1)[0].strip())
-            if line_number is None:
-                print("Invalid target", command)
-                return None
-            line_range = LineRange(start=line_number, end=line_number)
-        else:  # "I" in front_part:
-            line_number = try_parse_int(front_part.split("I", maxsplit=1)[0].strip())
-            if line_number is None:
-                print("Invalid target", command)
-                return None
-            line_range = LineRange(start=line_number, end=line_number)
-        return Command(Commands.INSERT, line_range=line_range, original_text=original_text)
+    # This where range is 1 row.. monoparse it! ignore teh range end
+    # insert_commands = ("I", "INSERT")
+    # if ends_with_any(front_part, insert_commands) or front_part in insert_commands:
+    #     if front_part in insert_commands:
+    #         line_range = None
+    #     elif "INSERT" in front_part:
+    #         line_number = try_parse_int(front_part.split("INSERT", maxsplit=1)[0].strip())
+    #         if line_number is None:
+    #             print("Invalid target", command)
+    #             return None
+    #         line_range = LineRange(start=line_number, end=line_number)
+    #     else:  # "I" in front_part:
+    #         line_number = try_parse_int(front_part.split("I", maxsplit=1)[0].strip())
+    #         if line_number is None:
+    #             print("Invalid target", command)
+    #             return None
+    #         line_range = LineRange(start=line_number, end=line_number)
+    #     return Command(Commands.INSERT, line_range=line_range, original_text=original_text)
 
     candidate = bare_command(command)
     if candidate:
@@ -349,6 +338,7 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
 
 
 if __name__ == "__main__":
+    result = parse_command("1i cat dog", 1, 0)
     result = parse_command("1", 1, 3)
     print(result)
     print(result.validate())

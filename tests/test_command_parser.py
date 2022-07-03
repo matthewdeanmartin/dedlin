@@ -12,9 +12,7 @@ def test_extract_one_range():
 def test_parse_command_insert_default():
 
     for insert in ("I", "Insert", "insert", "i", "INSERT"):
-        assert parse_command(insert, 1, 3) == Command(
-            Commands.INSERT,  # LineRange(start=1, end=1), # Phrases("")
-        ), insert
+        assert parse_command(insert, 1, 3) == Command(Commands.INSERT, LineRange(start=1, end=3), None), insert
 
 
 def test_parse_command_insert_specific_rage():

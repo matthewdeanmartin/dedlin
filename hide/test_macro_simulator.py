@@ -1,5 +1,5 @@
 """
-Simulates user entry from a macro file using command_generator
+Simulates user entry from a macro file using generate
 """
 import logging.config
 from pathlib import Path
@@ -26,7 +26,7 @@ def test_lorem_ed():
     lines_path = ANIMALS_FILE
     macro_path = Path(locate_file("sample_macros/lorem.ed", __file__))
     string_generator = CommandGenerator()
-    dedlin = Dedlin(string_generator.command_generator(macro_path), document_inputter_that_blows_up, print)
+    dedlin = Dedlin(string_generator.generate(macro_path), document_inputter_that_blows_up, print)
     dedlin.halt_on_error = True
     dedlin.quit_safety = False
     dedlin.entry_point(str(lines_path.absolute()))
@@ -41,7 +41,7 @@ def test_shuffle_sort_reverse_ed():
     lines_path = ANIMALS_FILE
     macro_path = Path(locate_file("sample_macros/randomize.ed", __file__))
     string_generator = CommandGenerator()
-    dedlin = Dedlin(string_generator.command_generator(macro_path), document_inputter_that_blows_up, print)
+    dedlin = Dedlin(string_generator.generate(macro_path), document_inputter_that_blows_up, print)
     dedlin.halt_on_error = True
     dedlin.quit_safety = False
     dedlin.entry_point(str(lines_path.absolute()))
@@ -55,7 +55,7 @@ def test_degenerate_ed():
 
     macro_path = Path(locate_file("sample_macros/degenerate.ed", __file__))
     string_generator = CommandGenerator()
-    dedlin = Dedlin(string_generator.command_generator(macro_path), document_inputter_that_blows_up, print)
+    dedlin = Dedlin(string_generator.generate(macro_path), document_inputter_that_blows_up, print)
     dedlin.halt_on_error = False
     dedlin.entry_point()
     assert not dedlin.doc.lines
@@ -74,7 +74,7 @@ def test_search_ed():
         thing.append(line)
 
     string_generator = CommandGenerator()
-    dedlin = Dedlin(string_generator.command_generator(macro_path), document_inputter_that_blows_up, capture)
+    dedlin = Dedlin(string_generator.generate(macro_path), document_inputter_that_blows_up, capture)
     dedlin.halt_on_error = True
     dedlin.quiet = True
     dedlin.entry_point(str(lines_path.absolute()))
@@ -95,7 +95,7 @@ def test_search_ed():
 #         thing.append(line)
 #
 #     string_generator = CommandGenerator()
-#     dedlin = Dedlin(string_generator.command_generator(macro_path),
+#     dedlin = Dedlin(string_generator.generate(macro_path),
 #                     document_inputter_that_blows_up, capture)
 #     dedlin.halt_on_error = True
 #     dedlin.quit_safety = False

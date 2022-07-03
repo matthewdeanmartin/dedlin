@@ -4,7 +4,7 @@ Basic classes and mypy types
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, Protocol, runtime_checkable
+from typing import Generator, Optional, Protocol, runtime_checkable
 
 logger = logging.getLogger(__name__)
 
@@ -160,4 +160,38 @@ class Printable(Protocol):
     """Something that acts like print()"""
 
     def __call__(self, text: Optional[str], end: str = "\n") -> None:
+        ...
+
+
+def null_printer(text: str, end: str = "") -> None:
+    """
+    Do nothing implementation of Printable
+    """
+    ...
+
+
+@runtime_checkable
+class CommandGeneratorProtocol(Protocol):
+    """Something stateful and that can generate commands"""
+
+    prompt: str
+    document_length: int
+    current_line: int
+
+    def generate(
+        self,
+    ) -> Generator[Command, None, None]:
+        ...
+
+
+@runtime_checkable
+class StringGeneratorProtocol(Protocol):
+    """Something stateful and that can generate strings"""
+
+    prompt: str
+    default: str
+
+    def generate(
+        self,
+    ) -> Generator[str, None, None]:
         ...

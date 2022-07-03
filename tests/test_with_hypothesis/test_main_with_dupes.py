@@ -4,12 +4,13 @@
 import typing
 from pathlib import Path
 
+import hypothesis
 from hypothesis import example, given
 from hypothesis import strategies as st
 from hypothesis.strategies import just
 
 import dedlin.main
-from dedlin.basic_types import LineRange, Printable
+from dedlin.basic_types import LineRange, Printable, StringGeneratorProtocol
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
 from dedlin.document_sources import SimpleInputter
 from dedlin.main import Document, Phrases
@@ -62,8 +63,11 @@ def test_fuzz_Phrases(first, second, third, fourth, fifth):
 
 @given(macro_path=st.builds(Path))
 def test_fuzz_command_generator(macro_path):
-    the_generator = CommandGenerator()
-    the_generator.command_generator(macro_path=macro_path)
+    the_generator = CommandGenerator(macro_path)
+    the_generator.generate()
+
+
+hypothesis.strategies.register_type_strategy(StringGeneratorProtocol, hypothesis.strategies.builds(SimpleInputter))
 
 
 @given(document=st.builds(Document))
@@ -85,7 +89,8 @@ def test_fuzz_display_info(document):
 @given(prompt=st.text())
 def test_fuzz_interactive_command_handler(prompt):
     the_generator = InteractiveGenerator()
-    the_generator.interactive_typed_command_handler(prompt=prompt)
+    the_generator.prompt = prompt
+    the_generator.generate()
 
 
 @given(command=st.text(), current_line=st.integers(), document_length=st.integers())

@@ -4,7 +4,7 @@ Interactive command input methods.
 These handle history, syntax highlighting, and auto-suggestion.
 """
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Optional
 
 import questionary
 from prompt_toolkit import PromptSession
@@ -26,22 +26,25 @@ from dedlin.pygments_code import EdLexer
 # thing = guess_lexer_for_filename("cats.py","")
 style = style_from_pygments_cls(get_style_by_name("monokai"))
 
-SESSION = None
+SESSION: Optional[PromptSession] = None
 
 
 class InteractiveGenerator:
     """Get a typed command from the user"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the generator"""
         self.current_line: int = 0
         self.document_length: int = 0
+        self.prompt: str = "> "
 
-    def interactive_typed_command_handler(self, prompt: str):
+    def generate(
+        self,
+    ) -> Generator[Command, None, None]:
         """Wrapper around prompt_toolkit for command input but typed"""
         user_command_text = ""
         while user_command_text is not None:
-            user_command_text = next(_interactive_command_handler(prompt))
+            user_command_text = next(_interactive_command_handler(self.prompt))
             command = parse_command(
                 user_command_text, current_line=self.current_line, document_length=self.document_length
             )
@@ -80,15 +83,18 @@ def questionary_command_handler(prompt: str = "*") -> Generator[str, None, None]
 class CommandGenerator:
     """Get a typed command from a file"""
 
-    def __init__(self):
+    def __init__(self, path: Path):
         """Initialize the generator"""
         self.current_line: int = 0
         self.document_length: int = 0
+        self.macro_path: Path = path
 
-    def command_generator(self, macro_path: Path) -> Generator[Command, None, None]:
+    def generate(
+        self,
+    ) -> Generator[Command, None, None]:
         """Turn a file into a bunch of commands"""
 
-        with open(str(macro_path), encoding="utf-8") as file:
+        with open(str(self.macro_path), encoding="utf-8") as file:
             for line in file:
                 command = parse_command(line, current_line=self.current_line, document_length=self.document_length)
                 yield command
