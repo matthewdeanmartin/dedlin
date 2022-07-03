@@ -1,3 +1,7 @@
+TODO
+- Try to use Githubs task tracking features to prove I can
+-
+
 Current line logic
 - Can't see current line, can't just change current line
 - display * on List/Page for "current line"

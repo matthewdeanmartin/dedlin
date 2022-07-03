@@ -56,7 +56,10 @@ class Commands(Enum):
 
 @dataclass(frozen=True)
 class LineRange:
-    """A 1-base range of lines"""
+    """A 1-base range of lines
+
+    TODO: refactor to start + positive offset and end is a convenience property
+    """
 
     start: int
     end: int
@@ -86,7 +89,10 @@ class LineRange:
 
 @dataclass(frozen=True)
 class Phrases:
-    """End part of a command, especially for search/replace"""
+    """End part of a command, especially for search/replace
+
+    TODO: refactor as list with convenience properties named first, second, etc.
+    """
 
     first: str
     second: Optional[str] = None

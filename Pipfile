@@ -20,7 +20,7 @@ dpcontracts = "*"
 mypy = "*"
 pytest = "*"
 pytest-cov = "*"
-hypothesis = "*"
+hypothesis = {extras = ["cli"], version = "*"}
 types-requests = "*"
 
 [requires]

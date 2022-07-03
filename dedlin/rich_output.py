@@ -16,5 +16,10 @@ class RichPrinter:
         """Syntax highlighting"""
         if text and text.endswith("\n"):
             text = text[:-1]
-        syntax = Syntax(text, "python", theme="monokai", line_numbers=False)
+        syntax = Syntax(
+            text,
+            "python",
+            # theme="monokai",
+            line_numbers=False,
+        )
         self.console.print(syntax, end=end)

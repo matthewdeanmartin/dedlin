@@ -4,7 +4,7 @@ Interactive command input methods.
 These handle history, syntax highlighting, and auto-suggestion.
 """
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, Iterable, Optional
 
 import questionary
 from prompt_toolkit import PromptSession
@@ -98,6 +98,22 @@ class CommandGenerator:
             for line in file:
                 command = parse_command(line, current_line=self.current_line, document_length=self.document_length)
                 yield command
+
+
+class InMemoryCommandGenerator:
+    """A bunch of predefined commands"""
+
+    def __init__(self, commands: Iterable[Command]):
+        """Initialize the generator"""
+        self.current_line: int = 0
+        self.document_length: int = 0
+        self.commands: Iterable[Command] = commands
+
+    def generate(
+        self,
+    ) -> Generator[Command, None, None]:
+        """Return a predefined command"""
+        yield from self.commands
 
 
 # class CommandStringGenerator:

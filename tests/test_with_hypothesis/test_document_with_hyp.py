@@ -11,7 +11,7 @@ def test_fuzz_LineRange(start, end, repeat):
     dedlin.document.LineRange(start=start, end=end, repeat=repeat)
 
 
-#
+# Hangs
 # @given(line=st.text())
 # def test_fuzz_check(line):
 #     dedlin.document.check(line=line)

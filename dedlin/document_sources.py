@@ -6,7 +6,7 @@ Python doesn't do this out of the box and there is a different solution
 for linux than for windows.
 """
 
-from typing import Generator
+from typing import Generator, Iterable
 
 import questionary
 
@@ -61,7 +61,10 @@ else:
 
 
 class SimpleInputter:
-    """Get input from the user"""
+    """Get input from the user
+
+    Implements StringGeneratorProtocol
+    """
 
     def __init__(self) -> None:
         """Set up the inputter"""
@@ -77,3 +80,22 @@ class SimpleInputter:
             if response is None:
                 break
             yield response
+
+
+class InMemoryInputter:
+    """Get input from the user
+
+    Implements StringGeneratorProtocol
+    """
+
+    def __init__(self, lines: Iterable[str]) -> None:
+        """Set up the inputter"""
+        self.prompt: str = ""
+        self.default: str = ""
+        self.lines = lines
+
+    def generate(
+        self,
+    ) -> Generator[str, None, None]:
+        """Wrapper around questionary for inserting text"""
+        yield from self.lines

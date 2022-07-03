@@ -7,16 +7,16 @@ from pathlib import Path
 from typing import Callable, Generator, Optional
 
 import dedlin.help_text as help_text
-from dedlin.basic_types import (
+from dedlin.basic_types import (  # CommandGeneratorProtocol,; StringGeneratorProtocol,
     Command,
-    CommandGeneratorProtocol,
     Commands,
     Phrases,
     Printable,
-    StringGeneratorProtocol,
     null_printer,
 )
+from dedlin.command_sources import InMemoryCommandGenerator
 from dedlin.document import Document
+from dedlin.document_sources import InMemoryInputter
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
@@ -34,10 +34,10 @@ class Dedlin:
 
     def __init__(
         self,
-        inputter: CommandGeneratorProtocol,
-        insert_document_inputter: StringGeneratorProtocol,
+        inputter: InMemoryCommandGenerator,  # CommandGeneratorProtocol,
+        insert_document_inputter: InMemoryInputter,  # StringGeneratorProtocol,
         edit_document_inputter: Callable[[Optional[str], str], Generator[Optional[str], None, None]],
-        outputter: Printable,
+        outputter: Callable[[Optional[str], str], None],  # Printable,
     ) -> None:
         """Set up initial state and some dependency injection"""
         self.command_inputter = inputter
