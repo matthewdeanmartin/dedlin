@@ -1,10 +1,13 @@
 """
 Basic classes and mypy types
 """
+import dataclasses
 import logging
-from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Generator, Optional, Protocol, runtime_checkable
+
+from pydantic import validator
+from pydantic.dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -62,8 +65,34 @@ class LineRange:
     """
 
     start: int
-    end: int
+    offset: int
     repeat: int = 1
+
+    @validator("start", allow_reuse=True)
+    def start_must_be_one_or_more(cls, start: int) -> int:
+        """Start must be 1 or more"""
+        if start < 1:
+            raise ValueError("start must be one or more")
+        return start
+
+    @validator("offset", allow_reuse=True)
+    def offset_zero_or_more(cls, offset: int) -> int:
+        """Offset must be zero or more"""
+        if offset < 0:
+            raise ValueError("offset must be zero or more")
+        return offset
+
+    @validator("repeat", allow_reuse=True)
+    def repeat_zero_or_more(cls, repeat: int) -> int:
+        """Repeat must be zero or more"""
+        if repeat < 0:
+            raise ValueError("repeat must be zero or more")
+        return repeat
+
+    @property
+    def end(self) -> int:
+        """Make this derived so that start and end are valid as long as they are positive"""
+        return self.start + self.offset
 
     def count(self) -> int:
         """How many rows on a 1-based index"""
@@ -87,6 +116,7 @@ class LineRange:
         return range_part + repeat_part
 
 
+# can't freeze anymore because of list.
 @dataclass(frozen=True)
 class Phrases:
     """End part of a command, especially for search/replace
@@ -94,19 +124,66 @@ class Phrases:
     TODO: refactor as list with convenience properties named first, second, etc.
     """
 
-    first: str
-    second: Optional[str] = None
-    third: Optional[str] = None
-    fourth: Optional[str] = None
-    fifth: Optional[str] = None
+    # TODO: refactor to tuple so we can freeze this.
+    parts: tuple[str, ...] = dataclasses.field(default_factory=lambda: ())
+
+    @property
+    def first(self) -> Optional[str]:
+        """First phrase"""
+        return self.parts[0] if len(self.parts) > 0 else None
+
+    @property
+    def second(self) -> Optional[str]:
+        """Return the second phrase"""
+        return self.parts[1] if len(self.parts) > 1 else None
+
+    @property
+    def third(self) -> Optional[str]:
+        """Return the third part of the phrases"""
+        return self.parts[2] if len(self.parts) > 2 else None
+
+    @property
+    def fourth(self) -> Optional[str]:
+        """Return the fourth phrase"""
+        return self.parts[3] if len(self.parts) > 3 else None
+
+    @property
+    def fifth(self) -> Optional[str]:
+        """Return the fifth phrase"""
+        return self.parts[4] if len(self.parts) > 4 else None
+
+    @property
+    def sixth(self) -> Optional[str]:
+        """Return the sixth part of the phrases"""
+        return self.parts[5] if len(self.parts) > 5 else None
+
+    @property
+    def seventh(self) -> Optional[str]:
+        """Return the seventh phrase"""
+        return self.parts[6] if len(self.parts) > 6 else None
+
+    @property
+    def eighth(self) -> Optional[str]:
+        """Return the eighth phrase"""
+        return self.parts[7] if len(self.parts) > 7 else None
+
+    @property
+    def ninth(self) -> Optional[str]:
+        """Return the ninth phrase"""
+        return self.parts[8] if len(self.parts) > 8 else None
+
+    @property
+    def tenth(self) -> Optional[str]:
+        """Tenth phrase"""
+        return self.parts[9] if len(self.parts) > 9 else None
 
     def as_list(self) -> list[str]:
         """Convert to a list_doc of strings"""
-        return list(filter(lambda _: _ is not None, [self.first, self.second, self.third, self.fourth, self.fifth]))
+        return list(filter(lambda _: _ is not None, self.parts))
 
     def format(self) -> str:
         """Round tripable format"""
-        parts = self.as_list()
+        # parts = self.as_list()
         usable_parts = []
 
         def safe_quote(value: str) -> str:
@@ -118,13 +195,17 @@ class Phrases:
                 return f'"{value}'
             return value
 
-        for part in parts:
+        for part in self.parts:
             if part:
                 usable_parts.append(part)
             else:
                 break
 
-        return " ".join(safe_quote(_) for _ in parts if _)
+        return " ".join(safe_quote(_) for _ in self.parts if _)
+
+    def validate(self) -> bool:
+        """Check if phrases are sensible"""
+        return None not in self.parts
 
 
 @dataclass(frozen=True)
@@ -134,13 +215,17 @@ class Command:
     command: Commands
     line_range: Optional[LineRange] = None
     phrases: Optional[Phrases] = None
-    original_text: Optional[str] = field(default=None, compare=False)
+    original_text: Optional[str] = dataclasses.field(default=None, compare=False)
 
     def validate(self) -> bool:
         """Check if ranges are sensible"""
         if self.line_range:
             line_range_is_valid = self.line_range.validate()
             if not line_range_is_valid:
+                return False
+        if self.phrases:
+            phrases_are_valid = self.phrases.validate()
+            if not phrases_are_valid:
                 return False
         return True
 

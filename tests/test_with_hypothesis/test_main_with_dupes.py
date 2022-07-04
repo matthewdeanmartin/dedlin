@@ -10,7 +10,7 @@ from hypothesis import strategies as st
 from hypothesis.strategies import just
 
 import dedlin.main
-from dedlin.basic_types import LineRange, Printable, StringGeneratorProtocol
+from dedlin.basic_types import Command, LineRange, Printable, StringGeneratorProtocol
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
 from dedlin.document_sources import SimpleInputter
 from dedlin.main import Document, Phrases
@@ -19,16 +19,13 @@ from dedlin.parsers import parse_command
 
 @given(
     command=st.sampled_from(dedlin.basic_types.Commands),
-    line_range=st.one_of(st.none(), st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers()))),
+    line_range=st.one_of(
+        st.none(),
+        st.builds(LineRange, start=st.integers(1), offset=st.integers(0), repeat=st.one_of(st.just(1), st.integers(0))),
+    ),
     phrases=st.one_of(
         st.none(),
-        st.builds(
-            Phrases,
-            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-        ),
+        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
     ),
     original_text=st.one_of(st.none(), st.text()),
 )
@@ -50,15 +47,9 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
 #     dedlin.main.Document(inputter=inputter, editor=editor, lines=lines)
 
 
-@given(
-    first=st.text(),
-    second=st.one_of(st.none(), st.text()),
-    third=st.one_of(st.none(), st.text()),
-    fourth=st.one_of(st.none(), st.text()),
-    fifth=st.one_of(st.none(), st.text()),
-)
-def test_fuzz_Phrases(first, second, third, fourth, fifth):
-    dedlin.main.Phrases(first=first, second=second, third=third, fourth=fourth, fifth=fifth)
+@given(parts=st.tuples(st.text(), st.text()))
+def test_fuzz_Phrases(parts):
+    dedlin.main.Phrases(parts=parts)
 
 
 @given(macro_path=st.builds(Path))
@@ -93,9 +84,27 @@ def test_fuzz_interactive_command_handler(prompt):
     the_generator.generate()
 
 
-@given(command=st.text(), current_line=st.integers(), document_length=st.integers())
-def test_fuzz_parse_command(command, current_line, document_length):
-    parse_command(command=command, current_line=current_line, document_length=document_length)
+@given(
+    current_command=st.builds(
+        Command,
+        command=st.sampled_from(dedlin.basic_types.Commands),
+        line_range=st.one_of(
+            st.none(),
+            st.builds(
+                LineRange, start=st.integers(1), offset=st.integers(0), repeat=st.one_of(st.just(1), st.integers(0))
+            ),
+        ),
+        phrases=st.one_of(
+            st.none(),
+            st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
+        ),
+        original_text=st.one_of(st.none(), st.text()),
+    ),
+    current_line=st.integers(0),
+    document_length=st.integers(0),
+)
+def test_fuzz_parse_command(current_command, current_line, document_length):
+    parse_command(command=current_command.format(), current_line=current_line, document_length=document_length)
 
 
 # @given(path=st.builds(Path))

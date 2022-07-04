@@ -6,6 +6,8 @@ from pygments.token import Comment, Keyword, Text
 
 
 class EdLexer(RegexLexer):
+    """Lexer for dedlin DSL."""
+
     name = "ED"
     aliases = ["ed"]
     filenames = ["*.ed"]

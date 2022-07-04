@@ -6,9 +6,9 @@ from hypothesis import strategies as st
 import dedlin.document
 
 
-@given(start=st.integers(), end=st.integers(), repeat=st.integers())
-def test_fuzz_LineRange(start, end, repeat):
-    dedlin.document.LineRange(start=start, end=end, repeat=repeat)
+@given(start=st.integers(min_value=1), offset=st.integers(min_value=0), repeat=st.integers(min_value=0))
+def test_fuzz_LineRange(start, offset, repeat):
+    dedlin.document.LineRange(start=start, offset=offset, repeat=repeat)
 
 
 # Hangs

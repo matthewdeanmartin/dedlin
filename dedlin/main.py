@@ -152,7 +152,7 @@ class Dedlin:
                     # if "y" in next(generate):
                     self.save_document()
                     return 0
-                elif command.command == Commands.EXIT:
+                if command.command == Commands.EXIT:
                     self.save_document(command.phrases)
                 if command.command in (Commands.QUIT, Commands.EXIT):
                     return 0

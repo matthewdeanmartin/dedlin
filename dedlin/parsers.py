@@ -40,7 +40,7 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
             print("Range invalid:", value)
             return None
 
-        candidate = LineRange(start=start, end=end, repeat=repeat)
+        candidate = LineRange(start=start, offset=end - start, repeat=repeat)
 
         # TODO: need better parser errors
         if not candidate.validate():
@@ -49,12 +49,12 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
 
         return candidate
     if value == ".":
-        return LineRange(start=current_line, end=current_line, repeat=1)
+        return LineRange(start=current_line, offset=0, repeat=1)
     if value == "$":
-        return LineRange(start=document_length, end=document_length, repeat=1)
+        return LineRange(start=document_length, offset=0, repeat=1)
     if value and all(_ in "0123456789" for _ in value):
         start = int(value)
-        candidate = LineRange(start=start, end=start, repeat=1)
+        candidate = LineRange(start=start, offset=0, repeat=1)
 
         # TODO: need better parser errors
         if not candidate.validate():
@@ -69,23 +69,12 @@ def extract_phrases(value: str) -> Optional[Phrases]:
     # handle quotes without escapes
     if '"' in value and '\\"' not in value:
         parts = [_ for _ in value.split('"') if _.strip() != ""]
-
-        kwarg_names = ["first", "second", "third", "fourth", "fifth"]
-        kwargs = {}
-        for part, name in zip(parts, kwarg_names):
-            if part:
-                kwargs[name] = part
-        if kwargs:
-            return Phrases(**kwargs)
+        return Phrases(tuple(parts))
 
     # handle unquoted delimited by spaces
     if '"' not in value:
         parts = [_ for _ in value.split(" ") if _.strip() != ""]
-        if len(parts) == 1:
-            return Phrases(parts[0].strip(), None)
-        if len(parts) > 1:
-            return Phrases(parts[0].strip(), parts[1].strip())
-
+        return Phrases(parts=parts)
     if '\\"' in value:
         raise NotImplementedError("Escape quotes not implemented")
 
@@ -147,7 +136,9 @@ def parse_range_only(
     for command_code, command_forms in RANGE_ONLY.items():
         if just_command in command_forms:
             if front_part in command_forms:
-                line_range: Optional[LineRange] = LineRange(start=1, end=1 if document_length == 0 else document_length)
+                line_range: Optional[LineRange] = LineRange(
+                    start=1, offset=0 if document_length == 0 else document_length - 1
+                )
             else:
                 command_length = get_command_length(front_part, command_forms)
                 range_text = front_part[0 : len(front_part) - command_length]
@@ -192,14 +183,14 @@ def parse_search_replace(
                 if line_number is None:
                     print("Bad range", original_text)
                     return None
-                line_range = LineRange(start=line_number, end=line_number)
+                line_range = LineRange(start=line_number, offset=0)
             elif abbreviation is not None:
                 line_number = try_parse_int(front_part.split(abbreviation)[0].strip())
                 if line_number is None:
                     print("Bad range", original_text)
                     return None
 
-                line_range = LineRange(start=line_number, end=line_number)
+                line_range = LineRange(start=line_number, offset=0)
 
             return Command(
                 command_code,
@@ -256,7 +247,7 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
         target = target if target <= document_length else document_length
         return Command(
             command=Commands.EDIT,
-            line_range=LineRange(start=target, end=target),
+            line_range=LineRange(start=target, offset=0),
             original_text=original_text,
         )
 
@@ -288,21 +279,6 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
     if not front_part:
         raise TypeError("Something has gone wrong.")
 
-    # Meaning of range shifted, need to fix.
-    # lorem_commands = ("LOREM",)
-    # if ends_with_any(front_part, lorem_commands) or front_part in lorem_commands:
-    #     if front_part in lorem_commands:
-    #         line_count = len(LOREM_IPSUM)
-    #         line_range = LineRange(start=1, end=line_count, repeat=1)
-    #     else:
-    #         line_count = try_parse_int(front_part.split("LOREM", maxsplit=1)[0].strip())
-    #         line_range = LineRange(start=1, end=line_count, repeat=1)
-    #     return Command(
-    #         Commands.LOREM,
-    #         line_range=line_range,
-    #         original_text=original_text,
-    #     )
-
     candidate = parse_range_only(just_command, front_part, original_text, current_line, document_length, phrases)
     if candidate:
         return candidate
@@ -310,25 +286,6 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
     candidate = parse_search_replace(front_part, phrases, original_text)
     if candidate:
         return candidate
-
-    # This where range is 1 row.. monoparse it! ignore teh range end
-    # insert_commands = ("I", "INSERT")
-    # if ends_with_any(front_part, insert_commands) or front_part in insert_commands:
-    #     if front_part in insert_commands:
-    #         line_range = None
-    #     elif "INSERT" in front_part:
-    #         line_number = try_parse_int(front_part.split("INSERT", maxsplit=1)[0].strip())
-    #         if line_number is None:
-    #             print("Invalid target", command)
-    #             return None
-    #         line_range = LineRange(start=line_number, end=line_number)
-    #     else:  # "I" in front_part:
-    #         line_number = try_parse_int(front_part.split("I", maxsplit=1)[0].strip())
-    #         if line_number is None:
-    #             print("Invalid target", command)
-    #             return None
-    #         line_range = LineRange(start=line_number, end=line_number)
-    #     return Command(Commands.INSERT, line_range=line_range, original_text=original_text)
 
     candidate = bare_command(command)
     if candidate:

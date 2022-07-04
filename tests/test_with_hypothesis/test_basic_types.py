@@ -16,20 +16,14 @@ from dedlin.basic_types import LineRange, Phrases
         st.none(),
         st.builds(
             LineRange,
-            start=st.integers(1, 5),
-            end=st.integers(5, 6),
-            repeat=st.one_of(st.just(1), st.integers(min_value=1)),
+            start=st.integers(1),
+            offset=st.integers(0),
+            repeat=st.one_of(st.just(1), st.integers(min_value=0)),
         ),
     ),
     phrases=st.one_of(
         st.none(),
-        st.builds(
-            Phrases,
-            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-        ),
+        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
     ),
     original_text=st.one_of(st.none(), st.text()),
 )
@@ -45,29 +39,25 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
 
 @given(
     start=st.integers(min_value=1, max_value=10),
-    end=st.integers(min_value=10, max_value=20),
+    offset=st.integers(min_value=1, max_value=20),
     repeat=st.integers(min_value=1),
 )
-def test_fuzz_LineRange(start, end, repeat):
-    line_range = dedlin.basic_types.LineRange(start=start, end=end, repeat=repeat)
+def test_fuzz_LineRange(start, offset, repeat):
+    line_range = dedlin.basic_types.LineRange(start=start, offset=offset, repeat=repeat)
     assert line_range.validate()
 
 
 @given(start=st.integers(min_value=1), repeat=st.integers(min_value=1))
 def test_fuzz_LineRange_one_point_range(start, repeat):
-    line_range = dedlin.basic_types.LineRange(start=start, end=start, repeat=repeat)
+    line_range = dedlin.basic_types.LineRange(start=start, offset=0, repeat=repeat)
     assert line_range.validate()
 
 
 @given(
-    first=st.text(),
-    second=st.one_of(st.none(), st.text()),
-    third=st.one_of(st.none(), st.text()),
-    fourth=st.one_of(st.none(), st.text()),
-    fifth=st.one_of(st.none(), st.text()),
+    parts=st.tuples(st.text(), st.text()),
 )
-def test_fuzz_Phrases(first, second, third, fourth, fifth):
-    dedlin.basic_types.Phrases(first=first, second=second, third=third, fourth=fourth, fifth=fifth)
+def test_fuzz_Phrases(parts):
+    dedlin.basic_types.Phrases(parts=parts)
 
 
 @given(value=st.text(), default_value=st.one_of(st.none(), st.integers()))

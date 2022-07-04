@@ -8,7 +8,6 @@ from typing import Callable, Generator, Optional
 from dpcontracts import invariant
 
 from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
-from dedlin.document_sources import SimpleInputter
 from dedlin.lorem_data import LOREM_IPSUM
 from dedlin.spelling_overlay import check
 
@@ -25,7 +24,7 @@ def print(*args, **kwargs):
 # What does current line mean when there are 0 lines anyhow? Allow 0 or 1.
 # print(self.current_line) is None and
 @invariant(
-    f"Current line must be a valid line",
+    "Current line must be a valid line",
     lambda self: (1 <= self.current_line <= len(self.lines) or self.current_line in (0, 1) and not self.lines),
 )
 class Document:
@@ -50,7 +49,7 @@ class Document:
         """Display lines specified by range"""
         if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
-            line_range = LineRange(1, len(self.lines))
+            line_range = LineRange(1, len(self.lines) - 1)
 
         self.current_line = line_range.start
 
@@ -87,7 +86,7 @@ class Document:
         # TODO: handle case sensitive case
 
         if not line_range:
-            line_range = LineRange(1, len(self.lines))
+            line_range = LineRange(1, len(self.lines) - 1)
         self.current_line = line_range.start - 1
 
         for line_text in self.lines[line_range.start - 1 : line_range.end]:
@@ -128,7 +127,7 @@ class Document:
     def copy(self, line_range: Optional[LineRange], target_line: int) -> None:
         """Copy lines to target_line"""
         if not line_range:
-            line_range = LineRange(1, len(self.lines))
+            line_range = LineRange(1, len(self.lines) - 1)
 
         to_copy = self.lines[line_range.start - 1 : line_range.end].copy()
         # doesn't seem efficient but no obvious built-in way to do this
@@ -179,7 +178,7 @@ class Document:
             logger.debug("No lines to delete")
             return
         if not line_range:
-            line_range = LineRange(1, len(self.lines))
+            line_range = LineRange(1, len(self.lines) - 1)
         self.list_doc(line_range)
 
         # TODO: prompt for confirmation
@@ -277,7 +276,7 @@ class Document:
     def lorem(self, line_range: Optional[LineRange]) -> None:
         """Add lorem ipsum to lines"""
         if not line_range:
-            line_range = LineRange(1, len(LOREM_IPSUM))
+            line_range = LineRange(1, len(LOREM_IPSUM) - 1)
 
         self.backup()
         # TODO: generate from a specified range of Lorem?

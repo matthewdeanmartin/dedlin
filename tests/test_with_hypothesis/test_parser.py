@@ -14,16 +14,13 @@ from dedlin.parsers import LineRange, Phrases
 
 @given(
     command=st.sampled_from(dedlin.basic_types.Commands),
-    line_range=st.one_of(st.none(), st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers()))),
+    line_range=st.one_of(
+        st.none(),
+        st.builds(LineRange, start=st.integers(1), offset=st.integers(0), repeat=st.one_of(st.just(1), st.integers(0))),
+    ),
     phrases=st.one_of(
         st.none(),
-        st.builds(
-            Phrases,
-            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-        ),
+        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
     ),
     original_text=st.one_of(st.none(), st.text()),
 )
@@ -36,20 +33,14 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
     )
 
 
-@given(start=st.integers(), end=st.integers(), repeat=st.integers())
-def test_fuzz_LineRange(start, end, repeat):
-    dedlin.parsers.LineRange(start=start, end=end, repeat=repeat)
+@given(start=st.integers(1), offset=st.integers(0), repeat=st.integers(0))
+def test_fuzz_LineRange(start, offset, repeat):
+    dedlin.parsers.LineRange(start=start, offset=offset, repeat=repeat)
 
 
-@given(
-    first=st.text(),
-    second=st.one_of(st.none(), st.text()),
-    third=st.one_of(st.none(), st.text()),
-    fourth=st.one_of(st.none(), st.text()),
-    fifth=st.one_of(st.none(), st.text()),
-)
-def test_fuzz_Phrases(first, second, third, fourth, fifth):
-    dedlin.parsers.Phrases(first=first, second=second, third=third, fourth=fourth, fifth=fifth)
+@given(parts=st.tuples(st.text(), st.text()))
+def test_fuzz_Phrases(parts):
+    dedlin.parsers.Phrases(parts=parts)
 
 
 @given(command=st.text())
@@ -74,9 +65,13 @@ def test_fuzz_ends_with_any(value, suffixes):
     dedlin.parsers.ends_with_any(value=value, suffixes=suffixes)
 
 
-@given(value=st.text(), current_line=st.integers(), document_length=st.integers())
-def test_fuzz_extract_one_range(value, current_line, document_length):
-    dedlin.parsers.extract_one_range(value=value, current_line=current_line, document_length=document_length)
+@given(
+    value=st.builds(LineRange, start=st.integers(1), offset=st.integers(0), repeat=st.integers(0)),
+    current_line=st.integers(0),
+    document_length=st.integers(0),
+)
+def test_fuzz_extract_one_range(value: LineRange, current_line: int, document_length: int):
+    dedlin.parsers.extract_one_range(value=value.format(), current_line=current_line, document_length=document_length)
 
 
 @given(value=st.text())
@@ -101,11 +96,6 @@ def test_fuzz_get_command_length(value, suffixes):
     dedlin.parsers.get_command_length(value=value, suffixes=suffixes)
 
 
-@given(command=st.text(), current_line=st.integers(), document_length=st.integers())
-def test_fuzz_parse_command(command, current_line, document_length):
-    dedlin.parsers.parse_command(command=command, current_line=current_line, document_length=document_length)
-
-
 @given(
     just_command=st.text(),
     front_part=st.text(),
@@ -114,13 +104,7 @@ def test_fuzz_parse_command(command, current_line, document_length):
     document_length=st.integers(),
     phrases=st.one_of(
         st.none(),
-        st.builds(
-            Phrases,
-            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-        ),
+        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
     ),
 )
 def test_fuzz_parse_range_only(just_command, front_part, original_text, current_line, document_length, phrases):
@@ -138,13 +122,7 @@ def test_fuzz_parse_range_only(just_command, front_part, original_text, current_
     front_part=st.text(),
     phrases=st.one_of(
         st.none(),
-        st.builds(
-            Phrases,
-            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-        ),
+        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
     ),
     original_text=st.text(),
 )

@@ -11,26 +11,24 @@ from dedlin.command_sources import Command
 
 @given(
     command=st.sampled_from(dedlin.basic_types.Commands),
-    line_range=st.one_of(st.none(), st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers()))),
+    line_range=st.one_of(
+        st.none(),
+        st.builds(LineRange, start=st.integers(1), offset=st.integers(0), repeat=st.one_of(st.just(1), st.integers(0))),
+    ),
     phrases=st.one_of(
         st.none(),
-        st.builds(
-            Phrases,
-            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-        ),
+        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
     ),
     original_text=st.one_of(st.none(), st.text()),
 )
 def test_fuzz_Command(command, line_range, phrases, original_text):
-    dedlin.command_sources.Command(
+    command = dedlin.command_sources.Command(
         command=command,
         line_range=line_range,
         phrases=phrases,
         original_text=original_text,
     )
+    assert command.validate()
 
 
 # will just fail on bad file names
@@ -48,7 +46,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -56,13 +59,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             )
@@ -74,7 +71,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -82,13 +84,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             )
@@ -100,7 +96,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -108,13 +109,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             )
@@ -126,7 +121,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -134,13 +134,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             ),
@@ -150,7 +144,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -158,13 +157,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             ),
@@ -176,7 +169,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -184,13 +182,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             ),
@@ -204,7 +196,10 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(LineRange,
+                                  start=st.integers(1),
+                                  offset=st.integers(0),
+                                  repeat=st.one_of(st.just(1), st.integers(0))),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -212,13 +207,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             ),
@@ -230,7 +219,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -238,13 +232,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             )
@@ -256,7 +244,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers())),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -264,13 +257,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             ),
@@ -280,7 +267,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange, repeat=st.one_of(st.just(1), st.integers(min_value=1))),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(min_value=0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),
@@ -288,13 +280,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(
-                            Phrases,
-                            fifth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            fourth=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            second=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                            third=st.one_of(st.none(), st.one_of(st.none(), st.text())),
-                        ),
+                        st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
                     ),
                 ),
             ),
@@ -310,11 +296,6 @@ def test_fuzz_InMemoryCommandGenerator(commands):
             break
         # can't validate without rethinking object model
         assert command.format()
-
-
-@given(command=st.text(), current_line=st.integers(), document_length=st.integers())
-def test_fuzz_parse_command(command, current_line, document_length):
-    dedlin.command_sources.parse_command(command=command, current_line=current_line, document_length=document_length)
 
 
 # Needs mock
