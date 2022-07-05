@@ -75,6 +75,27 @@ class Document:
                 yield f"   {self.current_line} : {line_text}"
             self.current_line += 1
 
+    def spread(
+        self,
+        line_range: Optional[LineRange],
+        parts: tuple[str, ...],
+    ) -> None:
+        """Spread phrases across existing line range"""
+        # TODO: handle case sensitive case
+
+        if not line_range:
+            line_range = LineRange(1, len(self.lines) - 1)
+
+        end_of_range = len(self.lines) if line_range.end > len(self.lines) else line_range.end
+        self.current_line = line_range.start - 1
+        for index, line_text in zip(range(line_range.start - 1 , end_of_range+1), parts):
+            if line_text:
+                self.lines[index] = line_text
+                self.dirty = True  # this is ugly
+                self.current_line += 1
+            else:
+                break
+
     def replace(
         self,
         line_range: Optional[LineRange],

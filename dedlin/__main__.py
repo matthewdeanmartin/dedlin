@@ -3,7 +3,7 @@
 An improved version of the edlin.
 
 Usage:
-  dedlin <file> [options]
+  dedlin [<file>] [options]
   dedlin (-h | --help)
   dedlin --version
 
@@ -15,7 +15,10 @@ Options:
   --halt_on_error    End program on error.
   --promptless_quit  Skip prompt on quit.
   --vim_mode         User hostile, no feedback.
+  --verbose          Displaying all debugging info.
 """
+import logging
+import logging.config
 import sys
 from pathlib import Path
 from typing import Generator, Optional
@@ -25,9 +28,16 @@ from docopt import docopt
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
 from dedlin.document_sources import SimpleInputter, input_with_prefill
 from dedlin.flash import title_screen
+from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.rich_output import RichPrinter
 
+import sys
+
+
+
+logger = logging.getLogger(__name__)
+print(__name__)
 
 def main() -> None:
     """Main function."""
@@ -39,6 +49,7 @@ def main() -> None:
         macro_file_name=arguments["--macro"],
         quit_safety=not arguments["--promptless_quit"],
         vim_mode=bool(arguments["--vim_mode"]),
+        verbose=bool(arguments["--verbose"]),
     )
     sys.exit(0)
 
@@ -50,8 +61,14 @@ def run(
     halt_on_error: bool = False,
     quit_safety: bool = False,
     vim_mode: bool = False,
+    verbose: bool = False,
 ) -> Dedlin:
     """Set up everything except things from command line"""
+    if verbose:
+        config = configure_logging()
+        logging.config.dictConfig(config)
+        logger.info("Verbose mode enabled")
+
     if not macro_file_name:
         title_screen()
 
@@ -63,11 +80,11 @@ def run(
 
     if macro_file_name:
         the_generator = CommandGenerator(Path(macro_file_name))
-        command_handler = the_generator.generate()
+        # command_handler = the_generator.generate()
     else:
-        the_interactive_generator = InteractiveGenerator()
-        the_interactive_generator.prompt = " * "
-        command_handler = the_interactive_generator.generate()
+        the_generator = InteractiveGenerator()
+        the_generator.prompt = " * "
+        # command_handler = the_interactive_generator.generate()
 
     def document_inputter(prompt: str, text: str = "") -> Generator[str, None, None]:
         """Get input from the user"""
@@ -75,11 +92,15 @@ def run(
             yield input_with_prefill(prompt, text)
 
     dedlin = Dedlin(
-        inputter=InteractiveGenerator(),
+        inputter=the_generator, # InteractiveGenerator(),
         insert_document_inputter=SimpleInputter(),
         edit_document_inputter=document_inputter,
         outputter=printer if file_name and file_name.endswith(".py") else print,
     )
+
+    # save on crash but hides error info
+    # sys.excepthook = lambda type, value, tb: dedlin.save_document() if dedlin.doc.dirty else None
+
     dedlin.halt_on_error = halt_on_error
     dedlin.echo = echo
     dedlin.quit_safety = quit_safety

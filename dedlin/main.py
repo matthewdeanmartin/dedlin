@@ -164,12 +164,15 @@ class Dedlin:
                 line_number = command.line_range.start if command.line_range else 1
                 self.doc.push(line_number, command.phrases.as_list())
             elif command.command == Commands.EDIT:
-                self.command_outputter("[Control C], [Enter] to exit edit mode")
-                edit_line_number: Optional[int] = command.line_range.start if command.line_range else 1
-                while edit_line_number:
-                    edit_line_number = self.doc.edit(edit_line_number)
-                # New line or else next text will be on the same line
-                self.command_outputter("")
+                if command.phrases.parts:
+                    self.doc.spread(command.line_range, command.phrases.parts)
+                else:
+                    self.command_outputter("[Control C] to exit edit mode")
+                    edit_line_number: Optional[int] = command.line_range.start if command.line_range else 1
+                    while edit_line_number:
+                        edit_line_number = self.doc.edit(edit_line_number)
+                    # New line or else next text will be on the same line
+                    self.command_outputter("")
             elif command.command == Commands.SEARCH and command.line_range and command.phrases:
                 for text in self.doc.search(command.line_range, value=command.phrases.first):
                     self.document_outputter(text)

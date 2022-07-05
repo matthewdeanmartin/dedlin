@@ -88,6 +88,7 @@ class CommandGenerator:
         self.current_line: int = 0
         self.document_length: int = 0
         self.macro_path: Path = path
+        self.prompt: str = "> "
 
     def generate(
         self,

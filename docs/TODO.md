@@ -65,7 +65,11 @@ COMMANDLINE THINGS
 FILE THINGS
 - Save on crash
 - Implement load file, transfer
-- Implement "run script"
-  - Invoke from commandline
 - Use more questionary things, esp for load file
   - Use questionary for confirm delete
+
+# DONE
+- `--verbose` works
+- macro files (almost) work again from command line
+- hypothesis can generate a stream of commands
+
