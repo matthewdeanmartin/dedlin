@@ -72,4 +72,3 @@ FILE THINGS
 - `--verbose` works
 - macro files (almost) work again from command line
 - hypothesis can generate a stream of commands
-

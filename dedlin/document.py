@@ -88,7 +88,7 @@ class Document:
 
         end_of_range = len(self.lines) if line_range.end > len(self.lines) else line_range.end
         self.current_line = line_range.start - 1
-        for index, line_text in zip(range(line_range.start - 1 , end_of_range+1), parts):
+        for index, line_text in zip(range(line_range.start - 1, end_of_range + 1), parts):
             if line_text:
                 self.lines[index] = line_text
                 self.dirty = True  # this is ugly

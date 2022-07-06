@@ -4,6 +4,7 @@ Main code.
 Handles UI and links command parser to the document object
 """
 import logging
+import signal
 from pathlib import Path
 from typing import Callable, Generator, Optional
 
@@ -22,9 +23,9 @@ from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
 from dedlin.web import fetch_page_as_rows
-import signal
 
 logger = logging.getLogger(__name__)
+
 
 class Dedlin:
     """Application for Dedlin
@@ -73,8 +74,6 @@ class Dedlin:
         self.history: list[Command] = []
         self.history_log = HistoryLog()
         self.macro_file_name: Optional[Path] = None
-
-
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
@@ -245,12 +244,10 @@ class Dedlin:
             else:
                 self.feedback(f"Command {command.command} not implemented")
 
-            self.feedback(
-                    f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---"
-                )
+            self.feedback(f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---")
         return 0
 
-    def feedback(self, string, end="\n")->None:
+    def feedback(self, string, end="\n") -> None:
         """
         Prints a string to the outputter if needed.
 
@@ -263,7 +260,8 @@ class Dedlin:
         if self.verbose:
             logger.info(string)
 
-    def echo_if_needed(self, string, end="\n")->None:
+    def echo_if_needed(self, string, end="\n") -> None:
+        """Echos a string to the outputter if needed."""
         if self.echo and not (self.vim_mode or self.quiet):
             self.command_outputter(string, end)
 
@@ -284,8 +282,6 @@ class Dedlin:
         """Save the document to the file"""
         save_and_overwrite(Path("history.ed"), [_.original_text for _ in self.history])
 
-    def final_report(self)->None:
+    def final_report(self) -> None:
         """Print out the final report"""
         self.feedback(f"History saved to {self.history_log.history_file_string}")
-
-

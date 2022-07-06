@@ -272,6 +272,7 @@ class CommandGeneratorProtocol(Protocol):
     def generate(
         self,
     ) -> Generator[Command, None, None]:
+        """Generate commands"""
         ...
 
 
@@ -285,4 +286,5 @@ class StringGeneratorProtocol(Protocol):
     def generate(
         self,
     ) -> Generator[str, None, None]:
+        """Generate strings"""
         ...

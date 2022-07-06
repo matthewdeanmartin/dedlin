@@ -196,10 +196,12 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
                     st.none(),
                     st.one_of(
                         st.none(),
-                        st.builds(LineRange,
-                                  start=st.integers(1),
-                                  offset=st.integers(0),
-                                  repeat=st.one_of(st.just(1), st.integers(0))),
+                        st.builds(
+                            LineRange,
+                            start=st.integers(1),
+                            offset=st.integers(0),
+                            repeat=st.one_of(st.just(1), st.integers(0)),
+                        ),
                     ),
                 ),
                 original_text=st.one_of(st.none(), st.one_of(st.none(), st.text())),

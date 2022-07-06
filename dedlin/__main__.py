@@ -33,12 +33,9 @@ from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.rich_output import RichPrinter
 
-import sys
-
-
-
 logger = logging.getLogger(__name__)
 print(__name__)
+
 
 def main() -> None:
     """Main function."""
@@ -93,7 +90,7 @@ def run(
             yield input_with_prefill(prompt, text)
 
     dedlin = Dedlin(
-        inputter=the_generator, # InteractiveGenerator(),
+        inputter=the_generator,  # InteractiveGenerator(),
         insert_document_inputter=SimpleInputter(),
         edit_document_inputter=document_inputter,
         outputter=printer if file_name and file_name.endswith(".py") else print,
@@ -108,6 +105,7 @@ def run(
     dedlin.vim_mode = vim_mode
     dedlin.verbose = verbose
     while True:
+        # pylint: disable=broad-except
         try:
             dedlin.entry_point(file_name, macro_file_name)
             if not vim_mode:
@@ -115,7 +113,7 @@ def run(
         except KeyboardInterrupt:
             if not vim_mode:
                 break
-        except Exception as e:
+        except Exception:
             print(traceback.format_exc())
             break
     dedlin.final_report()

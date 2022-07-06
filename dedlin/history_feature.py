@@ -11,6 +11,7 @@ class HistoryLog:
 
     @property
     def history_file_string(self) -> str:
+        """String representation of the history file"""
         return str(self.history_file.resolve().absolute())
 
     def __init__(self) -> None:
@@ -46,4 +47,3 @@ class HistoryLog:
         with open(self.history_file, "a", encoding="utf-8") as file_handle:
             file_handle.write(command)
             file_handle.write("\n")
-

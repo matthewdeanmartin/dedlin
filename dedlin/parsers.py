@@ -8,6 +8,7 @@ from dedlin.basic_types import Command, Commands, LineRange, Phrases, try_parse_
 
 logger = logging.getLogger(__name__)
 
+
 def extract_one_range(value: str, current_line: int, document_length: int) -> Optional[LineRange]:
     """Extract a single line range from a string
     . = current line
@@ -38,14 +39,14 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
 
         # TODO: need better parser errors
         if start is None or end is None or repeat is None:
-            logger.warning("Range invalid:", value)
+            logger.warning(f"Range invalid:{value}")
             return None
 
         candidate = LineRange(start=start, offset=end - start, repeat=repeat)
 
         # TODO: need better parser errors
         if not candidate.validate():
-            logger.warning("Candidate invalid:", candidate)
+            logger.warning(f"Candidate invalid: {candidate}")
             return None
 
         return candidate
@@ -59,7 +60,7 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
 
         # TODO: need better parser errors
         if not candidate.validate():
-            logger.warning("Candidate invalid:", candidate)
+            logger.warning(f"Candidate invalid: {candidate}")
             return None
         return candidate
     return None
