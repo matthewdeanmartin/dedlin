@@ -20,6 +20,7 @@ Options:
 import logging
 import logging.config
 import sys
+import traceback
 from pathlib import Path
 from typing import Generator, Optional
 
@@ -114,7 +115,8 @@ def run(
         except KeyboardInterrupt:
             if not vim_mode:
                 break
-        except:
+        except Exception as e:
+            print(traceback.format_exc())
             break
     dedlin.final_report()
     return dedlin
