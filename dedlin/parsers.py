@@ -1,11 +1,12 @@
 """
 Code that turns strings to command objects
 """
-
+import logging
 from typing import Iterable, Optional
 
 from dedlin.basic_types import Command, Commands, LineRange, Phrases, try_parse_int
 
+logger = logging.getLogger(__name__)
 
 def extract_one_range(value: str, current_line: int, document_length: int) -> Optional[LineRange]:
     """Extract a single line range from a string
@@ -37,14 +38,14 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
 
         # TODO: need better parser errors
         if start is None or end is None or repeat is None:
-            print("Range invalid:", value)
+            logger.warning("Range invalid:", value)
             return None
 
         candidate = LineRange(start=start, offset=end - start, repeat=repeat)
 
         # TODO: need better parser errors
         if not candidate.validate():
-            print("Candidate invalid:", candidate)
+            logger.warning("Candidate invalid:", candidate)
             return None
 
         return candidate
@@ -58,7 +59,7 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
 
         # TODO: need better parser errors
         if not candidate.validate():
-            print("Candidate invalid:", candidate)
+            logger.warning("Candidate invalid:", candidate)
             return None
         return candidate
     return None
@@ -181,13 +182,13 @@ def parse_search_replace(
                 line_number_string = front_part.split(long_command)[0].strip()
                 line_number = try_parse_int(line_number_string)
                 if line_number is None:
-                    print("Bad range", original_text)
+                    logger.warning(f"Bad range {original_text}")
                     return None
                 line_range = LineRange(start=line_number, offset=0)
             elif abbreviation is not None:
                 line_number = try_parse_int(front_part.split(abbreviation)[0].strip())
                 if line_number is None:
-                    print("Bad range", original_text)
+                    logger.warning(f"Bad range {original_text}")
                     return None
 
                 line_range = LineRange(start=line_number, offset=0)
@@ -292,10 +293,3 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
         return candidate
 
     return Command(Commands.UNKNOWN, original_text=original_text)
-
-
-if __name__ == "__main__":
-    result = parse_command("1i cat dog", 1, 0)
-    result = parse_command("1", 1, 3)
-    print(result)
-    print(result.validate())

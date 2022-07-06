@@ -105,7 +105,18 @@ def run(
     dedlin.echo = echo
     dedlin.quit_safety = quit_safety
     dedlin.vim_mode = vim_mode
-    dedlin.entry_point(file_name, macro_file_name)
+    dedlin.verbose = verbose
+    while True:
+        try:
+            dedlin.entry_point(file_name, macro_file_name)
+            if not vim_mode:
+                break
+        except KeyboardInterrupt:
+            if not vim_mode:
+                break
+        except:
+            break
+    dedlin.final_report()
     return dedlin
 
 

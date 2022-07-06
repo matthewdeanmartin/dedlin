@@ -9,6 +9,10 @@ from dedlin.utils.file_utils import locate_file
 class HistoryLog:
     """Records commands in a history file"""
 
+    @property
+    def history_file_string(self) -> str:
+        return str(self.history_file.resolve().absolute())
+
     def __init__(self) -> None:
         """Initialize the history log"""
         self.history_file = self.initialize_history_folder() / self.make_sequential_history_file_name()
@@ -42,3 +46,4 @@ class HistoryLog:
         with open(self.history_file, "a", encoding="utf-8") as file_handle:
             file_handle.write(command)
             file_handle.write("\n")
+
