@@ -16,6 +16,8 @@ pygments = "*"
 textstat = "*"
 dpcontracts = "*"
 pydantic = "*"
+fastapi = "*"
+uvicorn = "*"
 
 [dev-packages]
 mypy = "*"
