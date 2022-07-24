@@ -28,9 +28,13 @@ def read_file(path: Optional[Path]) -> list[str]:
     with open(path, encoding="utf-8") as file:
         for line in file:
             if line.endswith("\n"):
-                lines.append(line)
+                lines.append(line[:-1])
+            elif line.endswith("\r"):
+                lines.append(line[:-1])
+            elif line.endswith("\r\n") or line.endswith("\n\r"):
+                lines.append(line[:-2])
             else:
-                lines.append(line + "\n")
+                lines.append(line)
     return lines
 
 
@@ -40,4 +44,5 @@ def save_and_overwrite(path: Path, lines: list[str]):
         raise TypeError("No file path")
     with open(str(path), "w", encoding="utf-8") as file:
         file.seek(0)
-        file.writelines(lines)
+        # TODO: make this use preferred line break
+        file.writelines((line +"\n" for line in lines))

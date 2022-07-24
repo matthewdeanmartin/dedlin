@@ -14,11 +14,11 @@ from dedlin.basic_types import (  # CommandGeneratorProtocol,; StringGeneratorPr
     Commands,
     Phrases,
     Printable,
-    null_printer,
+    null_printer, LineRange,
 )
 from dedlin.command_sources import InMemoryCommandGenerator
 from dedlin.document import Document
-from dedlin.document_sources import InMemoryInputter
+from dedlin.document_sources import InMemoryInputter, PrefillInputter
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
@@ -40,7 +40,7 @@ class Dedlin:
         self,
         inputter: InMemoryCommandGenerator,  # CommandGeneratorProtocol,
         insert_document_inputter: InMemoryInputter,  # StringGeneratorProtocol,
-        edit_document_inputter: Callable[[Optional[str], str], Generator[Optional[str], None, None]],
+        edit_document_inputter: PrefillInputter,  # StringGeneratorProtocol,
         outputter: Callable[[Optional[str], str], None],  # Printable,
     ) -> None:
         """Set up initial state and some dependency injection"""
@@ -139,7 +139,8 @@ class Dedlin:
                     self.doc.dirty = True
             elif command.command == Commands.HISTORY:
                 for command in self.history:
-                    self.feedback(command.original_text)
+                    # self.feedback(command.original_text.strip("\n\t\r "))
+                    self.feedback(command.format())
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.LIST and command.line_range:
@@ -179,7 +180,16 @@ class Dedlin:
             elif command.command == Commands.INSERT:
                 line_number = command.line_range.start if command.line_range else 1
                 self.feedback("Control C to exit insert mode")
-                self.doc.insert(line_number, command.phrases)
+                inserted = self.doc.insert(line_number, command.phrases)
+                if command.phrases is None or not command.phrases.parts:
+                    _ = self.history.pop()
+                    rewritten_history = Command(
+                        command=Commands.INSERT,
+                        phrases=inserted,
+                        line_range=command.line_range,
+                        original_text=command.original_text,
+                    )
+                    self.history.append(rewritten_history)
             elif command.command == Commands.PUSH and command.phrases and command.line_range:
                 line_number = command.line_range.start if command.line_range else 1
                 self.doc.push(line_number, command.phrases.as_list())
@@ -187,10 +197,24 @@ class Dedlin:
                 if command.phrases and command.phrases.parts:
                     self.doc.spread(command.line_range, command.phrases.parts)
                 else:
-                    self.feedback("[Control C] to exit edit mode")
+                    self.feedback("[Control C]-[Enter] to exit edit mode")
                     edit_line_number: Optional[int] = command.line_range.start if command.line_range else 1
-                    while edit_line_number:
-                        edit_line_number = self.doc.edit(edit_line_number)
+                    can_continue = True
+                    while can_continue:
+                        edit_status = self.doc.edit(edit_line_number)
+                        can_continue = edit_status.can_edit_again
+                        if can_continue:
+                            edit_line_number = edit_status.line_edited + 1
+
+                        if edit_status.text is not None:
+                            # rewrite history
+                            #_ = self.history.pop()
+                            self.history.append(Command(command=Commands.EDIT,
+                                                        line_range=LineRange(start=edit_status.line_edited,
+                                                                    offset=0),
+                                                        phrases=Phrases(parts=tuple([edit_status.text]))))
+
+
                     # New line or else next text will be on the same line
                     self.command_outputter("")
             elif command.command == Commands.SEARCH and command.line_range and command.phrases:
@@ -248,11 +272,6 @@ class Dedlin:
         return 0
 
     def feedback(self, string, end="\n") -> None:
-        """
-        Prints a string to the outputter if needed.
-
-        Extracted so we don't have if statements everywhere.
-        """
         if not (self.vim_mode or self.quiet):
             self.command_outputter(string, end)
             return

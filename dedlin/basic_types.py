@@ -4,8 +4,9 @@ Basic classes and mypy types
 import dataclasses
 import logging
 from enum import Enum, auto
-from typing import Generator, Optional, Protocol, runtime_checkable
+from typing import Generator, Optional, Protocol, runtime_checkable, Sequence, cast
 
+from icontract import DBC, require
 from pydantic import validator
 from pydantic.dataclasses import dataclass
 
@@ -234,6 +235,9 @@ class Command:
         range_part = self.line_range.format() if self.line_range is not None else ""
         phrase_part = self.phrases.format() if self.phrases is not None else ""
         return " ".join([range_part, self.command.name, phrase_part])
+
+
+
 
 
 def try_parse_int(value: str, default_value: Optional[int] = None) -> Optional[int]:

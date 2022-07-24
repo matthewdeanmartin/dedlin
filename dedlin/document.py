@@ -3,9 +3,11 @@ Abstract document class.
 """
 import logging
 import random
-from typing import Callable, Generator, Optional
+from typing import Callable, Generator, Optional, Tuple
+from pydantic import validator
+from pydantic.dataclasses import dataclass
 
-from dpcontracts import invariant
+import icontract
 
 from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
 from dedlin.lorem_data import LOREM_IPSUM
@@ -14,18 +16,27 @@ from dedlin.spelling_overlay import check
 logger = logging.getLogger(__name__)
 
 
+@dataclass(frozen=True)
+class EditStatus:
+    can_edit_again: bool
+    line_edited:Optional[int]
+    text:Optional[str]
+
 # noinspection PyShadowingBuiltins
 # pylint: disable=redefined-builtin
 def print(*args, **kwargs):
     """Discourage accidental usage of print"""
     raise Exception("Don't call UI from here.")
 
-
 # What does current line mean when there are 0 lines anyhow? Allow 0 or 1.
 # print(self.current_line) is None and
-@invariant(
-    "Current line must be a valid line",
+@icontract.invariant(
+        lambda self:
+        all('\n' not in line and '\r' not in line for line in self.lines)
+    )
+@icontract.invariant(
     lambda self: (1 <= self.current_line <= len(self.lines) or self.current_line in (0, 1) and not self.lines),
+    "Current line must be a valid line",
 )
 class Document:
     """Abstract document with as few input/output concerns as possible"""
@@ -33,7 +44,7 @@ class Document:
     def __init__(
         self,
         insert_inputter: StringGeneratorProtocol,
-        edit_inputter: Callable[[Optional[str], str], Generator[Optional[str], None, None]],
+        edit_inputter: StringGeneratorProtocol,
         lines: list[str],
     ) -> None:
         """Set up initial state"""
@@ -193,6 +204,8 @@ class Document:
         self.current_line = target_line
         logger.debug(f"Moving {line_range} to {target_line}")
 
+    @icontract.ensure(lambda self: len(self.previous_lines) >= len(self.lines),
+                      "Lines should shrink or stay the same after delete")
     def delete(self, line_range: Optional[LineRange]) -> None:
         """Delete lines"""
         if not self.lines:
@@ -221,7 +234,8 @@ class Document:
             self.current_line += 1
         logger.debug(f"Filled {line_range} with {value}")
 
-    def edit(self, line_number: int) -> Optional[int]:
+
+    def edit(self, line_number: int) -> EditStatus:
         """Edit line"""
         self.backup()
         if line_number - 1 < 0:
@@ -231,23 +245,36 @@ class Document:
 
         line_text = self.lines[line_number - 1]
 
+        input_generator = self.edit_inputter.generate()
         try:
-            new_line = next(self.edit_inputter(f"   {line_number} : ", line_text[0 : len(line_text) - 1]))
+            self.edit_inputter.current_line = f"   {line_number} : "
+            self.edit_inputter.default = line_text
+            new_line = next(input_generator)
+        except StopIteration:
+            logger.warning("Didn't get an input, nothing changed.")
+            return EditStatus(can_edit_again=False, text=None, line_edited=None)
         except KeyboardInterrupt:
-            return None
-        self.lines[line_number - 1] = new_line + "\n"
+            logger.warning("Cancelling out of edit, line not changed.")
+            return EditStatus(can_edit_again=False, text=None, line_edited=None)
+
+        if new_line is None:
+            logger.warning("Cancelling out of edit, line not changed.")
+            return EditStatus(can_edit_again=False, text=None, line_edited=None)
+
+        self.lines[line_number - 1] = new_line
         self.dirty = True  # this is ugly
         self.current_line = line_number
         logger.debug(f"Edited {line_number}")
         if self.current_line >= len(self.lines):
-            return None
-        return self.current_line + 1
+            logger.warning("Went beyond end of document, signalling nothing more to edit")
+            return EditStatus(can_edit_again=False, text=new_line, line_edited=self.current_line)
+        return EditStatus(can_edit_again=True, text=new_line, line_edited=self.current_line)
 
     def push(self, line_number: int, lines: list[str]) -> None:
         """Noninteractively insert line or lines"""
         self.backup()
         for line in lines:
-            self.lines.insert(line_number - 1, line + "\n")
+            self.lines.insert(line_number - 1, line)
             self.dirty = True  # this is ugly
             self.current_line = line_number
             line_number += 1
@@ -257,7 +284,7 @@ class Document:
         self,
         line_number: int,
         phrases: Optional[Phrases] = None,
-    ) -> None:
+    ) -> Phrases:
         """Insert a new line at line_number"""
         self.backup()
         if line_number < 0:
@@ -269,14 +296,14 @@ class Document:
 
         if phrases:
             for phrase in phrases.as_list():
-                self.lines.insert(line_number - 1, phrase + "\n")
+                self.lines.insert(line_number - 1, phrase)
                 self.dirty = True
                 self.current_line = line_number
                 line_number += 1
-            return
+            return phrases
 
         user_input_text: Optional[str] = "GO!"
-
+        accumulated_lines =[]
         input_generator = self.insert_inputter.generate()
         while user_input_text is not None:
             prompt = f"  {line_number} : "
@@ -288,11 +315,13 @@ class Document:
             except StopIteration:
                 user_input_text = None
             if user_input_text is not None:
-                self.lines.insert(line_number - 1, user_input_text + "\n")
+                accumulated_lines.append(user_input_text)
+                self.lines.insert(line_number - 1, user_input_text)
                 self.dirty = True  # this is ugly
                 self.current_line = line_number
                 line_number += 1
         logger.debug(f"Inserted at {line_number}")
+        return Phrases(accumulated_lines)
 
     def lorem(self, line_range: Optional[LineRange]) -> None:
         """Add lorem ipsum to lines"""

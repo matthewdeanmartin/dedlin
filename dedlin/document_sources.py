@@ -99,3 +99,26 @@ class InMemoryInputter:
     ) -> Generator[str, None, None]:
         """Wrapper around questionary for inserting text"""
         yield from self.lines
+
+
+class PrefillInputter:
+    """Get input from the user, used for Edit
+
+    Implements StringGeneratorProtocol
+    """
+
+    def __init__(self) -> None:
+        """Set up the inputter"""
+        self.prompt: str = ""
+        self.default: str = ""
+
+    def generate(
+        self,
+    ) -> Generator[str, None, None]:
+        """Get input from the user"""
+        try:
+            value = input_with_prefill(self.prompt, self.default)
+            yield value
+        except KeyboardInterrupt:
+            yield None
+

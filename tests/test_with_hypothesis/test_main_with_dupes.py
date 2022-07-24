@@ -61,7 +61,12 @@ def test_fuzz_command_generator(macro_path):
 hypothesis.strategies.register_type_strategy(StringGeneratorProtocol, hypothesis.strategies.builds(SimpleInputter))
 
 
-@given(document=st.builds(Document))
+@given(document=st.builds(Document,
+        insert_inputter= st.from_type(StringGeneratorProtocol),
+        edit_inputter=st.from_type(typing.Callable[[typing.Optional[str], str], typing.Generator[
+            typing.Optional[str], None, None]]),
+        lines= st.lists(st.text().filter(lambda s: "\n" not in s and "\r" not in s)),
+    ))
 def test_fuzz_display_info(document):
     dedlin.main.display_info(document=document)
 

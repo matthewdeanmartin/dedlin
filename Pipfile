@@ -16,8 +16,9 @@ pygments = "*"
 textstat = "*"
 dpcontracts = "*"
 pydantic = "*"
-fastapi = "*"
-uvicorn = "*"
+fastapi = { version = "*", optional = true }
+uvicorn = { version = "*", optional = true }
+icontract = "*"
 
 [dev-packages]
 mypy = "*"

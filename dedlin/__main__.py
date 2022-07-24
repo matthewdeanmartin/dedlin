@@ -27,14 +27,13 @@ from typing import Generator, Optional
 from docopt import docopt
 
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
-from dedlin.document_sources import SimpleInputter, input_with_prefill
+from dedlin.document_sources import SimpleInputter, input_with_prefill, PrefillInputter
 from dedlin.flash import title_screen
 from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.rich_output import RichPrinter
 
 logger = logging.getLogger(__name__)
-print(__name__)
 
 
 def main() -> None:
@@ -89,11 +88,20 @@ def run(
         while True:
             yield input_with_prefill(prompt, text)
 
+
+    def plain_printer(text: Optional[str], end: str = "\n") -> None:
+        text = "" if text is None else text
+        if text.endswith("\n"):
+            text = text[:-1]
+            print(text, end="")
+        else:
+            print(text, end=end)
+
     dedlin = Dedlin(
         inputter=the_generator,  # InteractiveGenerator(),
         insert_document_inputter=SimpleInputter(),
-        edit_document_inputter=document_inputter,
-        outputter=printer if file_name and file_name.endswith(".py") else print,
+        edit_document_inputter=PrefillInputter(),
+        outputter=printer if file_name and file_name.endswith(".py") else plain_printer,
     )
 
     # save on crash but hides error info

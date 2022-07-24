@@ -64,6 +64,12 @@ requests = "*"
 # ascii art/fonts
 art = "*"
 
+# web api
+fastapi = { version = "*", optional = true }
+uvicorn = { version = "*", optional = true }
+
+[tool.poetry.extras]
+webapi = ["fastapi","uvicorn"]
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
