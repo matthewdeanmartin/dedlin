@@ -14,11 +14,12 @@ art = "*"
 pyspellchecker = "*"
 pygments = "*"
 textstat = "*"
-dpcontracts = "*"
 pydantic = "*"
 fastapi = { version = "*", optional = true }
 uvicorn = { version = "*", optional = true }
 icontract = "*"
+# typeguard does not seem to get along with pydantic.
+# typeguard = "*"
 
 [dev-packages]
 mypy = "*"

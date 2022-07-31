@@ -6,7 +6,6 @@ from dataclasses import field
 import pydantic.dataclasses as dc
 from fastapi import FastAPI
 
-from dedlin.basic_types import Command
 from dedlin.command_sources import InMemoryCommandGenerator
 from dedlin.document_sources import InMemoryInputter
 from dedlin.main import Dedlin
@@ -30,6 +29,7 @@ app = FastAPI()
 
 @app.post("/execute")
 async def execute(payload: InputPayload) -> OutputPayload:
+    """Noninteractive editing of a document"""
     commands = []
     lines = payload.lines
     for command_text in payload.commands:
@@ -39,7 +39,8 @@ async def execute(payload: InputPayload) -> OutputPayload:
     output = OutputPayload()
     output_lines = output.lines
 
-    def outputter(value, _line_ending):
+    def outputter(value: str, _line_ending: str) -> None:
+        """Simulate print"""
         output_lines.append(value)
 
     inputter = InMemoryCommandGenerator(commands)

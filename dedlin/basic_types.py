@@ -4,9 +4,8 @@ Basic classes and mypy types
 import dataclasses
 import logging
 from enum import Enum, auto
-from typing import Generator, Optional, Protocol, runtime_checkable, Sequence, cast
+from typing import Generator, Optional, Protocol, runtime_checkable
 
-from icontract import DBC, require
 from pydantic import validator
 from pydantic.dataclasses import dataclass
 
@@ -70,6 +69,7 @@ class LineRange:
     repeat: int = 1
 
     @validator("start", allow_reuse=True)
+    @classmethod
     def start_must_be_one_or_more(cls, start: int) -> int:
         """Start must be 1 or more"""
         if start < 1:
@@ -77,12 +77,14 @@ class LineRange:
         return start
 
     @validator("offset", allow_reuse=True)
+    @classmethod
     def offset_zero_or_more(cls, offset: int) -> int:
         """Offset must be zero or more"""
         if offset < 0:
             raise ValueError("offset must be zero or more")
         return offset
 
+    @classmethod
     @validator("repeat", allow_reuse=True)
     def repeat_zero_or_more(cls, repeat: int) -> int:
         """Repeat must be zero or more"""
@@ -105,6 +107,10 @@ class LineRange:
         if not validate:
             logger.warning(f"Invalid line range: {self}")
         return validate
+
+    def to_slice(self):
+        """Convert to a slice"""
+        return slice(self.start - 1, self.end - 1)
 
     def format(self) -> str:
         """Format the range as a string"""
@@ -235,9 +241,6 @@ class Command:
         range_part = self.line_range.format() if self.line_range is not None else ""
         phrase_part = self.phrases.format() if self.phrases is not None else ""
         return " ".join([range_part, self.command.name, phrase_part])
-
-
-
 
 
 def try_parse_int(value: str, default_value: Optional[int] = None) -> Optional[int]:

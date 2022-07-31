@@ -45,4 +45,4 @@ def save_and_overwrite(path: Path, lines: list[str]):
     with open(str(path), "w", encoding="utf-8") as file:
         file.seek(0)
         # TODO: make this use preferred line break
-        file.writelines((line +"\n" for line in lines))
+        file.writelines(line + "\n" for line in lines)

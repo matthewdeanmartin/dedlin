@@ -5,12 +5,12 @@ import typing
 from pathlib import Path
 
 import hypothesis
-from hypothesis import example, given
+from hypothesis import given
 from hypothesis import strategies as st
 from hypothesis.strategies import just
 
 import dedlin.main
-from dedlin.basic_types import Command, LineRange, Printable, StringGeneratorProtocol
+from dedlin.basic_types import Command, LineRange, StringGeneratorProtocol
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
 from dedlin.document_sources import SimpleInputter
 from dedlin.main import Document, Phrases
@@ -29,7 +29,7 @@ from dedlin.parsers import parse_command
     ),
     original_text=st.one_of(st.none(), st.text()),
 )
-def test_fuzz_Command(command, line_range, phrases, original_text):
+def test_fuzz_command(command, line_range, phrases, original_text):
     dedlin.main.Command(
         command=command,
         line_range=line_range,
@@ -48,7 +48,7 @@ def test_fuzz_Command(command, line_range, phrases, original_text):
 
 
 @given(parts=st.tuples(st.text(), st.text()))
-def test_fuzz_Phrases(parts):
+def test_fuzz_phrases(parts):
     dedlin.main.Phrases(parts=parts)
 
 
@@ -61,12 +61,16 @@ def test_fuzz_command_generator(macro_path):
 hypothesis.strategies.register_type_strategy(StringGeneratorProtocol, hypothesis.strategies.builds(SimpleInputter))
 
 
-@given(document=st.builds(Document,
-        insert_inputter= st.from_type(StringGeneratorProtocol),
-        edit_inputter=st.from_type(typing.Callable[[typing.Optional[str], str], typing.Generator[
-            typing.Optional[str], None, None]]),
-        lines= st.lists(st.text().filter(lambda s: "\n" not in s and "\r" not in s)),
-    ))
+@given(
+    document=st.builds(
+        Document,
+        insert_inputter=st.from_type(StringGeneratorProtocol),
+        edit_inputter=st.from_type(
+            typing.Callable[[typing.Optional[str], str], typing.Generator[typing.Optional[str], None, None]]
+        ),
+        lines=st.lists(st.text().filter(lambda s: "\n" not in s and "\r" not in s)),
+    )
+)
 def test_fuzz_display_info(document):
     dedlin.main.display_info(document=document)
 
@@ -109,7 +113,10 @@ def test_fuzz_interactive_command_handler(prompt):
     document_length=st.integers(0),
 )
 def test_fuzz_parse_command(current_command, current_line, document_length):
-    parse_command(command=current_command.format(), current_line=current_line, document_length=document_length)
+    try:
+        parse_command(command=current_command.format(), current_line=current_line, document_length=document_length)
+    except NotImplementedError:
+        pass
 
 
 # @given(path=st.builds(Path))

@@ -4,10 +4,10 @@ Abstract document class.
 import logging
 import random
 from typing import Callable, Generator, Optional, Tuple
-from pydantic import validator
-from pydantic.dataclasses import dataclass
 
 import icontract
+from pydantic import validator
+from pydantic.dataclasses import dataclass
 
 from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
 from dedlin.lorem_data import LOREM_IPSUM
@@ -19,8 +19,9 @@ logger = logging.getLogger(__name__)
 @dataclass(frozen=True)
 class EditStatus:
     can_edit_again: bool
-    line_edited:Optional[int]
-    text:Optional[str]
+    line_edited: Optional[int]
+    text: Optional[str]
+
 
 # noinspection PyShadowingBuiltins
 # pylint: disable=redefined-builtin
@@ -28,12 +29,10 @@ def print(*args, **kwargs):
     """Discourage accidental usage of print"""
     raise Exception("Don't call UI from here.")
 
+
 # What does current line mean when there are 0 lines anyhow? Allow 0 or 1.
 # print(self.current_line) is None and
-@icontract.invariant(
-        lambda self:
-        all('\n' not in line and '\r' not in line for line in self.lines)
-    )
+@icontract.invariant(lambda self: all("\n" not in line and "\r" not in line for line in self.lines))
 @icontract.invariant(
     lambda self: (1 <= self.current_line <= len(self.lines) or self.current_line in (0, 1) and not self.lines),
     "Current line must be a valid line",
@@ -57,34 +56,31 @@ class Document:
         self.dirty = False
 
     def list_doc(self, line_range: Optional[LineRange] = None) -> Generator[tuple[str, str], None, None]:
-        """Display lines specified by range"""
+        """Display lines specified by range, do not advance current line"""
         if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
             line_range = LineRange(1, len(self.lines) - 1)
 
-        self.current_line = line_range.start
+        # self.current_line = line_range.start
 
         # slice handles the case where the range is beyond the end of the document
-        for line_text in self.lines[line_range.start - 1 : line_range.end + 1]:
-            end = "" if line_text[:-1] == "\n" else "\n"
-            yield f"   {self.current_line} : {line_text}", end
+        for line_text in self.lines[line_range.to_slice()]:
+            # lines never end in a newline
+            yield f"   {self.current_line} : {line_text}", "\n"
 
             # tiny inefficiency here
-            if self.current_line >= len(self.lines):
-                break
-            self.current_line += 1
+            # if self.current_line >= len(self.lines):
+            #     break
+            # self.current_line += 1
 
     def search(self, line_range: LineRange, value: str, case_sensitive: bool = False) -> Generator[str, None, None]:
         """Display lines that have value in line"""
-        self.current_line = line_range.start
-
         if not case_sensitive:
             value = value.upper()
 
         for line_text in self.lines[line_range.start - 1 : line_range.end]:
             if value in line_text.upper():
                 yield f"   {self.current_line} : {line_text}"
-            self.current_line += 1
 
     def spread(
         self,
@@ -121,29 +117,27 @@ class Document:
             line_range = LineRange(1, len(self.lines) - 1)
         self.current_line = line_range.start - 1
 
-        for line_text in self.lines[line_range.start - 1 : line_range.end]:
+        for line_text in self.lines[line_range.to_slice()]:
             if target in line_text:
                 line_text = line_text.replace(target, replacement)
                 self.lines[self.current_line] = line_text
-                self.dirty = True  # this is ugly
                 self.dirty = True  # this is ugly
                 yield f"   {self.current_line + 1 } : {line_text}"
             self.current_line += 1
 
     def page(self, page_size: int = 5) -> Generator[tuple[str, str], None, None]:
         """Display lines in pages"""
-        line_number = 1
+
         # TODO: add asterix to new current line
-        for line_text in self.lines[self.current_line - 1 : self.current_line + page_size]:
-            end = "" if line_text[:-1] == "\n" else "\n"
-            yield f"   {self.current_line + line_number} : {line_text}", end
-            line_number += 1
-            if self.current_line >= len(self.lines):
+        for line_text in self.lines[self.current_line - 1 : self.current_line + page_size - 1]:
+            yield f"   {self.current_line} : {line_text}", "\n"
+            self.current_line += 1
+            if self.current_line - 1 >= len(self.lines):
                 break
-        if self.current_line + line_number >= len(self.lines):
+
+        # repair if necessary
+        if self.current_line >= len(self.lines):
             self.current_line = len(self.lines)
-        else:
-            self.current_line = self.current_line + line_number
 
     def spell(self, line_range: LineRange) -> Generator[tuple[str, str], None, None]:
         """Show spelling errors in range"""
@@ -204,9 +198,10 @@ class Document:
         self.current_line = target_line
         logger.debug(f"Moving {line_range} to {target_line}")
 
-    @icontract.ensure(lambda self: len(self.previous_lines) >= len(self.lines),
-                      "Lines should shrink or stay the same after delete")
-    def delete(self, line_range: Optional[LineRange]) -> None:
+    @icontract.ensure(
+        lambda self: len(self.previous_lines) >= len(self.lines), "Lines should shrink or stay the same after delete"
+    )
+    def delete(self, line_range: Optional[LineRange] = None) -> None:
         """Delete lines"""
         if not self.lines:
             logger.debug("No lines to delete")
@@ -218,10 +213,15 @@ class Document:
         # TODO: prompt for confirmation
 
         self.backup()
-        for index in range(line_range.end - 1, line_range.start - 2, -1):
-            self.lines.pop(index)
+        if line_range.start == line_range.end:
+            self.lines.pop(line_range.start - 1)
             self.dirty = True  # this is ugly
-        self.current_line = line_range.start - 1
+        else:
+            for index in range(line_range.end - 1, line_range.start - 2, -1):
+                self.lines.pop(index)
+                self.dirty = True  # this is ugly
+        if self.current_line > len(self.lines):
+            self.current_line = len(self.lines)
         logger.debug(f"Deleted {line_range}")
 
     def fill(self, line_range: LineRange, value: str) -> None:
@@ -233,7 +233,6 @@ class Document:
             self.dirty = True  # this is ugly
             self.current_line += 1
         logger.debug(f"Filled {line_range} with {value}")
-
 
     def edit(self, line_number: int) -> EditStatus:
         """Edit line"""
@@ -303,7 +302,7 @@ class Document:
             return phrases
 
         user_input_text: Optional[str] = "GO!"
-        accumulated_lines =[]
+        accumulated_lines = []
         input_generator = self.insert_inputter.generate()
         while user_input_text is not None:
             prompt = f"  {line_number} : "

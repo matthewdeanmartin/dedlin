@@ -26,12 +26,12 @@ SPECIFIC_HELP = {
 [line] Edit - edit number
 [range] Delete - delete range
 [range] Replace "[text]", "[text]" - replace text in range
-[range] Lorem - insert lorem ipsum text
-[range] Split [file name] [file name] [file name]- split file into two or three files
 """,
     "DATA": """Data Source Commands
 [target line] Transfer [file name] - inserts file contents to target
-[range] Browse [URL] - fetch web page as HTML, convert to text""",
+[range] Lorem - insert lorem ipsum text
+[range] Browse [URL] - fetch web page as HTML, convert to text
+""",
     "META": """Meta Commands
 HISTORY [file] - list_doc all commands run
 MACRO [file] - run macro
@@ -44,6 +44,7 @@ HELP - display this""",
 [range] Sort - sort lines alphabetically
 [range] Shuffle - shuffle lines randomly""",
     "FILE": """File System Commands
+[range] Split [file name] [file name] [file name]- split file into two or three files
 Quit - Exits, unless the file has been modified
 Exit [file name] - Saves file and exits
 """,

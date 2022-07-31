@@ -4,7 +4,7 @@ Dedlin is an interactive line-by-line text editor and a DSL. Line editors
 suck, but they are easy to write and the DSL is mildly interesting.
 
 This is not intended to be backwards compatible with anything. I have made
-changes to make the app less user hostile, but there is a `--vim` mode
+changes to make the app less user hostile, but there is a `--vim_mode`
 where all help, warnings, feedback will be suppressed.
 
 
@@ -27,7 +27,7 @@ Dedlin.
 An improved version of the edlin.
 
 Usage:
-  dedlin <file> [options]
+  dedlin [<file>] [options]
   dedlin (-h | --help)
   dedlin --version
 
@@ -38,6 +38,8 @@ Options:
   --echo             Echo commands.
   --halt_on_error    End program on error.
   --promptless_quit  Skip prompt on quit.
+  --vim_mode         User hostile, no feedback.
+  --verbose          Displaying all debugging info.
 ```
 
 Sample session

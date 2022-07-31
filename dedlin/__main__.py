@@ -27,7 +27,7 @@ from typing import Generator, Optional
 from docopt import docopt
 
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
-from dedlin.document_sources import SimpleInputter, input_with_prefill, PrefillInputter
+from dedlin.document_sources import PrefillInputter, SimpleInputter, input_with_prefill
 from dedlin.flash import title_screen
 from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
@@ -87,7 +87,6 @@ def run(
         """Get input from the user"""
         while True:
             yield input_with_prefill(prompt, text)
-
 
     def plain_printer(text: Optional[str], end: str = "\n") -> None:
         text = "" if text is None else text

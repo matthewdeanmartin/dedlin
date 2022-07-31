@@ -12,9 +12,10 @@ import dedlin.help_text as help_text
 from dedlin.basic_types import (  # CommandGeneratorProtocol,; StringGeneratorProtocol,
     Command,
     Commands,
+    LineRange,
     Phrases,
     Printable,
-    null_printer, LineRange,
+    null_printer,
 )
 from dedlin.command_sources import InMemoryCommandGenerator
 from dedlin.document import Document
@@ -208,12 +209,14 @@ class Dedlin:
 
                         if edit_status.text is not None:
                             # rewrite history
-                            #_ = self.history.pop()
-                            self.history.append(Command(command=Commands.EDIT,
-                                                        line_range=LineRange(start=edit_status.line_edited,
-                                                                    offset=0),
-                                                        phrases=Phrases(parts=tuple([edit_status.text]))))
-
+                            # _ = self.history.pop()
+                            self.history.append(
+                                Command(
+                                    command=Commands.EDIT,
+                                    line_range=LineRange(start=edit_status.line_edited, offset=0),
+                                    phrases=Phrases(parts=tuple([edit_status.text])),
+                                )
+                            )
 
                     # New line or else next text will be on the same line
                     self.command_outputter("")

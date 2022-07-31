@@ -121,4 +121,3 @@ class PrefillInputter:
             yield value
         except KeyboardInterrupt:
             yield None
-
