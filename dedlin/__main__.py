@@ -76,11 +76,11 @@ def run(
         rich_printer.print(text, end="")
 
     if macro_file_name:
-        the_generator = CommandGenerator(Path(macro_file_name))
+        the_command_generator = CommandGenerator(Path(macro_file_name))
         # command_handler = the_generator.generate()
     else:
-        the_generator = InteractiveGenerator()
-        the_generator.prompt = " * "
+        the_command_generator = InteractiveGenerator()
+        the_command_generator.prompt = " * "
         # command_handler = the_interactive_generator.generate()
 
     def document_inputter(prompt: str, text: str = "") -> Generator[str, None, None]:
@@ -97,7 +97,7 @@ def run(
             print(text, end=end)
 
     dedlin = Dedlin(
-        inputter=the_generator,  # InteractiveGenerator(),
+        inputter=the_command_generator,  # InteractiveGenerator(),
         insert_document_inputter=SimpleInputter(),
         edit_document_inputter=PrefillInputter(),
         outputter=printer if file_name and file_name.endswith(".py") else plain_printer,
@@ -114,13 +114,15 @@ def run(
     while True:
         # pylint: disable=broad-except
         try:
+            sys.excepthook = dedlin.save_on_crash
             dedlin.entry_point(file_name, macro_file_name)
             if not vim_mode:
                 break
         except KeyboardInterrupt:
             if not vim_mode:
                 break
-        except Exception:
+        except Exception as the_exception:
+            dedlin.save_on_crash(the_exception, None, None)
             print(traceback.format_exc())
             break
     dedlin.final_report()

@@ -160,6 +160,7 @@ COMMANDS_WITH_PHRASES = {
     Commands.REPLACE: ("R", "REPLACE"),  # 2 phrases
     Commands.HELP: ("HELP",),
     Commands.PUSH: ("PUSH",),
+    Commands.CRASH: ("CRASH",),
 }
 
 

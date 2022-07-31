@@ -24,7 +24,8 @@ from dedlin.pygments_code import EdLexer
 # from prompt_toolkit.formatted_text import HTML
 
 # thing = guess_lexer_for_filename("cats.py","")
-style = style_from_pygments_cls(get_style_by_name("monokai"))
+style = style_from_pygments_cls(get_style_by_name("borland"))
+
 
 SESSION: Optional[PromptSession] = None
 
@@ -117,8 +118,5 @@ class InMemoryCommandGenerator:
         yield from self.commands
 
 
-# class CommandStringGenerator:
-#     def command_string_generator(self, macro_path: Path) -> Generator[str, None, None]:
-#         """Turn a file into a bunch of commands"""
-#         with open(str(macro_path), encoding="utf-8") as file:
-#             yield from file
+if __name__ == "__main__":
+    print("This is a module, not a program.")

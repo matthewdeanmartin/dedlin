@@ -64,9 +64,11 @@ class Document:
         # self.current_line = line_range.start
 
         # slice handles the case where the range is beyond the end of the document
+        line_number = line_range.start
         for line_text in self.lines[line_range.to_slice()]:
             # lines never end in a newline
-            yield f"   {self.current_line} : {line_text}", "\n"
+            yield f"   {line_number} : {line_text}", "\n"
+            line_number += 1
 
             # tiny inefficiency here
             # if self.current_line >= len(self.lines):
@@ -123,7 +125,10 @@ class Document:
                 self.lines[self.current_line] = line_text
                 self.dirty = True  # this is ugly
                 yield f"   {self.current_line + 1 } : {line_text}"
-            self.current_line += 1
+            if self.current_line <= len(self.lines):
+                self.current_line += 1
+            else:
+                break
 
     def page(self, page_size: int = 5) -> Generator[tuple[str, str], None, None]:
         """Display lines in pages"""
@@ -244,6 +249,9 @@ class Document:
 
         line_text = self.lines[line_number - 1]
 
+        # BUG this is creating a closure and I think we can
+        # pass a ref to doc e.g. generate(self) that will not
+        # end up with a reference to a static, past state of the prompt and line number
         input_generator = self.edit_inputter.generate()
         try:
             self.edit_inputter.current_line = f"   {line_number} : "

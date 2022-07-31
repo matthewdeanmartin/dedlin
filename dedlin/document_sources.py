@@ -109,7 +109,7 @@ class PrefillInputter:
 
     def __init__(self) -> None:
         """Set up the inputter"""
-        self.prompt: str = ""
+        self.prompt: str = "* "
         self.default: str = ""
 
     def generate(

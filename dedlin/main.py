@@ -6,7 +6,7 @@ Handles UI and links command parser to the document object
 import logging
 import signal
 from pathlib import Path
-from typing import Callable, Generator, Optional
+from typing import Any, Callable, Generator, Optional
 
 import dedlin.help_text as help_text
 from dedlin.basic_types import (  # CommandGeneratorProtocol,; StringGeneratorProtocol,
@@ -23,6 +23,7 @@ from dedlin.document_sources import InMemoryInputter, PrefillInputter
 from dedlin.file_system import read_or_create_file, save_and_overwrite
 from dedlin.history_feature import HistoryLog
 from dedlin.info_bar import display_info
+from dedlin.utils.exceptions import DedlinException
 from dedlin.web import fetch_page_as_rows
 
 logger = logging.getLogger(__name__)
@@ -135,9 +136,9 @@ class Dedlin:
                     self.feedback("No URL, can't browse")
                 elif command.phrases:
                     page_as_rows = fetch_page_as_rows(command.phrases.first)
-                    self.doc.lines = page_as_rows
+                    phrases = Phrases(page_as_rows)
+                    self.doc.insert(self.doc.current_line, phrases)
 
-                    self.doc.dirty = True
             elif command.command == Commands.HISTORY:
                 for command in self.history:
                     # self.feedback(command.original_text.strip("\n\t\r "))
@@ -145,20 +146,11 @@ class Dedlin:
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.LIST and command.line_range:
-
-                # TODO: move this to the Document class
                 for line, end in self.doc.list_doc(command.line_range):
-                    if line.endswith("\n"):
-                        self.document_outputter(line, "")
-                    else:
-                        self.document_outputter(line, end=end)
+                    self.document_outputter(line, end)
             elif command.command == Commands.PAGE:
-                # TODO: move this to the Document class
                 for line, end in self.doc.page():
-                    if line.endswith("\n"):
-                        self.document_outputter(line, "")
-                    else:
-                        self.document_outputter(line, end=end)
+                    self.document_outputter(line, end)
             elif command.command == Commands.SPELL and command.line_range:
                 for line, end in self.doc.spell(command.line_range):
                     self.document_outputter(line, end=end)
@@ -252,6 +244,8 @@ class Dedlin:
                 self.doc.current_line = command.line_range.start
             elif command.command == Commands.EMPTY:
                 pass
+            elif command.command == Commands.CRASH:
+                raise DedlinException("Crashing")
             elif command.command == Commands.HELP:
                 if not command.phrases or command.phrases.first is None:
                     self.feedback(help_text.HELP_TEXT)
@@ -307,3 +301,7 @@ class Dedlin:
     def final_report(self) -> None:
         """Print out the final report"""
         self.feedback(f"History saved to {self.history_log.history_file_string}")
+
+    def save_on_crash(self, type: Optional[Exception], value: Any, tb: Any) -> None:
+        self.save_document()
+        raise type

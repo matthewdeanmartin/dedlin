@@ -7,19 +7,20 @@ def test_list():
     lines = ["1", "2", "3", "4"]
     doc = Document(fake_input, fake_edit, lines)
     current = doc.current_line
+    assert current == 1
 
-    result = list(doc.list_doc(LineRange(1, offset=1)))
+    result = list(doc.list_doc(LineRange(1, offset=0)))
     assert len(result) == 1
     assert ": 1" in result[0][0]
     assert doc.current_line == current
 
-    result = list(doc.list_doc(LineRange(2, offset=2)))
+    result = list(doc.list_doc(LineRange(2, offset=1)))
     assert len(result) == 2
     assert ": 2" in result[0][0]
     assert ": 3" in result[1][0]
     assert doc.current_line == current
 
-    result = list(doc.list_doc(LineRange(1, offset=10)))
+    result = list(doc.list_doc(LineRange(1, offset=20)))
     assert len(result) == 4
     for i in lines:
         assert f": {i}" in result[int(i) - 1][0]

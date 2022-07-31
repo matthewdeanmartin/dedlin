@@ -55,6 +55,7 @@ class Commands(Enum):
     UNDO = auto()
     UNKNOWN = auto()
     INFO = auto()
+    CRASH = auto()
 
 
 @dataclass(frozen=True)
@@ -110,7 +111,7 @@ class LineRange:
 
     def to_slice(self):
         """Convert to a slice"""
-        return slice(self.start - 1, self.end - 1)
+        return slice(self.start - 1, self.end)
 
     def format(self) -> str:
         """Format the range as a string"""

@@ -47,17 +47,27 @@ def test_try_parse_int():
 
 
 def test_line_range_slice():
-    line_range = LineRange(1, 1)
+    line_range = LineRange(1, offset=0)
+    assert line_range.start == 1
+    assert line_range.end == 1
     assert [1, 2, 3, 4, 5][line_range.to_slice()] == [1]
 
-    line_range = LineRange(1, 2)
+    line_range = LineRange(1, offset=1)
+    assert line_range.start == 1
+    assert line_range.end == 2
     assert [1, 2, 3, 4, 5][line_range.to_slice()] == [1, 2]
 
-    line_range = LineRange(2, 3)
+    line_range = LineRange(2, offset=2)
+    assert line_range.start == 2
+    assert line_range.end == 4
     assert [1, 2, 3, 4, 5][line_range.to_slice()] == [2, 3, 4]
 
-    line_range = LineRange(1, 5)
+    line_range = LineRange(1, offset=4)
+    assert line_range.start == 1
+    assert line_range.end == 5
     assert [1, 2, 3, 4, 5][line_range.to_slice()] == [1, 2, 3, 4, 5]
 
-    line_range = LineRange(3, 2)
+    line_range = LineRange(3, offset=1)
+    assert line_range.start == 3
+    assert line_range.end == 4
     assert [1, 2, 3, 4, 5][line_range.to_slice()] == [3, 4]

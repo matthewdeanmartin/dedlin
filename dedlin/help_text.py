@@ -4,6 +4,7 @@ HELP_TEXT = """Command format: [start],[end],[repeat] [command] "[search]" "[rep
 [start],[end] is abbreviated to [range]
 
 1,10 LIST   - Lists lines 1 to 10
+1 CURRENT  - Reset current line to first line
 1,20 SEARCH cat - Search for cat
 
 1  - Edit line 1
@@ -14,12 +15,20 @@ REPLACE cat dog - Replace cat with dog
 For more help, type
 HELP display|edit|files|data|reorder|meta|data|all"""
 
+FILES_HELP = """File System Commands
+[range] Split [file name] [file name] [file name]- split file into two or three files
+Quit - Exits, unless the file has been modified
+Exit [file name] - Saves file and exits
+"""
+
 SPECIFIC_HELP = {
     "DISPLAY": """Display Commands
 [range] List - display lines, set current to end of range
 [range] Page - repeat to flip through entire document
 [range] Spell - show spelling mistakes
-[range] Search "[text]" """,
+[range] Search "[text]"
+[line] Current - set current line to [line]
+""",
     "EDIT": """Edit Commands
 [line] - Bare number defaults to Edit at that line
 [line] Insert - insert line at line number
@@ -43,9 +52,6 @@ HELP - display this""",
 [range] Copy [target line number] - copy range to target
 [range] Sort - sort lines alphabetically
 [range] Shuffle - shuffle lines randomly""",
-    "FILE": """File System Commands
-[range] Split [file name] [file name] [file name]- split file into two or three files
-Quit - Exits, unless the file has been modified
-Exit [file name] - Saves file and exits
-""",
+    "FILE": FILES_HELP,
+    "FILES": FILES_HELP,
 }
