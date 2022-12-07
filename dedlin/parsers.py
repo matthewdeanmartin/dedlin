@@ -156,6 +156,7 @@ def parse_range_only(
 
 
 COMMANDS_WITH_PHRASES = {
+    Commands.COPY: ("COPY",),  # 1 phrase
     Commands.SEARCH: ("S", "SEARCH"),  # 1 phrase
     Commands.REPLACE: ("R", "REPLACE"),  # 2 phrases
     Commands.HELP: ("HELP",),

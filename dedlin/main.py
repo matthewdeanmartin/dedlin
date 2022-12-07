@@ -186,6 +186,9 @@ class Dedlin:
             elif command.command == Commands.PUSH and command.phrases and command.line_range:
                 line_number = command.line_range.start if command.line_range else 1
                 self.doc.push(line_number, command.phrases.as_list())
+            elif command.command == Commands.COPY and command.phrases and command.line_range:
+                self.doc.copy(command.line_range.start, command.line_range.end, int(command.phrases[0]))
+                self.feedback("Copied")
             elif command.command == Commands.EDIT:
                 if command.phrases and command.phrases.parts:
                     self.doc.spread(command.line_range, command.phrases.parts)
