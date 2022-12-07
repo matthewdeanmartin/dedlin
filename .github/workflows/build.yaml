@@ -12,9 +12,13 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pipenv' # caching pipenv dependencies
-      - name: Install Poetry
+      - name: Install pipenv and pipx
         run: |
-          pip install pipenv
+          pip install pipenv && pip install pipx
+
+      - name: Install global dependencies
+        run: |
+          pipx install isort && pipx install black && pipx install bandit
 
       - name: Install Dependencies
         run: pipenv install --dev --skip-lock
