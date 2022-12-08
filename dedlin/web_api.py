@@ -14,12 +14,16 @@ from dedlin.parsers import parse_command
 
 @dc.dataclass
 class InputPayload:
+    """Command text"""
+
     commands: list[str] = field(default_factory=list)
     lines: list[str] = field(default_factory=list)
 
 
 @dc.dataclass
 class OutputPayload:
+    """Document text"""
+
     messages: list[str] = field(default_factory=list)
     lines: list[str] = field(default_factory=list)
 

@@ -6,7 +6,7 @@ Handles UI and links command parser to the document object
 import logging
 import signal
 from pathlib import Path
-from typing import Any, Callable, Generator, Optional
+from typing import Any, Callable, Optional
 
 import dedlin.help_text as help_text
 from dedlin.basic_types import (  # CommandGeneratorProtocol,; StringGeneratorProtocol,
@@ -272,6 +272,7 @@ class Dedlin:
         return 0
 
     def feedback(self, string, end="\n") -> None:
+        """Output feedback to the user"""
         if not (self.vim_mode or self.quiet):
             self.command_outputter(string, end)
             return
@@ -306,5 +307,6 @@ class Dedlin:
         self.feedback(f"History saved to {self.history_log.history_file_string}")
 
     def save_on_crash(self, type: Optional[Exception], value: Any, tb: Any) -> None:
+        """Save the document to the file"""
         self.save_document()
         raise type

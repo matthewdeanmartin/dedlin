@@ -3,10 +3,9 @@ Abstract document class.
 """
 import logging
 import random
-from typing import Callable, Generator, Optional, Tuple
+from typing import Generator, Optional
 
 import icontract
-from pydantic import validator
 from pydantic.dataclasses import dataclass
 
 from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
