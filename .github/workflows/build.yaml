@@ -1,6 +1,6 @@
 name: Build and Test
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
 
       - name: Install global dependencies
         run: |
-          pipx install isort && pipx install black && pipx install bandit && pipx install pylint
+          pipx install isort && pipx install black && pipx install bandit && pipx install pylint && pipx install pre-commit
 
       - name: Install Dependencies
         run: pipenv install --dev --skip-lock
