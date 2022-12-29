@@ -56,7 +56,7 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
         return LineRange(start=document_length, offset=0, repeat=1)
     if value and all(_ in "0123456789" for _ in value):
         start = int(value)
-        if start<=1:
+        if start <= 1:
             start = 1
         candidate = LineRange(start=start, offset=0, repeat=1)
 
@@ -169,10 +169,7 @@ COMMANDS_WITH_PHRASES = {
 
 
 def parse_search_replace(
-    front_part: str,
-    phrases: Optional[Phrases],
-    original_text: str,
-    current_line: int, document_length: int
+    front_part: str, phrases: Optional[Phrases], original_text: str, current_line: int, document_length: int
 ) -> Optional[Command]:
     """Parse a command that has a line range and phrases"""
     for command_code, command_forms in COMMANDS_WITH_PHRASES.items():

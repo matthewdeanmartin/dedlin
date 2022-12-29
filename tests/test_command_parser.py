@@ -10,24 +10,24 @@ def test_extract_one_range():
 
 
 def test_parse_command_insert_default():
-
     for insert in ("I", "Insert", "insert", "i", "INSERT"):
         assert parse_command(insert, 1, 3) == Command(Commands.INSERT, LineRange(start=1, offset=2), None), insert
+
 
 def test_parse_copy():
     command = "2,3 copy 1"
     result = parse_command(command, 1, 5)
     assert result.command == Commands.COPY
 
+
 def test_parse_move():
     command = "2,3 move 1"
     result = parse_command(command, 1, 5)
     assert result.command == Commands.MOVE
 
+
 def test_parse_command_insert_specific_rage():
-
     for insert in ("I", "Insert", "insert", "i", "INSERT"):
-
         assert parse_command(f"2{insert}", 1, 3) == Command(
             Commands.INSERT,
             LineRange(start=2, offset=0),  # Phrases("")

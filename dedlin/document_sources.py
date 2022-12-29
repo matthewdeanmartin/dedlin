@@ -49,6 +49,7 @@ else:
 
         Linux/Mac Version
         """
+
         # ref https://stackoverflow.com/a/8505387
         def hook() -> None:
             readline.insert_text(text)

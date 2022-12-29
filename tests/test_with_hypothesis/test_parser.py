@@ -125,9 +125,17 @@ def test_fuzz_parse_range_only(just_command, front_part, original_text, current_
         st.builds(Phrases, parts=st.tuples(st.text(), st.text())),
     ),
     original_text=st.text(),
+    current_line=st.integers(),
+    document_length=st.integers(),
 )
-def test_fuzz_parse_search_replace(front_part, phrases, original_text):
-    dedlin.parsers.parse_search_replace(front_part=front_part, phrases=phrases, original_text=original_text)
+def test_fuzz_parse_search_replace(front_part, phrases, original_text, current_line, document_length):
+    dedlin.parsers.parse_search_replace(
+        front_part=front_part,
+        phrases=phrases,
+        original_text=original_text,
+        current_line=current_line,
+        document_length=document_length,
+    )
 
 
 @given(value=st.text(), default_value=st.one_of(st.none(), st.integers()))
