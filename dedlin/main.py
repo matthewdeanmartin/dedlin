@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 
 import dedlin.help_text as help_text
-from dedlin.basic_types import (  # CommandGeneratorProtocol,; StringGeneratorProtocol,
+from dedlin.basic_types import (
     Command,
     Commands,
     LineRange,
@@ -155,8 +155,10 @@ class Dedlin:
                 for line, end in self.doc.spell(command.line_range):
                     self.document_outputter(line, end=end)
             elif command.command == Commands.DELETE and command.line_range:
-                self.doc.delete(command.line_range)
-                self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
+                if self.doc.delete(command.line_range):
+                    self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
+                else:
+                    self.feedback(f"Could not delete")
             elif command.command in (Commands.EXIT, Commands.QUIT):
                 if self.vim_mode:
                     continue
@@ -187,8 +189,11 @@ class Dedlin:
                 line_number = command.line_range.start if command.line_range else 1
                 self.doc.push(line_number, command.phrases.as_list())
             elif command.command == Commands.COPY and command.phrases and command.line_range:
-                self.doc.copy(command.line_range.start, command.line_range.end, int(command.phrases[0]))
+                self.doc.copy(command.line_range, int(command.phrases.first))
                 self.feedback("Copied")
+            elif command.command == Commands.MOVE and command.phrases and command.line_range:
+                self.doc.copy(command.line_range, int(command.phrases.first))
+                self.feedback("Moved")
             elif command.command == Commands.EDIT:
                 if command.phrases and command.phrases.parts:
                     self.doc.spread(command.line_range, command.phrases.parts)

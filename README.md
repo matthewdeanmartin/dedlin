@@ -9,6 +9,9 @@ where all help, warnings, feedback will be suppressed.
 
 
 ## Installation
+
+Requires python 3.11 or higher. Someday I'll write a standalone installer for it.
+
 ```bash
 pip install dedlin
 ```

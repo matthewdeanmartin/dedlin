@@ -205,11 +205,12 @@ class Document:
     @icontract.ensure(
         lambda self: len(self.previous_lines) >= len(self.lines), "Lines should shrink or stay the same after delete"
     )
-    def delete(self, line_range: Optional[LineRange] = None) -> None:
+    def delete(self, line_range: Optional[LineRange] = None) -> bool:
         """Delete lines"""
         if not self.lines:
             logger.debug("No lines to delete")
-            return
+            return False
+
         if not line_range:
             line_range = LineRange(1, len(self.lines) - 1)
         self.list_doc(line_range)
@@ -217,16 +218,22 @@ class Document:
         # TODO: prompt for confirmation
 
         self.backup()
-        if line_range.start == line_range.end:
-            self.lines.pop(line_range.start - 1)
-            self.dirty = True  # this is ugly
-        else:
-            for index in range(line_range.end - 1, line_range.start - 2, -1):
-                self.lines.pop(index)
+        try:
+            if line_range.start == line_range.end:
+                self.lines.pop(line_range.start - 1)
                 self.dirty = True  # this is ugly
+            else:
+                for index in range(line_range.end - 1, line_range.start - 2, -1):
+                    self.lines.pop(index)
+                    self.dirty = True  # this is ugly
+        except IndexError:
+            logger.debug(f"Can't delete {line_range}")
+            return False
+
         if self.current_line > len(self.lines):
             self.current_line = len(self.lines)
         logger.debug(f"Deleted {line_range}")
+        return True
 
     def fill(self, line_range: LineRange, value: str) -> None:
         """Fill lines with value"""

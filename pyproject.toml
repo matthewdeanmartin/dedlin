@@ -38,7 +38,7 @@ documentation ="https://github.com/matthewdeanmartin/dedlin"
 dedlin = 'dedlin.__main__:main'
 
 [tool.poetry.dependencies]
-python = ">=3.8, <4.0"
+python = ">=3.11, <4.0"
 # ui toolkits
 questionary = "*"
 pywin32 = { version = "*", markers = "sys_platform == 'win32'" }

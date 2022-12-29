@@ -157,6 +157,7 @@ def parse_range_only(
 
 COMMANDS_WITH_PHRASES = {
     Commands.COPY: ("COPY",),  # 1 phrase
+    Commands.MOVE: ("MOVE",),  # 1 phrase
     Commands.SEARCH: ("S", "SEARCH"),  # 1 phrase
     Commands.REPLACE: ("R", "REPLACE"),  # 2 phrases
     Commands.HELP: ("HELP",),
@@ -169,6 +170,7 @@ def parse_search_replace(
     front_part: str,
     phrases: Optional[Phrases],
     original_text: str,
+    current_line: int, document_length: int
 ) -> Optional[Command]:
     """Parse a command that has a line range and phrases"""
     for command_code, command_forms in COMMANDS_WITH_PHRASES.items():
@@ -182,20 +184,20 @@ def parse_search_replace(
             if front_part in command_forms:
                 line_range = None
             elif long_command in front_part:
-                line_number_string = front_part.split(long_command)[0].strip()
-                line_number = try_parse_int(line_number_string)
-                if line_number is None:
+                # line_number_string = front_part.split(long_command)[0].strip()
+                # line_number = try_parse_int(line_number_string)
+                # line_range = LineRange(start=line_number, offset=0)
+                line_range = extract_one_range(front_part.replace(long_command, ""), current_line, document_length)
+                if line_range is None:
                     logger.warning(f"Bad range {original_text}")
                     return None
-                line_range = LineRange(start=line_number, offset=0)
             elif abbreviation is not None:
-                line_number = try_parse_int(front_part.split(abbreviation)[0].strip())
-                if line_number is None:
+                # line_number = try_parse_int(front_part.split(abbreviation)[0].strip())
+                # line_range = LineRange(start=line_number, offset=0)
+                line_range = extract_one_range(front_part.replace(long_command, ""), current_line, document_length)
+                if line_range is None:
                     logger.warning(f"Bad range {original_text}")
                     return None
-
-                line_range = LineRange(start=line_number, offset=0)
-
             return Command(
                 command_code,
                 line_range=line_range,
@@ -287,7 +289,7 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
     if candidate:
         return candidate
 
-    candidate = parse_search_replace(front_part, phrases, original_text)
+    candidate = parse_search_replace(front_part, phrases, original_text, current_line, document_length)
     if candidate:
         return candidate
 

@@ -23,6 +23,12 @@ def test_document_move_front_stuff_to_back():
         "2",
     ]
 
+def test_document_move_front_stuff_to_back_2():
+    lines = ["1", "2", "3", "4", "", "", ""]
+    doc = Document(fake_input, fake_edit, lines)
+
+    doc.move(LineRange(1, 2), 5)
+    assert doc.lines == ['4', '', '', '1', '2', '3', '']
 
 def test_document_move_back_stuff_to_front():
     lines = ["1", "2", "3", "4"]
