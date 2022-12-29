@@ -56,6 +56,8 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
         return LineRange(start=document_length, offset=0, repeat=1)
     if value and all(_ in "0123456789" for _ in value):
         start = int(value)
+        if start<=1:
+            start = 1
         candidate = LineRange(start=start, offset=0, repeat=1)
 
         # TODO: need better parser errors
