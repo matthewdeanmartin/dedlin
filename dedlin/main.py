@@ -125,7 +125,11 @@ class Dedlin:
             self.echo_if_needed(command.format())
 
             if command.command == Commands.REDO:
-                command = self.history[-2]
+                try:
+                    command = self.history[-2]
+                except IndexError:
+                    self.feedback("Nothing to redo, not enough history")
+                    continue
                 self.history.append(command)
                 self.echo_if_needed(command.original_text)
 

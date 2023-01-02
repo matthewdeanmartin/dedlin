@@ -36,6 +36,8 @@ class Commands(Enum):
     QUIT = auto()
     EXIT = auto()
     TRANSFER = auto()
+
+    # Add text
     BROWSE = auto()
 
     # reorder commands
@@ -241,7 +243,7 @@ class Command:
         """Format the command as a string"""
         range_part = self.line_range.format() if self.line_range is not None else ""
         phrase_part = self.phrases.format() if self.phrases is not None else ""
-        return " ".join([range_part, self.command.name, phrase_part])
+        return " ".join([range_part, self.command.name, phrase_part]).strip()
 
 
 def try_parse_int(value: str, default_value: Optional[int] = None) -> Optional[int]:

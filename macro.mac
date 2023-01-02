@@ -1,0 +1,106 @@
+UNDO
+3,11 INSERT id, Sed consequatur, ratione
+REDO
+5,10,2 INSERT consequatur autem minus
+REDO
+10,16,3 INSERT alias est, quia eum amet voluptas
+UNDO
+7,17,3 INSERT natus fuga. ratione quo ratione doloremque qui Nemo ducimus,
+UNDO
+7,8,2 PUSH vel
+REDO
+4,7,2 PUSH deserunt ex sit, voluptatem, sint fugit, qui
+UNDO
+4,9,3 PUSH tempore, quae maxime
+UNDO
+5,11,2 PUSH sed qui consequatur minus Temporibus aut molestiae minima
+REDO
+3,7 PUSH officia
+REDO
+10 PUSH nisi dolores perferendis
+UNDO
+6,15,3 PUSH aspernatur eos, aliquid ipsam obcaecati dicta excepturi
+REDO
+6 PUSH quis odio consequuntur ipsum, provident, odio voluptatem, magni obcaecati eaque
+REDO
+3,13 PUSH et omnis
+UNDO
+6,11,2 EDIT nobis omnis et sit deleniti quod dolor et
+REDO
+8,17 EDIT et dignissimos eos omnis ab At quam
+UNDO
+3,11,3 EDIT quisquam vitae quia sit dolorem sequi quia
+REDO
+9,11,3 EDIT aperiam et suscipit iusto et doloremque aut pariatur?
+UNDO
+4,12,2 EDIT voluptatem ullam inventore est
+REDO
+2,2,3 EDIT et est
+UNDO
+9,16 EDIT porro doloribus tempore, quo aut reiciendis dolor cumque perspiciatis,
+UNDO
+1,2,2 EDIT consequatur,
+UNDO
+8,8,3 EDIT sapiente repellendus. laborum nihil expedita
+UNDO
+7,12,3 EDIT officiis aliquam
+REDO
+4,12 EDIT magni illum, sequi ratione vel
+REDO
+6,11,3 EDIT animi, omnis iusto eius ut magni mollitia
+UNDO
+1,3 EDIT quod nulla non dolor et aliquid dolorem
+UNDO
+10,12 DELETE omnis in expedita
+REDO
+8,15,3 DELETE tempore, Temporibus ullam voluptatibus ut et
+REDO
+3,7 DELETE ea voluptatem Itaque et et consequatur, natus accusamus perferendis
+UNDO
+2,5 DELETE impedit, ut porro aut amet nihil
+REDO
+2 DELETE est, provident, exercitationem repellat. possimus, illo esse, repellendus.
+UNDO
+5,12,3 REPLACE eum quaerat libero nihil aspernatur aliquid sunt, nostrumd
+REDO
+4,11,2 REPLACE est, quo quam necessitatibus optio, quidem ea
+UNDO
+3,9 REPLACE optio, doloribus labore
+REDO
+7,8,2 REPLACE est provident, quia Temporibus aspernatur deserunt sunt,
+REDO
+9,10,3 SEARCH ut do quaerat qui
+UNDO
+6,15,2 SEARCH eos, ut qui consequatur doloribus reprehenderit, ratione enim
+REDO
+9,18,2 SEARCH minus et doloremque quia
+UNDO
+4,5 SEARCH et consequatur At aspernatur fugiat, et aliquam ut
+UNDO
+REVERSE
+UNDO
+SHUFFLE
+UNDO
+SORT
+INFO
+HELP
+HISTORY
+3,8,3 LIST et neque iure modi asperiores fuga. consectetur nulla dolor
+10,10,2 LIST explicabo. explicabo. eos, sunt modi consectetur aut et
+2,12,2 LIST laboriosam, perferendis est, vitae modi illum,
+9,18 LIST doloribus explicabo. placeat, accusamus autem rerum
+4,8 PAGE ut Sed fugiat,
+1,10,3 SPELL officiis voluptatum ea dolore excepturi enim cumque
+7,16 SPELL consequatur reprehenderit, quidem
+3,10 SPELL assumenda dolor quas molestias totam minima voluptas consequuntur voluptatem.
+8,15,2 SPELL iste vero Ut aut sint, quasi
+3,9,3 SPELL illo fugit, obcaecati aut
+2,8,3 SPELL similique voluptas qui culpa,
+5,5,3 SPELL sequi iusto eveniet, in deserunt
+4,11 CURRENT laborum recusandae. perferendis
+7,16,3 CURRENT corporis At officia voluptas nesciunt,
+7,15,2 CURRENT fugiat, qui deleniti hic sapiente
+6,16 CURRENT consequatur doloremque velit porro aut
+4,13,3 CURRENT ut qui molestiae perspiciatis, autem consequuntur
+9,14,2 CURRENT et ratione harum distinctio. tenetur qui quis recusandae. eum
+7 CURRENT culpa, soluta

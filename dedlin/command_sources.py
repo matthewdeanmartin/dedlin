@@ -98,7 +98,9 @@ class CommandGenerator:
 
         with open(str(self.macro_path), encoding="utf-8") as file:
             for line in file:
-                command = parse_command(line, current_line=self.current_line, document_length=self.document_length)
+                command = parse_command(line.strip("\n").strip("\r"),
+                                        current_line=self.current_line,
+                                        document_length=self.document_length)
                 yield command
 
 

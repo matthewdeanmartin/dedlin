@@ -15,7 +15,7 @@ def check(line: str) -> str:
     new_line = line
     for word in misspelled:
         correction = spell.correction(word)
-        if correction != word:
+        if correction != word and correction:
             replacement = f"{word} (did you mean {correction}?)"
             new_line = new_line.replace(word, replacement)
     return new_line
