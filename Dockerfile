@@ -1,0 +1,14 @@
+FROM python:3.11.1-slim-buster
+WORKDIR /app
+ENV PIP_NO_CACHE_DIR=off
+ENV PYTHONUNBUFFERED=1
+# multidict doesnt have pre-compiled things for many OSs
+ENV MULTIDICT_NO_EXTENSIONS=1
+# RUN apk add --no-cache linux-headers==4.19.36-r0 wget
+ENV PATH="/root/.local/bin:${PATH}"
+RUN python -m pip install --user pipx && python -m pipx ensurepath
+RUN python -m pip install --no-cache-dir --upgrade pip --quiet \
+     && pip install pipenv  --no-cache-dir --quiet
+COPY dist/dedlin-*-py3-none-any.whl /app/
+RUN pipenv install dedlin-*.whl --skip-lock
+ENTRYPOINT ["pipenv", "run", "dedlin"]

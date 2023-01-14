@@ -87,3 +87,16 @@ publish_test:
 .PHONY: publish
 publish: test
 	echo "rm -rf dist && poetry version minor && poetry build && twine upload dist/*"
+
+.PHONY:
+docker:
+	docker build -t dedlin -f Dockerfile .
+
+.PHONY:
+pex:
+	# linux only
+	@pipenv requirements > requirements.txt
+	@pex -r "requirements.txt" -e "dedlin.cli:main" -o "dedlin.pex"
+
+shiv: dedlin.pyz
+	@shiv dedlin -o dedlin.pyz --python python --console-script dedlin

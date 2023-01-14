@@ -15,3 +15,16 @@ It was implemented as `ed` and inspired many good and bad editors thereafter.
 - [jeffpar's](https://jeffpar.github.io/kbarchive/kb/067/Q67706/)
 - [vscode-edlin](https://github.com/FFengIll/vscode-edlin)
 - [edlin in python](https://github.com/firefish111/edlin/blob/master/main.py)
+
+## Just other console, TUI, text based editors implemented in python
+- [babi](https://pypi.org/project/babi/) - nano clone, works on windows.
+
+# Couldn't install
+- [tui-editor](https://pypi.org/project/tui-editor/) - setup.py broken?
+- [kaaedit](https://pypi.org/project/kaaedit/) - Linux only
+- [exofrills](https://pypi.org/project/exofrills/) - Linux only
+- [atto](https://pypi.org/project/atto/) - Linux only
+- [py-curses-editor](https://pypi.org/project/py-curses-editor/) Library, not app
+- [ash](https://pypi.org/project/ash-editor/) Linux only
+- [yated](https://pypi.org/project/yated/) Linux only
+- 
