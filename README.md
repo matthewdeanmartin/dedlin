@@ -7,22 +7,24 @@ This is not intended to be backwards compatible with anything. I have made
 changes to make the app less user hostile, but there is a `--vim_mode`
 where all help, warnings, feedback will be suppressed.
 
-
 ## Installation
 
 Requires python 3.11 or higher. Someday I'll write a standalone installer for it.
 
-Install into your system python. This is a bad idea.
-```bash
-pip install dedlin
-```
-
 Install globally in an isolated virtual environment. This is a good idea.
+
 ```bash
 pipx install dedlin
 ```
 
+Install into your system python. This is a bad idea.
+
+```bash
+pip install dedlin
+```
+
 Build and run with docker. Painful, but you're using an edlin clone, so that is what you're looking for.
+
 ```
 make docker
 
@@ -31,12 +33,17 @@ docker run --rm -it -v "${PWD}/:/app" dedlin:latest
 ```
 
 ## Usage
+
 Launch and edit file_name.txt
+
+If you installed with `pip` or `pipx`
+
 ```bash
-python -m dedlin file_name.txt
+dedlin file_name.txt
 ```
 
 Command line help
+
 ```
 > python -m dedlin --help
 Dedlin.
@@ -60,6 +67,7 @@ Options:
 ```
 
 Sample session
+
 ```
    _          _  _  _
  __| | ___  __| || |(_) _ _
@@ -97,8 +105,8 @@ Sorted
 1,6 EXIT
 ```
 
-
 # Documentation
+
 - [User Manual](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/user_manual.md)
 - [Developer roadmap](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/TODO.md)
 - [Prior Art](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/prior_art.md)
