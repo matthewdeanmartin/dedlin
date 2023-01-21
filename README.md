@@ -17,19 +17,11 @@ Install globally in an isolated virtual environment. This is a good idea.
 pipx install dedlin
 ```
 
-Install into your system python. This is a bad idea.
+Run pre-built image with docker. Painful, but you're using an edlin clone, so that is what you're looking for.
 
-```bash
-pip install dedlin
-```
-
-Build and run with docker. Painful, but you're using an edlin clone, so that is what you're looking for.
-
-```
-make docker
-
-# This is powershell. Couldn't get docker to run this on windows in git-bash.
-docker run --rm -it -v "${PWD}/:/app" dedlin:latest
+```powershell
+# This is should work in powershell or linux bash. Not windows git-bash.
+docker run --rm -it -v "${PWD}/:/app"  ghcr.io/matthewdeanmartin/dedlin:latest file.txt
 ```
 
 ## Usage
