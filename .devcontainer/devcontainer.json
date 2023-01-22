@@ -47,11 +47,11 @@
 	
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
-	"folders": [
-		{
-			"path": ".devcontainer"
-		}
-	],
+	// "folders": [
+	// 	{
+	// 		"path": ".devcontainer"
+	// 	}
+	// ],
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/black:2": {},
 		"ghcr.io/devcontainers-contrib/features/coverage-py:2": {},
