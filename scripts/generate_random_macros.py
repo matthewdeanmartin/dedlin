@@ -5,7 +5,7 @@ This needs more business logic than I care to put into one massive decorator.
 import random
 
 from dedlin import LineRange
-from dedlin.basic_types import Commands, Command, Phrases
+from dedlin.basic_types import Command, Commands, Phrases
 from dedlin.lorem_data import LOREM_IPSUM
 
 
@@ -16,11 +16,13 @@ def make_range():
     some_range = LineRange(start=start, offset=offset, repeat=repeat)
     return some_range
 
+
 def go():
     macro = []
     commands = [command.value for command in Commands]
 
     make_range()
+
 
 def some_random_words():
     words = []
@@ -30,6 +32,7 @@ def some_random_words():
         words.append(lorem_word)
     return words
 
+
 def two_or_more_random_words():
     words = []
     for _ in range(random.randint(2, 10)):
@@ -37,6 +40,7 @@ def two_or_more_random_words():
         lorem_word = random.choice(lorem_line.split(" "))
         words.append(lorem_word)
     return words
+
 
 def make_insert():
     range = make_range()
@@ -48,6 +52,7 @@ def make_insert():
     )
     return the_command
 
+
 def make_edit():
     range = make_range()
 
@@ -57,6 +62,7 @@ def make_edit():
         phrases=Phrases(parts=tuple(some_random_words())),
     )
     return the_command
+
 
 def make_copy():
     range = make_range()
@@ -68,6 +74,7 @@ def make_copy():
     )
     return the_command
 
+
 def make_move():
     range = make_range()
 
@@ -77,6 +84,7 @@ def make_move():
         phrases=Phrases(parts=tuple("1")),
     )
     return the_command
+
 
 def make_push():
     range = make_range()
@@ -96,7 +104,6 @@ def make_delete():
     the_command = Command(
         command=Commands.DELETE,
         line_range=range,
-
         # should be ignored.
         phrases=Phrases(parts=tuple(some_random_words())),
     )
@@ -124,6 +131,7 @@ def make_list():
     )
     return the_command
 
+
 def make_page():
     range = make_range()
 
@@ -134,6 +142,7 @@ def make_page():
     )
     return the_command
 
+
 def make_spell():
     range = make_range()
 
@@ -143,6 +152,7 @@ def make_spell():
         phrases=Phrases(parts=tuple(two_or_more_random_words())),
     )
     return the_command
+
 
 def make_current():
     range = make_range()
@@ -237,5 +247,6 @@ def typical():
     for line in macro:
         print(line.format())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     typical()

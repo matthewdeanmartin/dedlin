@@ -27,4 +27,4 @@ It was implemented as `ed` and inspired many good and bad editors thereafter.
 - [py-curses-editor](https://pypi.org/project/py-curses-editor/) Library, not app
 - [ash](https://pypi.org/project/ash-editor/) Linux only
 - [yated](https://pypi.org/project/yated/) Linux only
-- 
+-

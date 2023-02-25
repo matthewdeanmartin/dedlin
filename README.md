@@ -7,6 +7,13 @@ This is not intended to be backwards compatible with anything. I have made
 changes to make the app less user hostile, but there is a `--vim_mode`
 where all help, warnings, feedback will be suppressed.
 
+Badges
+------
+
+![Libraries.io dependency status for latest release](https://img.shields.io/librariesio/release/pypi/dedlin) [![Downloads](https://pepy.tech/badge/dedlin/month)](https://pepy.tech/project/dedlin/month)
+
+[![CodeFactor](https://www.codefactor.io/repository/github/matthewdeanmartin/dedlin/badge)](https://www.codefactor.io/repository/github/matthewdeanmartin/dedlin)
+
 ## Installation
 
 Requires python 3.11 or higher. Someday I'll write a standalone installer for it.
