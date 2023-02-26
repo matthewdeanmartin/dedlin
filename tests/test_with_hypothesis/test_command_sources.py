@@ -1,5 +1,4 @@
 from collections import ChainMap
-from pathlib import Path
 
 from hypothesis import given
 from hypothesis import strategies as st

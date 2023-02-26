@@ -145,7 +145,6 @@ class Document:
 
     def spell(self, line_range: LineRange) -> Generator[tuple[str, str], None, None]:
         """Show spelling errors in range"""
-        line_number = 1
 
         # reset current line to start of range.
         self.current_line = line_range.start

@@ -266,7 +266,7 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
             found_first_alpha = True
         if found_first_alpha and char in alphabet:
             just_command_chars.append(char)
-        if found_first_alpha and not char in alphabet:
+        if found_first_alpha and char not in alphabet:
             break
         front_part_chars.append(char)
 

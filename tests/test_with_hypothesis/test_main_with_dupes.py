@@ -7,7 +7,6 @@ from pathlib import Path
 import hypothesis
 from hypothesis import given
 from hypothesis import strategies as st
-from hypothesis.strategies import just
 
 import dedlin.main
 from dedlin.basic_types import Command, LineRange, StringGeneratorProtocol

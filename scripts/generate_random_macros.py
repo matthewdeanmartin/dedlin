@@ -18,8 +18,7 @@ def make_range():
 
 
 def go():
-    macro = []
-    commands = [command.value for command in Commands]
+    [command.value for command in Commands]
 
     make_range()
 

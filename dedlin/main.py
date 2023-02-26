@@ -162,7 +162,7 @@ class Dedlin:
                 if self.doc.delete(command.line_range):
                     self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
                 else:
-                    self.feedback(f"Could not delete")
+                    self.feedback("Could not delete")
             elif command.command in (Commands.EXIT, Commands.QUIT):
                 if self.vim_mode:
                     continue

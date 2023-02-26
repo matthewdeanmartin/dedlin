@@ -1,5 +1,4 @@
-from dedlin.basic_types import Command, LineRange
-from dedlin.main import Dedlin
+from dedlin.basic_types import Command
 
 
 def make_command(command: Command):
@@ -7,4 +6,4 @@ def make_command(command: Command):
 
 
 def test_go():
-    d = Dedlin
+    pass

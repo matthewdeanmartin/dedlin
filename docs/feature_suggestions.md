@@ -1,4 +1,6 @@
-# from chatgpt
+# Suggestions from ChatGPT
+
+## general
 
 - Add support for syntax highlighting and code completion to make it easier for users to write and read code.
 - Add support for multiple tabs or windows to allow users to edit multiple files at once.
@@ -11,26 +13,26 @@
 - Implement support for collaboration and real-time editing with other users.
 - Add support for plugins or extensions to allow users to customize the editor and add additional features.
 
+## more generic
 
-# more generic
 --backup: create a backup copy of the file being edited
 --readonly: open the file in read-only mode, without allowing changes to be saved
---find <string>: search for the specified string within the file
---replace <old> <new>: replace occurrences of old with new within the file
---goto <line>: go to the specified line number in the file
+--find \<string>: search for the specified string within the file
+--replace \<old> \<new>: replace occurrences of old with new within the file
+--goto \<line>: go to the specified line number in the file
 --sort: sort the lines of the file alphabetically or numerically
 --undo: undo the last change made to the file
 --help-macros: display a list of available macros and their usage
 --load-defaults: load default settings for the editor
 
-# coding specific
---indent <n>: automatically indent new lines by n spaces
+## coding specific
+
+--indent \<n>: automatically indent new lines by n spaces
 --line-numbers: display line numbers in the editor
---syntax <language>: highlight syntax for the specified programming language
+--syntax \<language>: highlight syntax for the specified programming language
 --highlight-matching: highlight matching brackets or quotes
 
-
-# Scenarios where edlin could be better than full screen.
+## Scenarios where edlin could be better than full screen.
 
 - A very large text file that is too big to open in a full-screen editor without causing performance issues
 - A file that is being edited over a slow network connection, where using a full-screen editor would be impractical

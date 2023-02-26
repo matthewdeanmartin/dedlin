@@ -1,26 +1,32 @@
 # What is a line editor?
+
 A line editor edits a list of text items. Some things are more like a list of lines
 than other things.
 
-### Line-like
+## Line-like
+
 - TODO Lists
 - Grocery Lists
 - Most computer source code. Bash is usually a series of one-liners
 - Most computer configuration files
 
-### Somewhat line-like
+## Somewhat line-like
+
 - English text. Prose normally has sentences that need line breaks and paragraphs
-that span many lines of text.
+  that span many lines of text.
 - Most programming languages, which like English have semantic blocks and lines
-that run past the edge of the screen
+  that run past the edge of the screen
 - ASCII art. While creating it, you might insert rows, but once complete you
-have a block of rows that must stay together.
+  have a block of rows that must stay together.
 
 ## Commands
+
 Dedlin has a near-uniparse. Almost all commands can be reduced to the following form:
-```
+
+```dedlin
 [start],[end],[repeat][Command][Word][...]
 ```
+
 Where `[start],[end]` is a range of lines of text.
 
 Where `[repeat][Command]` is a command and how many times it should be executed
@@ -28,6 +34,7 @@ Where `[repeat][Command]` is a command and how many times it should be executed
 Where `[Word][...]` are string positional arguments of the command.
 
 ### Command types
+
 Commands either
 
 - display lines
@@ -36,8 +43,10 @@ Commands either
 - reorder lines
 
 ## Implemented Commands
+
 ### Command Structure
-```
+
+```pseudocode
 ([Range]) [Command] ([Phrase] ([Phrase]))
 Range = Start,(End),(Repeat)
 Command = [Letter]|Command
@@ -47,6 +56,7 @@ Where () means optional.
 ```
 
 #### Commands
+
 A command is either a letter or a word, e.g. I or Insert.
 
 Commands are not case-sensitive.
@@ -54,6 +64,7 @@ Commands are not case-sensitive.
 Edit is the default command.
 
 #### Ranges
+
 A range is a 1 indexed number. In a 3 line file, the range `1,3` represents all rows
 
 Everything up to the first letter is Range.
@@ -64,7 +75,8 @@ A single number is assumed to be a start.
 
 Missing starts are assumed to be 1, so `,3` means `1,3`
 
-# Features
+## Features
+
 **List, Page, Search.** These will display the document or part of it. Only Page increments the current location.
 Search only displays matching rows.
 

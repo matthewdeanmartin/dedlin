@@ -1,9 +1,11 @@
 ## Dedline's lineage
+
 A Pascal textbook first described a line editor.
 It was implemented as `ed` and inspired many good and bad editors thereafter.
 `edlin` is the main inspiration for `dedlin` which was `ed`-like editor.
 
 ## Specifications/Source Inspirations
+
 - [Video on how to use edlin](https://www.youtube.com/watch?v=CIlJeKuSl9w&t=165s)
 - [help](http://home.mnet-online.de/willybilly/fdhelp-dos/en/hhstndrd/base/edlin.htm)
 - [help another](https://www.computerhope.com/edlin.htm)
@@ -17,9 +19,11 @@ It was implemented as `ed` and inspired many good and bad editors thereafter.
 - [edlin in python](https://github.com/firefish111/edlin/blob/master/main.py)
 
 ## Just other console, TUI, text based editors implemented in python
+
 - [babi](https://pypi.org/project/babi/) - nano clone, works on windows.
 
 # Couldn't install
+
 - [tui-editor](https://pypi.org/project/tui-editor/) - setup.py broken?
 - [kaaedit](https://pypi.org/project/kaaedit/) - Linux only
 - [exofrills](https://pypi.org/project/exofrills/) - Linux only

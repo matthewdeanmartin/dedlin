@@ -28,6 +28,7 @@ pytest-cov = "*"
 hypothesis = {extras = ["cli"], version = "*"}
 types-requests = "*"
 pre-commit = "*"
+linkcheckmd = "*"
 
 [requires]
 python_version = "3.11"

@@ -13,7 +13,7 @@ def read_or_create_file(path: Path) -> list[str]:
     if path:
         print(f"Editing {path.absolute()}")
         if not path.exists():
-            with open(str(path.absolute()), "w", encoding="utf-8") as file:
+            with open(str(path.absolute()), "w", encoding="utf-8"):
                 pass
         lines = read_file(path)
     else:

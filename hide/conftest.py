@@ -42,7 +42,7 @@
 #         https://docs.pytest.org/en/6.2.x/reference.html#pytest.hookspec.pytest_runtest_call
 #     """
 #     # Decorate every test function [e.g. test_foo()] with typeguard's
-#     # typechecked() decorator.
+#     # t y p e c h e c k e d() decorator.
 #     test_func = getattr(item, "obj", None)
 #     if test_func is not None:
 #         setattr(item, "obj", typechecked(test_func))

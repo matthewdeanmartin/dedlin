@@ -139,3 +139,6 @@ dedlin/.dedlin_history/*.ed
 foo.txt
 
 dedlin.pyz
+/.ruff_cache/
+
+node_modules/
