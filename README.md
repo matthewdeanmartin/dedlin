@@ -3,7 +3,7 @@
 Dedlin is an interactive line-by-line text editor and a DSL. Line editors
 suck, but they are easy to write and the DSL is mildly interesting.
 
-This is not intended to be backwards compatible with anything. I have made
+While this is a clone of [edlin](https://en.wikipedia.org/wiki/Edlin), this is not intended to be backwards compatible with anything. I have made
 changes to make the app less user hostile, but there is a `--vim_mode`
 where all help, warnings, feedback will be suppressed.
 
