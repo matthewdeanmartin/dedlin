@@ -1,0 +1,38 @@
+# Define variables
+PYTHON_FILES = $(shell find . -name '*.py')
+MARKDOWN_FILES = $(shell find . -name '*.md')
+POT_FILE = messages.pot
+PO_FILES = $(wildcard *.po)
+MO_FILES = $(PO_FILES:.po=.mo)
+
+# Define commands
+all: lint-md lint-py docstrings docs i18n
+
+lint-md: $(MARKDOWN_FILES)
+	markdownlint $(MARKDOWN_FILES)
+	mdformat --wrap 80 --in-place $(MARKDOWN_FILES)
+
+lint-py: $(PYTHON_FILES)
+	pylint $(PYTHON_FILES)
+	black $(PYTHON_FILES)
+
+docstrings: $(PYTHON_FILES)
+	pydocstyle $(PYTHON_FILES)
+
+docs:
+	make -C docs html
+
+i18n: $(MO_FILES)
+
+$(POT_FILE): $(PYTHON_FILES)
+	xgettext -k_ -o $(POT_FILE) $(PYTHON_FILES)
+
+%.mo: %.po
+	msgfmt $< -o $@
+
+update-po: $(POT_FILE) $(PO_FILES)
+	for po_file in $(PO_FILES); do \
+		msgmerge --update $$po_file $(POT_FILE); \
+	done
+
+.PHONY: all lint-md lint-py docstrings docs i18n update-po
