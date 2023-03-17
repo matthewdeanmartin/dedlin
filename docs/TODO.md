@@ -1,5 +1,12 @@
 # TODO
 
+## Accessibility
+
+- https://dev.to/baspin94/two-ways-to-make-your-command-line-interfaces-more-accessible-541k
+- Look for various "no colors" flags to infer we are in accessible mode
+- Turn off ascii art, loaders, color
+- Look for tedious text re-reads/maybe support brief versions
+
 ## Process
 
 - Try to use Githubs task tracking features to prove I can
