@@ -9,8 +9,8 @@ import icontract
 from pydantic.dataclasses import dataclass
 
 from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
-from dedlin.lorem_data import LOREM_IPSUM
-from dedlin.spelling_overlay import check
+import dedlin.tools.lorem_data as lorem_data
+import dedlin.tools.spelling_overlay as spelling_overlay
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +150,7 @@ class Document:
         self.current_line = line_range.start
         for line_text in self.lines[line_range.start - 1 : line_range.end]:
             end = "" if line_text[:-1] == "\n" else "\n"
-            yield f"   {self.current_line} : {check(line_text)}", end
+            yield f"   {self.current_line} : {spelling_overlay.check(line_text)}", end
             self.current_line += 1
 
     def copy(self, line_range: Optional[LineRange], target_line: int) -> None:
@@ -338,17 +338,17 @@ class Document:
     def lorem(self, line_range: Optional[LineRange]) -> None:
         """Add lorem ipsum to lines"""
         if not line_range:
-            line_range = LineRange(1, len(LOREM_IPSUM) - 1)
+            line_range = LineRange(1, len(lorem_data.LOREM_IPSUM) - 1)
 
         self.backup()
         # TODO: generate from a specified range of Lorem?
         lines_to_generate = line_range.start
         if lines_to_generate == 0:
-            lines_to_generate = len(LOREM_IPSUM)
+            lines_to_generate = len(lorem_data.LOREM_IPSUM)
 
         for i in range(0, lines_to_generate):
-            if i < len(LOREM_IPSUM):
-                self.lines.append(LOREM_IPSUM[i])
+            if i < len(lorem_data.LOREM_IPSUM):
+                self.lines.append(lorem_data.LOREM_IPSUM[i])
                 self.dirty = True  # this is ugly
         logger.debug(f"Generated {lines_to_generate} lines")
 

@@ -8,7 +8,7 @@ import signal
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-import dedlin.help_text as help_text
+import dedlin.text.help_text as help_text
 from dedlin.basic_types import (
     Command,
     Commands,
@@ -20,11 +20,11 @@ from dedlin.basic_types import (
 from dedlin.command_sources import InMemoryCommandGenerator
 from dedlin.document import Document
 from dedlin.document_sources import InMemoryInputter, PrefillInputter
-from dedlin.file_system import read_or_create_file, save_and_overwrite
+import dedlin.file_system as file_system
 from dedlin.history_feature import HistoryLog
-from dedlin.info_bar import display_info
+from dedlin.tools.info_bar import display_info
 from dedlin.utils.exceptions import DedlinException
-from dedlin.web import fetch_page_as_rows
+from dedlin.tools.web import fetch_page_as_rows
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +72,11 @@ class Dedlin:
         self.verbose = False
         """Write logging to screen, even if quiet or vim mode is enabled"""
 
+        self.blind_mode = True
+        """Assume user can't see at all"""
+
+        self.preferred_line_break = "\n"
+
         self.file_path: Optional[Path] = None
         self.history: list[Command] = []
         self.history_log = HistoryLog()
@@ -94,7 +99,7 @@ class Dedlin:
 
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
-        lines = read_or_create_file(self.file_path)
+        lines = file_system.read_or_create_file(self.file_path)
 
         self.doc = Document(
             insert_inputter=self.insert_document_inputter,
@@ -121,7 +126,7 @@ class Dedlin:
                 self.feedback(f"Invalid command {command}")
 
             self.history.append(command)
-            self.history_log.write_command_to_history_file(command.format())
+            self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
             self.echo_if_needed(command.format())
 
             if command.command == Commands.REDO:
@@ -270,6 +275,9 @@ class Dedlin:
                     self.feedback(help_text.SPECIFIC_HELP[command.phrases.first.upper()])
                 else:
                     self.feedback("Don't have help for that category")
+            elif command.command == Commands.EXPORT:
+                file_system.export(self.doc.lines, self.preferred_line_break)
+                self.feedback("Exported to")
             elif command.command == Commands.UNKNOWN:
                 self.feedback("Unknown command, type HELP for help")
                 if self.halt_on_error:
@@ -277,7 +285,11 @@ class Dedlin:
             else:
                 self.feedback(f"Command {command.command} not implemented")
 
-            self.feedback(f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---")
+            if self.blind_mode:
+                status = f"Current line {self.doc.current_line} of {len(self.doc.lines)}"
+            else:
+                status = f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---"
+            self.feedback(status)
         return 0
 
     def feedback(self, string, end="\n") -> None:
@@ -304,12 +316,14 @@ class Dedlin:
         if self.doc:
             if self.file_path is not None and phrases is not None:
                 self.file_path = Path(phrases.first)
-            save_and_overwrite(self.file_path, self.doc.lines)
+            file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
             self.doc.dirty = False
 
     def save_macro(self):
         """Save the document to the file"""
-        save_and_overwrite(Path("history.ed"), [_.original_text for _ in self.history])
+        file_system.save_and_overwrite(Path("history.ed"),
+                                       [_.original_text for _ in self.history],
+                                       self.preferred_line_break)
 
     def final_report(self) -> None:
         """Print out the final report"""

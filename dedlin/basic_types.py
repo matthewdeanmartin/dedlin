@@ -36,6 +36,7 @@ class Commands(Enum):
     QUIT = auto()
     EXIT = auto()
     TRANSFER = auto()
+    EXPORT = auto()
 
     # Add text
     BROWSE = auto()
@@ -58,6 +59,28 @@ class Commands(Enum):
     UNKNOWN = auto()
     INFO = auto()
     CRASH = auto()
+
+    # print
+    PRINT = auto()
+
+    # Block String commands
+    INDENT = auto()
+    DEDENT = auto()
+
+    # String commands
+    TITLE = auto()
+    SWAPCASE = auto()
+    CASEFOLD = auto()
+    CAPITALIZE = auto()
+    UPPER = auto()
+    LOWER = auto()
+    EXPANDTABS = auto()
+    RJUST = auto()
+    LJUST = auto()
+    CENTER = auto()
+    RSTRIP = auto()
+    LSTRIP = auto()
+    STRIP = auto()
 
 
 @dataclass(frozen=True)
@@ -280,7 +303,7 @@ class CommandGeneratorProtocol(Protocol):
     current_line: int
 
     def generate(
-        self,
+            self,
     ) -> Generator[Command, None, None]:
         """Generate commands"""
         ...
@@ -294,7 +317,7 @@ class StringGeneratorProtocol(Protocol):
     default: str
 
     def generate(
-        self,
+            self,
     ) -> Generator[str, None, None]:
         """Generate strings"""
         ...

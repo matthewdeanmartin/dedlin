@@ -62,6 +62,12 @@ requests = "*"
 # ascii art/fonts
 art = "*"
 
+# Accessibilty
+pyttsx3 = "*"
+
+# printer support
+mistune = "*"
+
 # web api
 fastapi = { version = "*", optional = true }
 uvicorn = { version = "*", optional = true }

@@ -16,6 +16,7 @@ Options:
   --promptless_quit  Skip prompt on quit.
   --vim_mode         User hostile, no feedback.
   --verbose          Displaying all debugging info.
+  --blind_mode       Optimize for blind users (experimental).
 """
 import logging
 import logging.config
@@ -31,7 +32,8 @@ from dedlin.document_sources import PrefillInputter, SimpleInputter, input_with_
 from dedlin.flash import title_screen
 from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
-from dedlin.rich_output import RichPrinter
+from dedlin.outputters import talking_outputter, rich_output
+from dedlin.outputters.plain import plain_printer
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +49,7 @@ def main() -> None:
         quit_safety=not arguments["--promptless_quit"],
         vim_mode=bool(arguments["--vim_mode"]),
         verbose=bool(arguments["--verbose"]),
+        blind_mode=bool(arguments["--blind_mode"]),
     )
     sys.exit(0)
 
@@ -59,6 +62,7 @@ def run(
     quit_safety: bool = False,
     vim_mode: bool = False,
     verbose: bool = False,
+    blind_mode: bool = False
 ) -> Dedlin:
     """Set up everything except things from command line"""
     if verbose:
@@ -67,13 +71,18 @@ def run(
         logger.info("Verbose mode enabled")
 
     if not macro_file_name:
-        title_screen()
+        title_screen(blind_mode)
 
-    rich_printer = RichPrinter()
-
-    def printer(text: Optional[str], end: str = "\n") -> None:
-        text = "" if text is None else text
-        rich_printer.print(text, end="")
+    if blind_mode:
+        logger.info("Blind mode. UI should talk.")
+        printer = talking_outputter.printer
+        echo = True
+    elif file_name and file_name.endswith(".py") :
+        logger.info("Rich mode. UI should be colorful.")
+        printer = rich_output.printer
+    else:
+        logger.info("Plain mode. UI should be dull.")
+        printer = plain_printer
 
     if macro_file_name:
         the_command_generator = CommandGenerator(Path(macro_file_name))
@@ -88,19 +97,11 @@ def run(
         while True:
             yield input_with_prefill(prompt, text)
 
-    def plain_printer(text: Optional[str], end: str = "\n") -> None:
-        text = "" if text is None else text
-        if text.endswith("\n"):
-            text = text[:-1]
-            print(text, end="")
-        else:
-            print(text, end=end)
-
     dedlin = Dedlin(
         inputter=the_command_generator,  # InteractiveGenerator(),
         insert_document_inputter=SimpleInputter(),
         edit_document_inputter=PrefillInputter(),
-        outputter=printer if file_name and file_name.endswith(".py") else plain_printer,
+        outputter=printer,
     )
 
     # save on crash but hides error info

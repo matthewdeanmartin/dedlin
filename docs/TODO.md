@@ -1,4 +1,4 @@
-# TODO
+# To do
 
 ## Accessibility
 
@@ -19,7 +19,7 @@
 ## Parser
 
 - support for Append - as alias for insert to last line.. nope? breaks line rages
-- support for "Exit {file_name}" (almost! Needs tests)
+- support for "Exit {file_name}" (almost, Needs tests)
 - ? to enable/disable safety prompts
   - save
   - replace
@@ -51,7 +51,7 @@
 ## Apply Function commands
 
 - range UPPER - make upper case
-- range EACH command, e.g. 1,2 EACH UPPER... how is this different than just range?
+- range EACH command, e.g. `1,2 EACH UPPER...` how is this different than just range?
 - line PUSH "text" --- inset via command, not interactively.
 
 ## ENGLISH SUPPORT
@@ -83,8 +83,8 @@
 
 - Save on crash
 - Implement load file, transfer
-- Use more questionary things, esp for load file
-  - Use questionary for confirm delete
+- Use more `questionary` things, esp for load file
+  - Use `questionary` for confirm delete
 
 ## DONE
 

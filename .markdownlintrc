@@ -18,7 +18,8 @@
   "MD030": false,
 
   // Set list indent level to 4 which Python-Markdown requires
-  "MD007": { "indent": 4 },
+  // (mdformat uses 2)
+  "MD007": { "indent": 2 },
 
   // Code block style
   "MD046": { "style": "fenced" },

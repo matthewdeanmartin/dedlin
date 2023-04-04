@@ -20,6 +20,9 @@ uvicorn = { version = "*", optional = true }
 icontract = "*"
 # typeguard does not seem to get along with pydantic.
 # typeguard = "*"
+linkcheckmd = {ref = "b05bac0c852a5f5c0e92a4836d522210daef6823", git = "https://github.com/matthewdeanmartin/linkchecker-markdown"}
+pyttsx3 = "*"
+mistune = "*"
 
 [dev-packages]
 mypy = "*"
@@ -28,7 +31,7 @@ pytest-cov = "*"
 hypothesis = {extras = ["cli"], version = "*"}
 types-requests = "*"
 pre-commit = "*"
-linkcheckmd = "*"
+proselint = "*"
 
 [requires]
 python_version = "3.11"

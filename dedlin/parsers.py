@@ -165,8 +165,9 @@ COMMANDS_WITH_PHRASES = {
     Commands.HELP: ("HELP",),
     Commands.PUSH: ("PUSH",),
     Commands.CRASH: ("CRASH",),
+    Commands.EXPORT: ("EXPORT",)
+    # String Commands
 }
-
 
 def parse_search_replace(
     front_part: str, phrases: Optional[Phrases], original_text: str, current_line: int, document_length: int
