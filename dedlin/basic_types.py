@@ -303,7 +303,7 @@ class CommandGeneratorProtocol(Protocol):
     current_line: int
 
     def generate(
-            self,
+        self,
     ) -> Generator[Command, None, None]:
         """Generate commands"""
         ...
@@ -317,7 +317,7 @@ class StringGeneratorProtocol(Protocol):
     default: str
 
     def generate(
-            self,
+        self,
     ) -> Generator[str, None, None]:
         """Generate strings"""
         ...

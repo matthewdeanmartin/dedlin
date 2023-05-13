@@ -39,7 +39,7 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
 
         # TODO: need better parser errors
         if start is None or end is None or repeat is None:
-            logger.warning(f"Range invalid:{value}")
+            logger.warning(f"Range invalid:{value}. start:{start}, end:{end}, repeat:{repeat}")
             return None
 
         candidate = LineRange(start=start, offset=end - start, repeat=repeat)
@@ -124,6 +124,20 @@ RANGE_ONLY = {
     Commands.SHUFFLE: ("SHUFFLE",),
     Commands.SORT: ("SORT",),
     Commands.REVERSE: ("REVERSE",),
+    # String Commands
+    Commands.TITLE: ("TITLE",),
+    Commands.SWAPCASE: ("SWAPCASE",),
+    Commands.CASEFOLD: ("CASEFOLD",),
+    Commands.CAPITALIZE: ("CAPITALIZE",),
+    Commands.UPPER: ("UPPER",),
+    Commands.LOWER: ("LOWER",),
+    Commands.EXPANDTABS: ("EXPANDTABS",),
+    Commands.RJUST: ("RJUST",),
+    Commands.LJUST: ("LJUST",),
+    Commands.CENTER: ("CENTER",),
+    Commands.RSTRIP: ("RSTRIP",),
+    Commands.LSTRIP: ("LSTRIP",),
+    Commands.STRIP: ("STRIP",),
 }
 
 
@@ -165,9 +179,9 @@ COMMANDS_WITH_PHRASES = {
     Commands.HELP: ("HELP",),
     Commands.PUSH: ("PUSH",),
     Commands.CRASH: ("CRASH",),
-    Commands.EXPORT: ("EXPORT",)
-    # String Commands
+    Commands.EXPORT: ("EXPORT",),
 }
+
 
 def parse_search_replace(
     front_part: str, phrases: Optional[Phrases], original_text: str, current_line: int, document_length: int

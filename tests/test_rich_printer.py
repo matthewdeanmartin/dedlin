@@ -1,4 +1,4 @@
-from dedlin.rich_output import RichPrinter
+from dedlin.outputters.rich_output import RichPrinter
 
 
 def test_the_rich_printer(capsys) -> None:

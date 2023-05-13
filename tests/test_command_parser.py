@@ -79,3 +79,21 @@ def test_phrases_format():
 
 def test_parse_extract_phrases():
     assert extract_phrases("cat") == Phrases(["cat"])
+
+
+def test_parse_upper():
+    command = "1,2 upper"
+    result = parse_command(command, 1, 20)
+    assert result.command == Commands.UPPER
+
+
+def test_parse_list():
+    command = "1,2 LIST"
+    result = parse_command(command, 1, 20)
+    assert result.command == Commands.LIST
+
+
+def test_parse_upper_spaceless():
+    command = "1,2upper"
+    result = parse_command(command, 1, 20)
+    assert result.command == Commands.UPPER

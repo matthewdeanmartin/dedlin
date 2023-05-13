@@ -8,6 +8,7 @@ import signal
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+import dedlin.file_system as file_system
 import dedlin.text.help_text as help_text
 from dedlin.basic_types import (
     Command,
@@ -20,11 +21,11 @@ from dedlin.basic_types import (
 from dedlin.command_sources import InMemoryCommandGenerator
 from dedlin.document import Document
 from dedlin.document_sources import InMemoryInputter, PrefillInputter
-import dedlin.file_system as file_system
 from dedlin.history_feature import HistoryLog
+from dedlin.string_comands import process_strings
 from dedlin.tools.info_bar import display_info
-from dedlin.utils.exceptions import DedlinException
 from dedlin.tools.web import fetch_page_as_rows
+from dedlin.utils.exceptions import DedlinException
 
 logger = logging.getLogger(__name__)
 
@@ -276,8 +277,24 @@ class Dedlin:
                 else:
                     self.feedback("Don't have help for that category")
             elif command.command == Commands.EXPORT:
-                file_system.export(self.doc.lines, self.preferred_line_break)
+                file_system.export(self.file_path, self.doc.lines, self.preferred_line_break)
                 self.feedback("Exported to")
+            elif command.command in (
+                Commands.TITLE,
+                Commands.SWAPCASE,
+                Commands.CASEFOLD,
+                Commands.CAPITALIZE,
+                Commands.UPPER,
+                Commands.LOWER,
+                Commands.EXPANDTABS,
+                Commands.RJUST,
+                Commands.LJUST,
+                Commands.CENTER,
+                Commands.RSTRIP,
+                Commands.LSTRIP,
+                Commands.STRIP,
+            ):
+                process_strings(self.doc.lines, command)
             elif command.command == Commands.UNKNOWN:
                 self.feedback("Unknown command, type HELP for help")
                 if self.halt_on_error:
@@ -321,9 +338,9 @@ class Dedlin:
 
     def save_macro(self):
         """Save the document to the file"""
-        file_system.save_and_overwrite(Path("history.ed"),
-                                       [_.original_text for _ in self.history],
-                                       self.preferred_line_break)
+        file_system.save_and_overwrite(
+            Path("history.ed"), [_.original_text for _ in self.history], self.preferred_line_break
+        )
 
     def final_report(self) -> None:
         """Print out the final report"""

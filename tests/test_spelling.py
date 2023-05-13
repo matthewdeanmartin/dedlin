@@ -1,4 +1,4 @@
-from dedlin.spelling_overlay import check
+from dedlin.tools.spelling_overlay import check
 
 
 def test_spellcheck():

@@ -5,8 +5,6 @@ from rich.console import Console
 from rich.syntax import Syntax
 
 
-
-
 class RichPrinter:
     """ "Make the output of the program more readable."""
 
@@ -27,7 +25,10 @@ class RichPrinter:
         )
         self.console.print(syntax, end=end)
 
+
 rich_printer = RichPrinter()
+
+
 def printer(text: Optional[str], end: str = "\n") -> None:
     text = "" if text is None else text
     rich_printer.print(text, end="")

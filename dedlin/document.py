@@ -8,9 +8,9 @@ from typing import Generator, Optional
 import icontract
 from pydantic.dataclasses import dataclass
 
-from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
 import dedlin.tools.lorem_data as lorem_data
 import dedlin.tools.spelling_overlay as spelling_overlay
+from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
 
 logger = logging.getLogger(__name__)
 

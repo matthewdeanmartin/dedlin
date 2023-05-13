@@ -1,4 +1,4 @@
-from dedlin.web import fetch_page_as_rows
+from dedlin.tools.web import fetch_page_as_rows
 
 
 def test_fetch_page_as_rows():

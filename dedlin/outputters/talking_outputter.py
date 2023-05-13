@@ -3,6 +3,7 @@ from typing import Optional
 
 import pyttsx3
 
+
 class TalkingPrinter:
     """ "Make the output of the program more readable."""
 
@@ -15,7 +16,10 @@ class TalkingPrinter:
         self.engine.say(text)
         self.engine.runAndWait()
 
+
 talking_printer = TalkingPrinter()
+
+
 def printer(text: Optional[str], end: str = "\n") -> None:
     text = "" if text is None else text
     talking_printer.print(text, end="")

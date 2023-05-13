@@ -40,7 +40,7 @@ class HistoryLog:
         """
         return f"history{self.count_files_in_history_folder()}.ed"
 
-    def write_command_to_history_file(self, command: str, preferred_line_break:str) -> None:
+    def write_command_to_history_file(self, command: str, preferred_line_break: str) -> None:
         """
         Write a command to the history file
         """

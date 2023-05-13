@@ -32,7 +32,7 @@ from dedlin.document_sources import PrefillInputter, SimpleInputter, input_with_
 from dedlin.flash import title_screen
 from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
-from dedlin.outputters import talking_outputter, rich_output
+from dedlin.outputters import rich_output, talking_outputter
 from dedlin.outputters.plain import plain_printer
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ def run(
     quit_safety: bool = False,
     vim_mode: bool = False,
     verbose: bool = False,
-    blind_mode: bool = False
+    blind_mode: bool = False,
 ) -> Dedlin:
     """Set up everything except things from command line"""
     if verbose:
@@ -77,7 +77,7 @@ def run(
         logger.info("Blind mode. UI should talk.")
         printer = talking_outputter.printer
         echo = True
-    elif file_name and file_name.endswith(".py") :
+    elif file_name and file_name.endswith(".py"):
         logger.info("Rich mode. UI should be colorful.")
         printer = rich_output.printer
     else:

@@ -3,8 +3,8 @@
 Dedlin is an interactive line-by-line text editor and a DSL. Line editors
 suck, but they are easy to write and the DSL is mildly interesting.
 
-While this is a clone of [edlin](https://en.wikipedia.org/wiki/Edlin), this is not intended to be backwards compatible with anything. I have made
-changes to make the app less user hostile, but there is a `--vim_mode`
+While this is a clone of [edlin](https://en.wikipedia.org/wiki/Edlin), this is not intended to be backwards compatible
+with anything. I have made changes to make the app less user hostile, but there is a `--vim_mode`
 where all help, warnings, feedback will be suppressed.
 
 ## Badges
@@ -64,6 +64,7 @@ Options:
   --promptless_quit  Skip prompt on quit.
   --vim_mode         User hostile, no feedback.
   --verbose          Displaying all debugging info.
+  --blind_mode       Optimize for blind users (experimental).
 ```
 
 Sample session

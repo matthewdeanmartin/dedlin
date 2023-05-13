@@ -1,10 +1,10 @@
 import textwrap
 
-from dedlin.basic_types import Commands, Command
+from dedlin.basic_types import Command, Commands
 
 COMMANDS_WITH_PHRASES = {
     # String Commands
-    Commands.TRIM
+    Commands.STRIP: ("STRIP",)
 }
 
 

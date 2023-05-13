@@ -40,7 +40,7 @@ def read_file(path: Optional[Path]) -> list[str]:
     return lines
 
 
-def save_and_overwrite(path: Path, lines: list[str], preferred_line_break:str)->None:
+def save_and_overwrite(path: Path, lines: list[str], preferred_line_break: str) -> None:
     """Save a file and overwrite it"""
     if not path:
         raise TypeError("No file path")
@@ -49,12 +49,12 @@ def save_and_overwrite(path: Path, lines: list[str], preferred_line_break:str)->
         file.writelines(line + preferred_line_break for line in lines)
 
 
-def export(path: Path, lines: list[str], preferred_line_break:str)->None:
+def export(path: Path, lines: list[str], preferred_line_break: str) -> None:
     """Save a file and overwrite it"""
     if not path:
         raise TypeError("No file path")
     if path.suffix.lower() == ".html":
-        html_name = path.rename(path.with_suffix('.html'))
+        html_name = path.rename(path.with_suffix(".html"))
         with open(str(html_name), "w", encoding="utf-8") as file:
             file.seek(0)
             file.write(export_markdown(lines, preferred_line_break))
