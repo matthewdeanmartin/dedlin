@@ -1,3 +1,4 @@
+"""Pass string commands to python."""
 import textwrap
 
 from dedlin.basic_types import Command, Commands

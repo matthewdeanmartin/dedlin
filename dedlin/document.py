@@ -11,12 +11,15 @@ from pydantic.dataclasses import dataclass
 import dedlin.tools.lorem_data as lorem_data
 import dedlin.tools.spelling_overlay as spelling_overlay
 from dedlin.basic_types import LineRange, Phrases, StringGeneratorProtocol
+from dedlin.utils.exceptions import DedlinException
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
 class EditStatus:
+    """Status of edit operation"""
+
     can_edit_again: bool
     line_edited: Optional[int]
     text: Optional[str]
@@ -26,7 +29,7 @@ class EditStatus:
 # pylint: disable=redefined-builtin
 def print(*args, **kwargs):
     """Discourage accidental usage of print"""
-    raise Exception("Don't call UI from here.")
+    raise DedlinException("Don't call UI from here.")
 
 
 # What does current line mean when there are 0 lines anyhow? Allow 0 or 1.

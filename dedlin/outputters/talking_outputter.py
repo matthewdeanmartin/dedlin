@@ -21,5 +21,6 @@ talking_printer = TalkingPrinter()
 
 
 def printer(text: Optional[str], end: str = "\n") -> None:
+    """Speak"""
     text = "" if text is None else text
     talking_printer.print(text, end="")

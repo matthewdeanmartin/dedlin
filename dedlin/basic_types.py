@@ -291,7 +291,6 @@ def null_printer(text: str, end: str = "") -> None:
     """
     Do nothing implementation of Printable
     """
-    ...
 
 
 @runtime_checkable
@@ -320,4 +319,3 @@ class StringGeneratorProtocol(Protocol):
         self,
     ) -> Generator[str, None, None]:
         """Generate strings"""
-        ...

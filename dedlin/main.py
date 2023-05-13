@@ -346,7 +346,7 @@ class Dedlin:
         """Print out the final report"""
         self.feedback(f"History saved to {self.history_log.history_file_string}")
 
-    def save_on_crash(self, type: Optional[Exception], value: Any, tb: Any) -> None:
+    def save_on_crash(self, exception_type: Optional[Exception], value: Any, tb: Any) -> None:
         """Save the document to the file"""
         self.save_document()
-        raise type
+        raise exception_type
