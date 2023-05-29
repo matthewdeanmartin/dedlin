@@ -86,7 +86,7 @@ publish_test:
 
 .PHONY: publish
 publish: test
-	echo "rm -rf dist && poetry version minor && poetry build && twine upload dist/*"
+	rm -rf dist && poetry build
 
 .PHONY:
 docker:
