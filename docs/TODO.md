@@ -1,5 +1,8 @@
 # To do
 
+- Launch with `dedlin`, no file name, and try to save and it blows up.
+- `1,50 Lorem` is broken, only outputs 1 additional line.
+
 ## Accessibility
 
 - https://dev.to/baspin94/two-ways-to-make-your-command-line-interfaces-more-accessible-541k

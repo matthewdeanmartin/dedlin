@@ -12,7 +12,7 @@ RUN python -m pip install --user pipx && python -m pipx ensurepath
 RUN pipx install isort && \
     pipx install pylint
 RUN python -m pip install --no-cache-dir --upgrade pip --quiet \
-    && pip install pipenv  --no-cache-dir --quiet
+    && pip install poetry  --no-cache-dir --quiet
 COPY dist/so_pip-*-py3-none-any.whl /app/
-RUN pipenv install so_pip-*.whl --skip-lock
-ENTRYPOINT ["pipenv", "run", "so_pip"]
+RUN poetry install dedlin-*.whl
+ENTRYPOINT ["poetry", "run", "dedlin"]

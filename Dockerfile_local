@@ -8,7 +8,7 @@ ENV MULTIDICT_NO_EXTENSIONS=1
 ENV PATH="/root/.local/bin:${PATH}"
 RUN python -m pip install --user pipx && python -m pipx ensurepath
 RUN python -m pip install --no-cache-dir --upgrade pip --quiet \
-     && pip install pipenv  --no-cache-dir --quiet
+     && pip install poetry  --no-cache-dir --quiet
 COPY dist/dedlin-*-py3-none-any.whl /app/
-RUN pipenv install dedlin-*.whl --skip-lock
-ENTRYPOINT ["pipenv", "run", "dedlin"]
+RUN poetry install dedlin-*.whl --skip-lock
+ENTRYPOINT ["poetry", "run", "dedlin"]

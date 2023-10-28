@@ -11,10 +11,10 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: 'pipenv' # caching pipenv dependencies
-      - name: Install pipenv and pipx
+          # cache: 'pipenv' # caching pipenv dependencies
+      - name: Install poetry and pipx
         run: |
-          pip install pipenv && pip install pipx
+          pip install poetry && pip install pipx
 
       - name: Install global dependencies
         run: |
@@ -22,12 +22,12 @@ jobs:
           pipx install pylint && pipx install pre-commit && pipx install poetry
 
       - name: Install Dependencies
-        run: pipenv install --dev --skip-lock
+        run: poetry install --with dev
 
       - name: Run Makefile
         run: make check
       - name: Run make
-        run: pipenv run make publish
+        run: poetry run make publish
       - name: Upload Package
         uses: actions/upload-artifact@v3.1.2
         with:

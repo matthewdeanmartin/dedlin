@@ -164,6 +164,9 @@ class Dedlin:
             elif command.command == Commands.SPELL and command.line_range:
                 for line, end in self.doc.spell(command.line_range):
                     self.document_outputter(line, end=end)
+            elif command.command == Commands.PRINT:
+                for line, end in self.doc.print(command.line_range):
+                    self.document_outputter(line, end=end)
             elif command.command == Commands.DELETE and command.line_range:
                 if self.doc.delete(command.line_range):
                     self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
@@ -333,6 +336,9 @@ class Dedlin:
         if self.doc:
             if self.file_path is not None and phrases is not None:
                 self.file_path = Path(phrases.first)
+            if self.file_path is None:
+                # TODO: doesn't fit with the other input/output patterns
+                self.file_path = input("Please specify file name: ")
             file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
             self.doc.dirty = False
 

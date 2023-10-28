@@ -13,7 +13,23 @@ HELP_TEXT = """Command format: [start],[end],[repeat] [command] "[search]" "[rep
 REPLACE cat dog - Replace cat with dog
 
 For more help, type
-HELP display|edit|files|data|reorder|meta|data|all"""
+HELP display|edit|files|data|reorder|meta|data|strings|all"""
+
+STRINGS_HELP = """String commands
+[range] TITLE - title case the range
+[range] SWAPCASE = toggle current casing
+[range] CASEFOLD = lowercase for foreign text
+[range] CAPITALIZE = capitalize first character
+[range] UPPER = Uppercase text
+[range] LOWER = Lowercase text
+[range] EXPANDTABS = turn tabs into spaces
+[range] RJUST [width] = auto()
+[range] LJUST [width] = auto()
+[range] CENTER [width] - center text in span of width
+[range] RSTRIP - strip trailing whitespace
+[range] LSTRIP - strip leading whitespace
+[range] STRIP - strip leading and trailing whitespace"""
+
 
 FILES_HELP = """File System Commands
 [range] Split [file name] [file name] [file name]- split file into two or three files
@@ -54,4 +70,5 @@ HELP - display this""",
 [range] Shuffle - shuffle lines randomly""",
     "FILE": FILES_HELP,
     "FILES": FILES_HELP,
+    "STRINGS": STRINGS_HELP,
 }

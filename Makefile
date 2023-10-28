@@ -3,22 +3,22 @@
 
 FILES := $(wildcard **/*.py)
 
-# if you wrap everything in pipenv run, it runs slower.
+# if you wrap everything in poetry run, it runs slower.
 ifeq ($(origin VIRTUAL_ENV),undefined)
-    VENV := pipenv run
+    VENV := poetry run
 else
     VENV :=
 endif
 
-Pipfile.lock: Pipfile
+poetry.lock: pyproject.toml
 	@echo "Installing dependencies"
-	@pipenv install --dev
+	@poetry install --with dev
 
 clean-pyc:
 	@echo "Removing compiled files"
-	@find . -name '*.pyc' -exec rm -f {} + || true
-	@find . -name '*.pyo' -exec rm -f {} + || true
-	@find . -name '__pycache__' -exec rm -fr {} + || true
+	@find dedlin -name '*.pyc' -exec rm -f {} + || true
+	@find dedlin -name '*.pyo' -exec rm -f {} + || true
+	@find dedlin -name '__pycache__' -exec rm -fr {} + || true
 
 clean-test:
 	@echo "Removing coverage data"
@@ -29,7 +29,7 @@ clean: clean-pyc clean-test
 
 # tests can't be expected to pass if dependencies aren't installed.
 # tests are often slow and linting is fast, so run tests on linted code.
-test: clean .build_history/pylint .build_history/bandit Pipfile.lock
+test: clean .build_history/pylint .build_history/bandit poetry.lock
 	@echo "Running unit tests"
 	$(VENV) python -m unittest discover
 	$(VENV) py.test tests --cov=dedlin --cov-report=html --cov-fail-under 50
@@ -47,7 +47,9 @@ isort: .build_history/isort
 
 .build_history/black: .build_history .build_history/isort $(FILES)
 	@echo "Formatting code"
-	$(VENV) black .
+	$(VENV) black dedlin --exclude .venv
+	$(VENV) black tests --exclude .venv
+	$(VENV) black scripts --exclude .venv
 	@touch .build_history/black
 
 .PHONY: black
@@ -63,7 +65,7 @@ pre-commit: .build_history/pre-commit
 
 .build_history/bandit: .build_history $(FILES)
 	@echo "Security checks"
-	$(VENV)  bandit .
+	$(VENV)  bandit dedlin
 	@touch .build_history/bandit
 
 .PHONY: bandit
@@ -95,7 +97,7 @@ docker:
 .PHONY:
 pex:
 	# linux only
-	@pipenv requirements > requirements.txt
+	@poetry export -f requirements.txt --output requirements.txt
 	@pex -r "requirements.txt" -e "dedlin.cli:main" -o "dedlin.pex"
 
 shiv: dedlin.pyz
