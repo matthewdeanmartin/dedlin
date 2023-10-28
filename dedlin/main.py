@@ -3,13 +3,17 @@ Main code.
 
 Handles UI and links command parser to the document object
 """
+import asyncio
 import logging
 import signal
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+from openai.types.chat import ChatCompletionMessageParam
+
 import dedlin.file_system as file_system
 import dedlin.text.help_text as help_text
+from dedlin.ai_interface import AiClient, PROLOGUE
 from dedlin.basic_types import (
     Command,
     Commands,
@@ -121,10 +125,12 @@ class Dedlin:
 
             if command is None:
                 self.feedback("Unknown command")
+                self.feedback(f"Invalid command {command}")
                 continue
 
             if not command.validate():
                 self.feedback(f"Invalid command {command}")
+                self.print_ai_help(command)
 
             self.history.append(command)
             self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
@@ -302,6 +308,8 @@ class Dedlin:
                 self.feedback("Unknown command, type HELP for help")
                 if self.halt_on_error:
                     raise Exception(f"Unknown command {command.original_text}")
+                else:
+                    self.print_ai_help(command)
             else:
                 self.feedback(f"Command {command.command} not implemented")
 
@@ -311,6 +319,12 @@ class Dedlin:
                 status = f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---"
             self.feedback(status)
         return 0
+
+    def print_ai_help(self, command):
+        client = AiClient()
+        content = PROLOGUE + f" '{command.original_text}'"
+        ask = ChatCompletionMessageParam(content=content, role="user")
+        asyncio.run(client.completion([ask]))
 
     def feedback(self, string, end="\n") -> None:
         """Output feedback to the user"""

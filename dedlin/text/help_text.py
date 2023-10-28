@@ -9,6 +9,7 @@ HELP_TEXT = """Command format: [start],[end],[repeat] [command] "[search]" "[rep
 
 1  - Edit line 1
 2INSERT - Insert at line 2
+3INSERT "hello" - Insert "hello" at line 3
 2,4DELETE - Delete lines 2 to 4
 REPLACE cat dog - Replace cat with dog
 
@@ -72,3 +73,10 @@ HELP - display this""",
     "FILES": FILES_HELP,
     "STRINGS": STRINGS_HELP,
 }
+
+
+if __name__ == '__main__':
+    print(HELP_TEXT)
+    for key, value in SPECIFIC_HELP.items():
+        print(f"\n{key} commands\n")
+        print(value)

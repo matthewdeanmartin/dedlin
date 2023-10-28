@@ -265,6 +265,12 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
         target = candidate_int
         # edit end if target is greater than document length.
         target = target if target <= document_length else document_length
+        if document_length == 0:
+            print("Can't edit empty document. Use INSERT")
+            return Command(Commands.UNKNOWN, original_text=original_text)
+        if document_length < target:
+            print("Can't edit beyond end of document.")
+            return Command(Commands.UNKNOWN, original_text=original_text)
         return Command(
             command=Commands.EDIT,
             line_range=LineRange(start=target, offset=0),

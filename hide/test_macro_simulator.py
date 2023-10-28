@@ -25,8 +25,8 @@ def test_lorem_ed():
 
     lines_path = ANIMALS_FILE
     macro_path = Path(locate_file("sample_macros/lorem.ed", __file__))
-    string_generator = CommandGenerator()
-    dedlin = Dedlin(string_generator.generate(macro_path), document_inputter_that_blows_up, print)
+    string_generator = CommandGenerator(macro_path)
+    dedlin = Dedlin(string_generator.generate(), document_inputter_that_blows_up, print)
     dedlin.halt_on_error = True
     dedlin.quit_safety = False
     dedlin.entry_point(str(lines_path.absolute()))

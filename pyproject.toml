@@ -49,6 +49,10 @@ pydantic = "<2.0.0"
 pyspellchecker = ">=0.7.2"
 textstat = ">=0.7.3"
 
+# AI support
+openai = ">=1.0.0rc1"
+python-dotenv = ">=1.0.0"
+
 # syntax highlighting
 pygments = ">=2.16.1"
 

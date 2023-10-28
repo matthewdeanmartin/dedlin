@@ -94,6 +94,7 @@ class LineRange:
     offset: int
     repeat: int = 1
 
+    # problem when doc is 0 lines long
     @validator("start", allow_reuse=True)
     @classmethod
     def start_must_be_one_or_more(cls, start: int) -> int:

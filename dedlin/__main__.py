@@ -34,6 +34,9 @@ from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.outputters import rich_output, talking_outputter
 from dedlin.outputters.plain import plain_printer
+import asyncio
+import dotenv
+dotenv.load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +44,7 @@ logger = logging.getLogger(__name__)
 def main() -> None:
     """Main function."""
     arguments = docopt(__doc__, version="1.4.0")
+
     _ = run(
         arguments["<file>"],
         echo=bool(arguments["--echo"]),
@@ -130,5 +134,11 @@ def run(
     return dedlin
 
 
+
 if __name__ == "__main__":
+    # 2 ways to async from root.
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(main())
+    # asyncio.run(main())
+    # sync
     main()

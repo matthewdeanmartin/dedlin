@@ -12,6 +12,7 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
+from pydantic import ValidationError
 from pygments.styles import get_style_by_name
 
 from dedlin.basic_types import Command
@@ -46,9 +47,13 @@ class InteractiveGenerator:
         user_command_text = ""
         while user_command_text is not None:
             user_command_text = next(_interactive_command_handler(self.prompt))
-            command = parse_command(
-                user_command_text, current_line=self.current_line, document_length=self.document_length
-            )
+            try:
+                command = parse_command(
+                    user_command_text, current_line=self.current_line, document_length=self.document_length
+                )
+            except ValidationError as error:
+                print(error)
+                continue
             yield command
 
 
@@ -101,6 +106,7 @@ class CommandGenerator:
                 command = parse_command(
                     line.strip("\n").strip("\r"), current_line=self.current_line, document_length=self.document_length
                 )
+                # TODO : handle errors
                 yield command
 
 
