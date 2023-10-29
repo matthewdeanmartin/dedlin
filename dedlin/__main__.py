@@ -18,6 +18,7 @@ Options:
   --verbose          Displaying all debugging info.
   --blind_mode       Optimize for blind users (experimental).
 """
+import asyncio
 import logging
 import logging.config
 import sys
@@ -25,6 +26,7 @@ import traceback
 from pathlib import Path
 from typing import Generator, Optional
 
+import dotenv
 from docopt import docopt
 
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
@@ -34,8 +36,7 @@ from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.outputters import rich_output, talking_outputter
 from dedlin.outputters.plain import plain_printer
-import asyncio
-import dotenv
+
 dotenv.load_dotenv()
 
 logger = logging.getLogger(__name__)
@@ -132,7 +133,6 @@ def run(
             break
     dedlin.final_report()
     return dedlin
-
 
 
 if __name__ == "__main__":

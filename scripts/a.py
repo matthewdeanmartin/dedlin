@@ -2,7 +2,7 @@ import asyncio
 
 
 async def fetch_google_html():
-    return await asyncio.sleep(1,"2")
+    return await asyncio.sleep(1, "2")
 
 
 async def echo_text(text):

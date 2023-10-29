@@ -13,7 +13,7 @@ from openai.types.chat import ChatCompletionMessageParam
 
 import dedlin.file_system as file_system
 import dedlin.text.help_text as help_text
-from dedlin.ai_interface import AiClient, PROLOGUE
+from dedlin.ai_interface import PROLOGUE, AiClient
 from dedlin.basic_types import (
     Command,
     Commands,

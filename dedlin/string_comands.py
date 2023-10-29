@@ -9,7 +9,7 @@ COMMANDS_WITH_PHRASES = {
 }
 
 
-def block_commands(lines: list[str], command: Command):
+def block_commands(lines: list[str], command: Command) -> list[str]:
     """String manipulation for whole range as a unit, not line per line"""
 
     # doesn't need to use preferred line break
@@ -18,7 +18,7 @@ def block_commands(lines: list[str], command: Command):
         block = textwrap.indent(block, command.phrases.first)
     if command.command == Commands.DEDENT:
         block = textwrap.dedent(block)
-    return "\n".split(block)
+    return block.split("\n")
 
 
 def process_strings(lines: list[str], command: Command):

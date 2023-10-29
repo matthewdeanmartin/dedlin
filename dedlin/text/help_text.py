@@ -75,7 +75,7 @@ HELP - display this""",
 }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(HELP_TEXT)
     for key, value in SPECIFIC_HELP.items():
         print(f"\n{key} commands\n")

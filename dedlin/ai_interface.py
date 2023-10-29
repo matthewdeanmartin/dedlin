@@ -4,7 +4,6 @@ Code for AI
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 
-
 # client = OpenAI(
 #   api_key=os.environ['OPENAI_API_KEY'],  # this is also the default, it can be omitted
 # )
@@ -18,25 +17,30 @@ If the message is incoherent, reply with `ERROR: <explain what is wrong if possi
 The user says, 
 """
 
+
 class AiClient:
-  def __init__(self):
-    self.client = AsyncOpenAI()
-    self.model = "gpt-3.5-turbo"
-  async def completion(self, messages: list[ChatCompletionMessageParam]):
-    # [{"role": "user", "content": "Hello world"}]
+    def __init__(self):
+        self.client = AsyncOpenAI()
+        self.model = "gpt-3.5-turbo"
 
-    completion = await self.client.chat.completions.create(model=self.model,
-                                                           messages=messages)
-    # print(completion.model_dump_json(indent=2))
-    # print(dict(completion).get('usage'))
-    choice =completion.choices[0]
-    print(choice.message.content)
-    return completion
+    async def completion(self, messages: list[ChatCompletionMessageParam]):
+        # [{"role": "user", "content": "Hello world"}]
 
-if __name__ == '__main__':
+        completion = await self.client.chat.completions.create(model=self.model, messages=messages)
+        # print(completion.model_dump_json(indent=2))
+        # print(dict(completion).get('usage'))
+        choice = completion.choices[0]
+        print(choice.message.content)
+        return completion
+
+
+if __name__ == "__main__":
     import asyncio
+
     import dotenv
+
     dotenv.load_dotenv()
+
     async def main():
         client = AiClient()
         content = PROLOGUE + "draw me like one of your French girls"

@@ -8,7 +8,7 @@ from markdown_it import MarkdownIt
 # from mdit_py_plugins.footnote import footnote_plugin
 
 
-def write_to_markdown(filename: str, lines: list[str]):
+def write_to_markdown(filename: str, lines: list[str]) -> str:
     """Write to html if markdown"""
     md = (
         MarkdownIt("commonmark", {"breaks": True, "html": True})
@@ -23,3 +23,4 @@ def write_to_markdown(filename: str, lines: list[str]):
         path.write_text(html_text)
     else:
         print("Not markdown!")
+    return html_text

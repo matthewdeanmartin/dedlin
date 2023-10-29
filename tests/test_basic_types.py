@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from dedlin.basic_types import LineRange, try_parse_int
+from dedlin.basic_types import LineRange, Phrases, try_parse_int
 
 
 def test_line_range_validate():
@@ -71,3 +71,24 @@ def test_line_range_slice():
     assert line_range.start == 3
     assert line_range.end == 4
     assert [1, 2, 3, 4, 5][line_range.to_slice()] == [3, 4]
+
+
+def test_phrases_parts():
+    phrases = Phrases(parts=("a", "b", "c", "d", "e", "f"))
+    assert phrases.first == "a"
+    assert phrases.second == "b"
+    assert phrases.third == "c"
+    assert phrases.fourth == "d"
+    assert phrases.fifth == "e"
+    assert phrases.sixth == "f"
+
+
+def test_phrases_quotes():
+    phrases = Phrases(parts=("'a'", "'b'", "'c'", "'d'", "'e'", "'f'"))
+    assert phrases.format() == "'a' 'b' 'c' 'd' 'e' 'f'"
+
+    # does this make sense? maybe not.
+    phrases = Phrases(parts=("'a a'", "'b b'", "'c c'", "'d d'", "'e e'", "'f f'"))
+    assert phrases.format() == "\"'a a'\" \"'b b'\" \"'c c'\" \"'d d'\" \"'e e'\" \"'f f'\""
+    phrases = Phrases(parts=('"a a"', '"b b"', '"c c"', '"d d"', '"e e"', '"f f"'))
+    assert phrases.format() == '"\\"a a\\" "\\"b b\\" "\\"c c\\" "\\"d d\\" "\\"e e\\" "\\"f f\\"'
