@@ -18,7 +18,6 @@ Options:
   --verbose          Displaying all debugging info.
   --blind_mode       Optimize for blind users (experimental).
 """
-import asyncio
 import logging
 import logging.config
 import sys

@@ -1,7 +1,7 @@
 import dedlin.main as main_module
 from dedlin.basic_types import Command, Commands, LineRange
 from dedlin.command_sources import InMemoryCommandGenerator
-from dedlin.document_sources import InMemoryInputter, PrefillInputter
+from dedlin.document_sources import InMemoryInputter
 
 
 def test_main():
