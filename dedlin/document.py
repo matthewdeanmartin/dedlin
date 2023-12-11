@@ -358,7 +358,10 @@ class Document:
     def undo(self) -> None:
         """Undo last change"""
         self.lines = self.previous_lines
-        self.previous_current_line = self.current_line
+        if self.previous_current_line < 1:
+            self.current_line = 1
+        else:
+            self.current_line = self.previous_current_line
         logger.debug("Undid last step")
 
     def sort(self) -> None:

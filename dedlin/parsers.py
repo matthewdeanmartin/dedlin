@@ -244,6 +244,8 @@ def bare_command(command: str) -> Optional[Command]:
 def parse_command(command: str, current_line: int, document_length: int) -> Command:
     """Parse a command"""
     original_text = command
+
+    # Handle empty text.
     if not command:
         return Command(
             command=Commands.EMPTY,
@@ -253,13 +255,14 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
     original_text_upper = command.upper()
     command = command.upper().strip()
 
+    # Handle comments
     if not command or command.startswith("#"):
         return Command(
             command=Commands.EMPTY,
             original_text=original_text,
         )
 
-        # bare number is insert.
+    # Handle shortcuts, bare number is insert.
     candidate_int = try_parse_int(command)
     if candidate_int is not None:
         target = candidate_int
@@ -277,7 +280,10 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
             original_text=original_text,
         )
 
-    # TODO: maybe use regex.
+    # Divide into
+    # - front part (pre command)
+    # - command
+    # - phrases (post command)
     front_part_chars = []
     found_first_alpha = False
     just_command_chars = []
@@ -295,6 +301,7 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
     just_command = "".join(just_command_chars)
     location_of_command = original_text_upper.find(just_command)
 
+    # Handle post command phrases
     end_part = original_text[location_of_command + len(just_command) :]
     if end_part:
         # must preserve case!

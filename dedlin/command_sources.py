@@ -19,12 +19,6 @@ from dedlin.basic_types import Command
 from dedlin.parsers import parse_command
 from dedlin.pygments_code import EdLexer
 
-# from prompt_toolkit.shortcuts import prompt
-# from pygments.lexers import guess_lexer_for_filename
-# from prompt_toolkit.completion import Completer, Completion
-# from prompt_toolkit.formatted_text import HTML
-
-# thing = guess_lexer_for_filename("cats.py","")
 style = style_from_pygments_cls(get_style_by_name("borland"))
 
 
@@ -126,5 +120,22 @@ class InMemoryCommandGenerator:
         yield from self.commands
 
 
-if __name__ == "__main__":
-    print("This is a module, not a program.")
+class StringCommandGenerator:
+    """Get a typed command from a string"""
+
+    def __init__(self, source: str):
+        """Initialize the generator"""
+        self.source: str = source
+        self.current_line: int = 0
+        self.document_length: int = 0
+        self.prompt: str = "> "
+
+    def generate(
+        self,
+    ) -> Generator[Command, None, None]:
+        """Turn a sring into a bunch of commands"""
+        for line in self.source.split("\n"):
+            command = parse_command(
+                line.strip("\r"), current_line=self.current_line, document_length=self.document_length
+            )
+            yield command

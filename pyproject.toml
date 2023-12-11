@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "dedlin"
-version = "1.14.0"
+version = "1.15.0"
 description = "Line editor, edlin clone with many improvements"
 authors = ["Matthew Martin <matthewdeanmartin@gmail.com>"]
 keywords = ["editor", "edlin", "line editor",]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",

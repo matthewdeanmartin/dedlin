@@ -1,10 +1,15 @@
 # dedlin
 
-Dedlin is an interactive line-by-line text editor and a DSL. Line editors
-suck, but they are easy to write and the DSL is mildly interesting.
+Dedlin is an interactive line-by-line text editor and a DSL, similar to edlin or ed. It is perfect for
+letting AI chatbots edit documents without sending the whole document back and forth.
 
-While this is a clone of [edlin](https://en.wikipedia.org/wiki/Edlin), this is not intended to be backwards compatible
-with anything. I have made changes to make the app less user hostile, but there is a `--vim_mode`
+It is scriptable making it similar to `sed` for doing find, insert, replace, delete operations on existing files.
+
+Soon it will support non-line number ranges, e.g. `"/Done/ DELETE`
+
+Dedlin extends on [edlin](https://en.wikipedia.org/wiki/Edlin) enough that it is not backwards compatible.
+
+I have made changes to make the app less user hostile than classic ed or edlin, but there is a `--vim_mode`
 where all help, warnings, feedback will be suppressed.
 
 ## Badges
