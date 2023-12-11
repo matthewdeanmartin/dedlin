@@ -66,9 +66,6 @@ requests = ">=2.31.0"
 # ascii art/fonts
 art = ">=6.1"
 
-# Accessibilty
-pyttsx3 = ">=2.90"
-
 # printer support
 mistune = ">=3.0.2"
 markdown-it-py = ">=3.0.0"
@@ -76,6 +73,12 @@ markdown-it-py = ">=3.0.0"
 # web api
 #fastapi = { version = "*", optional = true }
 #uvicorn = { version = "*", optional = true }
+
+# Accessibilty
+[tool.poetry.extras]
+# doesn't build on gitlab actions today (dec 2023)
+# pyttsx3 = ">=2.90"
+speaking = ["pyttsx3"]
 
 #[tool.poetry.extras]
 #webapi = ["fastapi","uvicorn"]
