@@ -12,16 +12,24 @@ class HistoryLog:
     @property
     def history_file_string(self) -> str:
         """String representation of the history file"""
+        if self.history_file is None:
+            return ""
         return str(self.history_file.resolve().absolute())
 
-    def __init__(self) -> None:
+    def __init__(self, persist: bool = True) -> None:
         """Initialize the history log"""
-        self.history_file = self.initialize_history_folder() / self.make_sequential_history_file_name()
+        self.persist = persist
+        if self.persist:
+            self.history_file = self.initialize_history_folder() / self.make_sequential_history_file_name()
+        else:
+            self.history_file = None
 
     def initialize_history_folder(self) -> Path:
         """
         Initialize the history folder
         """
+        if not self.persist:
+            return Path()
         history_folder = Path(locate_file(".dedlin_history", __file__))
         if not history_folder.exists():
             history_folder.mkdir()
@@ -31,6 +39,8 @@ class HistoryLog:
         """
         Count the number of files in the history folder
         """
+        if not self.persist:
+            return 0
         history_folder = self.initialize_history_folder()
         return len(list(history_folder.glob("*.ed")))
 
@@ -44,6 +54,8 @@ class HistoryLog:
         """
         Write a command to the history file
         """
+        if not self.persist:
+            return
         with open(self.history_file, "a", encoding="utf-8") as file_handle:
             file_handle.write(command)
             file_handle.write(preferred_line_break)

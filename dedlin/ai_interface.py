@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     async def main():
         client = AiClient()
-        content = PROLOGUE + "draw me like one of your French girls"
+        content = PROLOGUE + "Tell me about edlin."
         ask = ChatCompletionMessageParam(content=content, role="user")
         await client.completion([ask])
 

@@ -108,8 +108,8 @@ def get_command_length(value: str, suffixes: Iterable[str]) -> int:
 RANGE_ONLY = {
     Commands.LOREM: ("LOREM",),
     Commands.DELETE: ("D", "DELETE"),
-    Commands.EDIT: ("EDIT",),
-    Commands.INSERT: ("I", "INSERT"),
+    Commands.EDIT: ("EDIT",),  # Only end part, don't split into phrases!
+    Commands.INSERT: ("I", "INSERT"),  # Only end part, don't split into phrases!
     Commands.LIST: ("L", "LIST"),
     Commands.PAGE: ("P", "PAGE"),
     Commands.SPELL: ("SPELL",),
@@ -148,6 +148,7 @@ def parse_range_only(
     current_line: int,
     document_length: int,
     phrases: Optional[Phrases],
+    end_part: str = "",
 ) -> Optional[Command]:
     """Parse a command that has a line range"""
     # TODO: the biggest generic parser should replace all of these
@@ -161,6 +162,11 @@ def parse_range_only(
                 command_length = get_command_length(front_part, command_forms)
                 range_text = front_part[0 : len(front_part) - command_length]
                 line_range = extract_one_range(range_text, current_line, document_length)
+
+            # These are not long "range only"!
+            if command_code in (Commands.INSERT, Commands.EDIT):
+                if end_part[1:]:
+                    phrases = Phrases((end_part[1:],))
 
             return Command(
                 command_code,
@@ -225,6 +231,7 @@ BARE_COMMANDS = {
     Commands.HISTORY: ("H", "HISTORY"),
     Commands.REDO: ("REDO",),
     Commands.UNDO: ("UNDO",),
+    Commands.WRITE: ("W", "WRITE"),
     Commands.EXIT: ("E", "EXIT"),  # BUG, this takes argument.
     Commands.QUIT: ("Q", "QUIT"),
 }
@@ -312,7 +319,10 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
     if not front_part:
         raise TypeError("Something has gone wrong.")
 
-    candidate = parse_range_only(just_command, front_part, original_text, current_line, document_length, phrases)
+    candidate = parse_range_only(
+        just_command, front_part, original_text, current_line, document_length, phrases, end_part
+    )
+
     if candidate:
         return candidate
 

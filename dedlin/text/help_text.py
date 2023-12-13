@@ -74,6 +74,33 @@ HELP - display this""",
     "STRINGS": STRINGS_HELP,
 }
 
+CONCISE_HELP = """
+Basic Commands:
+1,10 LIST - Lists lines 1-10
+1 CURRENT - Reset current line to 1
+1,20 SEARCH cat - Search for 'cat'
+1 - Edit line 1
+2INSERT - Insert at line 2
+3INSERT 'hello' - Insert 'hello' at line 3
+2,4DELETE - Delete lines 2-4
+REPLACE cat dog - Replace 'cat' with 'dog'
+
+String Commands:
+[range] TITLE/SWAPCASE/CASEFOLD/CAPITALIZE/UPPER/LOWER/EXPANDTABS/RJUST [width]/LJUST [width]/CENTER [width]/RSTRIP/LSTRIP/STRIP - Various string operations
+
+File System Commands:
+[range] Split [file names] - Split file
+Quit - Exit if no modifications
+Exit [file name] - Save and exit
+
+Specific Commands:
+DISPLAY - List, Page, Spell, Search, Current
+EDIT - Edit, Insert, Delete, Replace
+DATA - Transfer, Lorem, Browse
+META - HISTORY, MACRO, REDO, UNDO, HELP
+REORDER - Move, Copy, Sort, Shuffle
+FILES - File system commands
+"""
 
 if __name__ == "__main__":
     print(HELP_TEXT)

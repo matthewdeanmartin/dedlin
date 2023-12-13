@@ -5,6 +5,7 @@ Handles UI and links command parser to the document object
 """
 import asyncio
 import logging
+import os
 import signal
 from pathlib import Path
 from typing import Any, Callable, Optional
@@ -49,6 +50,7 @@ class Dedlin:
         insert_document_inputter: InMemoryInputter,  # StringGeneratorProtocol,
         edit_document_inputter: PrefillInputter,  # StringGeneratorProtocol,
         outputter: Callable[[Optional[str], str], None],  # Printable,
+        headless: bool = False,
     ) -> None:
         """Set up initial state and some dependency injection"""
         self.command_inputter = inputter
@@ -59,7 +61,7 @@ class Dedlin:
 
         self.doc: Optional[Document] = None
 
-        self.halt_on_error = False
+        self.halt_on_error = False if not headless else True
         """Stop on errors, useful for macros."""
 
         self.quit_safety = True
@@ -77,19 +79,25 @@ class Dedlin:
         self.verbose = False
         """Write logging to screen, even if quiet or vim mode is enabled"""
 
-        self.blind_mode = True
+        self.blind_mode = False
         """Assume user can't see at all"""
+
+        self.enable_ai_help = False
+        """Call OpenAI API to get help with commands"""
+
+        self.headless = False
+        """No interactive features"""
 
         self.preferred_line_break = "\n"
 
         self.file_path: Optional[Path] = None
         self.history: list[Command] = []
-        self.history_log = HistoryLog()
+        self.history_log = HistoryLog(persist=not self.headless)
         self.macro_file_name: Optional[Path] = None
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
-        if self.vim_mode:
+        if self.vim_mode and not self.headless:
             self.quit_safety = False
             self.halt_on_error = False
             # these do nothing on Windows?
@@ -133,7 +141,8 @@ class Dedlin:
                 self.print_ai_help(command)
 
             self.history.append(command)
-            self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
+            if not self.headless:
+                self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
             self.echo_if_needed(command.format())
 
             if command.command == Commands.REDO:
@@ -178,6 +187,8 @@ class Dedlin:
                     self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
                 else:
                     self.feedback("Could not delete")
+            elif command.command == Commands.WRITE:
+                self.save_document(command.phrases)
             elif command.command in (Commands.EXIT, Commands.QUIT):
                 if self.vim_mode:
                     continue
@@ -320,7 +331,12 @@ class Dedlin:
             self.feedback(status)
         return 0
 
-    def print_ai_help(self, command):
+    def print_ai_help(self, command: str) -> None:
+        if not self.enable_ai_help:
+            return
+        if not os.environ.get("OPENAI_API_KEY"):
+            self.feedback("No API key for AI")
+            return
         client = AiClient()
         content = PROLOGUE + f" '{command.original_text}'"
         ask = ChatCompletionMessageParam(content=content, role="user")
@@ -343,30 +359,46 @@ class Dedlin:
         if self.verbose:
             logger.info(string)
 
+    def save_document_safe(self) -> None:
+        """Save the document to the file"""
+        if not self.doc:
+            self.feedback("Document not initialized, can't save")
+            return
+        # For untrusted editors, can't save to arbitrary location
+        if self.file_path is None:
+            self.feedback("Can't save, no initial file name specified")
+            return
+        file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
+        self.doc.dirty = False
+
     def save_document(self, phrases: Optional[Phrases] = None):
         """Save the document to the file"""
-
+        if not self.doc:
+            self.feedback("Document not initialized, can't save")
+            return
         # TODO: Refactor and guarantee that the file exists when saved
-        if self.doc:
-            if self.file_path is not None and phrases is not None:
-                self.file_path = Path(phrases.first)
-            if self.file_path is None:
-                # TODO: doesn't fit with the other input/output patterns
-                self.file_path = input("Please specify file name: ")
-            file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
-            self.doc.dirty = False
+
+        if self.file_path is not None and phrases is not None:
+            self.file_path = Path(phrases.first)
+        if self.file_path is None:
+            # TODO: doesn't fit with the other input/output patterns
+            self.file_path = input("Please specify file name: ")
+        file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
+        self.doc.dirty = False
 
     def save_macro(self):
         """Save the document to the file"""
+
         file_system.save_and_overwrite(
             Path("history.ed"), [_.original_text for _ in self.history], self.preferred_line_break
         )
 
     def final_report(self) -> None:
         """Print out the final report"""
-        self.feedback(f"History saved to {self.history_log.history_file_string}")
+        if not self.headless:
+            self.feedback(f"History saved to {self.history_log.history_file_string}")
 
     def save_on_crash(self, exception_type: Optional[Exception], value: Any, tb: Any) -> None:
         """Save the document to the file"""
         self.save_document()
-        raise exception_type
+        # raise exception_type

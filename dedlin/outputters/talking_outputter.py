@@ -1,6 +1,6 @@
 """Make text editor hypothetically usable while blind."""
-from typing import Optional
 import logging
+from typing import Optional
 
 try:
     import pyttsx3

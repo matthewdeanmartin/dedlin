@@ -33,6 +33,7 @@ class Commands(Enum):
     REPLACE = auto()
 
     # file and exit
+    WRITE = auto()  # have to include it to be compatible with edlin help files.
     QUIT = auto()
     EXIT = auto()
     TRANSFER = auto()

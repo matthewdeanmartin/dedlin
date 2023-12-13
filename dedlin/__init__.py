@@ -1,4 +1,8 @@
-from dedlin.command_sources import CommandGenerator, InteractiveGenerator
+from dedlin.command_sources import (
+    CommandGenerator,
+    InteractiveGenerator,
+    StringCommandGenerator,
+)
 from dedlin.document_sources import PrefillInputter, SimpleInputter, input_with_prefill
 from dedlin.flash import title_screen
 from dedlin.logging_utils import configure_logging
