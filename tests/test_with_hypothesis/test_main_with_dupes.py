@@ -110,10 +110,16 @@ def test_fuzz_interactive_command_handler(prompt):
     ),
     current_line=st.integers(0),
     document_length=st.integers(0),
+    headless=st.booleans(),
 )
-def test_fuzz_parse_command(current_command, current_line, document_length):
+def test_fuzz_parse_command(current_command, current_line, document_length, headless):
     try:
-        parse_command(command=current_command.format(), current_line=current_line, document_length=document_length)
+        parse_command(
+            command=current_command.format(),
+            current_line=current_line,
+            document_length=document_length,
+            headless=headless,
+        )
     except NotImplementedError:
         pass
 

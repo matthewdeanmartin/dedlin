@@ -1,0 +1,11 @@
+# List first 15 lines
+1,15 LIST
+# Move a section about habitat to the beginning
+20,22 MOVE 1
+# Shuffle lines in the introduction section
+1,5 SHUFFLE
+# Undo shuffle
+UNDO
+# Redo shuffle
+REDO
+SAVE

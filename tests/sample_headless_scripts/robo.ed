@@ -1,0 +1,9 @@
+# fully automated editor
+1i Cats
+2i Dogs
+3i Rabbits
+4i Fish
+1,2 SORT
+# edit this way is more like replace
+LIST
+QUIT

@@ -34,6 +34,14 @@ from dedlin.utils.exceptions import DedlinException
 
 logger = logging.getLogger(__name__)
 
+HIGH_TRUST_TOOLS = [
+    Commands.BROWSE, # Web browsing
+    Commands.EXPORT, # Export to html/write file not specified in startup
+    Commands.TRANSFER, # Read arbitrary files
+    Commands.MACRO, # Read/Write arbitrary files
+    Commands.CRASH, # Halts application
+    Commands.PRINT, # Either prints to device or to new file (unimplemented)
+]
 
 class Dedlin:
     """Application for Dedlin
@@ -49,10 +57,23 @@ class Dedlin:
         inputter: InMemoryCommandGenerator,  # CommandGeneratorProtocol,
         insert_document_inputter: InMemoryInputter,  # StringGeneratorProtocol,
         edit_document_inputter: PrefillInputter,  # StringGeneratorProtocol,
-        outputter: Callable[[Optional[str], str], None],  # Printable,
+        outputter: Printable, # Callable[[Optional[str], str], None],  # Printable,
         headless: bool = False,
+        disabled_commands: Optional[list[Commands]] = None,
+        untrusted_user: bool = False,
     ) -> None:
         """Set up initial state and some dependency injection"""
+
+        self.disabled_commands = disabled_commands if disabled_commands else []
+        """Disable list of commands for any reason"""
+
+        self.untrusted_user = untrusted_user
+        """Disable saving to file by script argument"""
+
+        # Autoconfigure untrusted_user mode
+        if self.untrusted_user and not self.disabled_commands:
+            self.disabled_commands = HIGH_TRUST_TOOLS
+
         self.command_inputter = inputter
         self.insert_document_inputter = insert_document_inputter
         self.edit_document_inputter = edit_document_inputter
@@ -85,7 +106,7 @@ class Dedlin:
         self.enable_ai_help = False
         """Call OpenAI API to get help with commands"""
 
-        self.headless = False
+        self.headless = headless
         """No interactive features"""
 
         self.preferred_line_break = "\n"
@@ -97,6 +118,11 @@ class Dedlin:
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin"""
+        if self.headless and not file_name:
+            raise TypeError("Headless mode requires a file name")
+        if self.untrusted_user and not file_name:
+            raise TypeError("Untrusted user mode requires a file name")
+
         if self.vim_mode and not self.headless:
             self.quit_safety = False
             self.halt_on_error = False
@@ -136,6 +162,12 @@ class Dedlin:
                 self.feedback(f"Invalid command {command}")
                 continue
 
+            if command.command in self.disabled_commands:
+                self.feedback(f"Command {command.command} is disabled")
+                if self.headless:
+                    raise Exception(f"Command {command.command} is disabled")
+                continue
+
             if not command.validate():
                 self.feedback(f"Invalid command {command}")
                 self.print_ai_help(command)
@@ -155,13 +187,14 @@ class Dedlin:
                 self.echo_if_needed(command.original_text)
 
             if command.command == Commands.BROWSE:
+
                 if self.doc.dirty:
                     self.feedback("Discarding current document")
                 if command.phrases and command.phrases.first is None:
                     self.feedback("No URL, can't browse")
                 elif command.phrases:
                     page_as_rows = fetch_page_as_rows(command.phrases.first)
-                    phrases = Phrases(page_as_rows)
+                    phrases = Phrases(tuple(page_as_rows))
                     self.doc.insert(self.doc.current_line, phrases)
 
             elif command.command == Commands.HISTORY:
@@ -187,7 +220,7 @@ class Dedlin:
                     self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
                 else:
                     self.feedback("Could not delete")
-            elif command.command == Commands.WRITE:
+            elif command.command in (Commands.WRITE, Commands.SAVE):
                 self.save_document(command.phrases)
             elif command.command in (Commands.EXIT, Commands.QUIT):
                 if self.vim_mode:
@@ -252,7 +285,7 @@ class Dedlin:
                     self.command_outputter("")
             elif command.command == Commands.SEARCH and command.line_range and command.phrases:
                 for text in self.doc.search(command.line_range, value=command.phrases.first):
-                    self.document_outputter(text)
+                    self.document_outputter(text, "")
             elif command.command == Commands.INFO:
                 for info, end in display_info(self.doc):
                     self.document_outputter(info, end)
@@ -324,9 +357,11 @@ class Dedlin:
             else:
                 self.feedback(f"Command {command.command} not implemented")
 
-            if self.blind_mode:
+            if self.blind_mode or self.headless:
+                # Concise, for screen readers, or bots
                 status = f"Current line {self.doc.current_line} of {len(self.doc.lines)}"
             else:
+                # Verbose, pretty for humans
                 status = f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---"
             self.feedback(status)
         return 0
@@ -371,18 +406,23 @@ class Dedlin:
         file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
         self.doc.dirty = False
 
-    def save_document(self, phrases: Optional[Phrases] = None):
+    def save_document(self, phrases: Optional[Phrases] = None) -> None:
         """Save the document to the file"""
         if not self.doc:
             self.feedback("Document not initialized, can't save")
             return
         # TODO: Refactor and guarantee that the file exists when saved
 
-        if self.file_path is not None and phrases is not None:
+        if self.file_path is None and phrases is not None and phrases.first and not self.untrusted_user:
             self.file_path = Path(phrases.first)
-        if self.file_path is None:
+        if self.file_path is None and not self.headless and not self.untrusted_user:
             # TODO: doesn't fit with the other input/output patterns
             self.file_path = input("Please specify file name: ")
+        if not self.file_path and self.untrusted_user:
+            self.feedback("Can't save, no initial file name specified and user is untrusted")
+            return
+        if not self.file_path and self.headless:
+            raise TypeError("Can't save in headless mode w/o initial file name")
         file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
         self.doc.dirty = False
 

@@ -1,0 +1,30 @@
+--- Current line is 1, 14 lines total ---
+   1 : They big
+   2 : They walrus
+   3 : They eat
+   4 : They swim
+   5 : They sleep
+   6 : They are cute
+   7 : They are fat
+   8 : They are lazy
+   9 : They are funny
+   10 : Their diet is fish and stuff.
+--- Current line is 1, 14 lines total ---
+--- Current line is 1, 14 lines total ---
+   1 : Their diet is fish and stuff.
+--- Current line is 1, 14 lines total ---
+--- Current line is 1, 14 lines total ---
+--- Current line is 10, 14 lines total ---
+--- Current line is 10, 14 lines total ---
+Control C to exit insert mode
+--- Current line is 11, 15 lines total ---
+--- Current line is 11, 15 lines total ---
+--- Current line is 11, 15 lines total ---
+--- Current line is 11, 15 lines total ---
+   8 : They are lazy
+   9 : They are funny
+   10 : Walruses would eat pizza rosa if they could.
+   11 : Walruses primarily feed on benthic bivalve mollusks.
+   12 : They are mammals
+--- Current line is 11, 15 lines total ---
+--- Current line is 11, 15 lines total ---

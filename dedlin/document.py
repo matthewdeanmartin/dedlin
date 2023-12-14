@@ -36,7 +36,8 @@ def print(*args, **kwargs):
 # print(self.current_line) is None and
 @icontract.invariant(lambda self: all("\n" not in line and "\r" not in line for line in self.lines))
 @icontract.invariant(
-    lambda self: (1 <= self.current_line <= len(self.lines) or self.current_line in (0, 1) and not self.lines),
+    # and not self.lines <-- I'd have to update current line this on every .append()
+    lambda self: (1 <= self.current_line <= len(self.lines) or self.current_line in (0, 1)),
     "Current line must be a valid line",
 )
 class Document:
@@ -344,15 +345,22 @@ class Document:
             line_range = LineRange(1, len(lorem_data.LOREM_IPSUM) - 1)
 
         self.backup()
-        # TODO: generate from a specified range of Lorem?
-        lines_to_generate = line_range.start
+
+        lines_to_generate = 0
+        if line_range.start == line_range.end:
+            lines_to_generate = line_range.start
+        elif line_range.start < line_range.end:
+            lines_to_generate = line_range.end - line_range.start
+
         if lines_to_generate == 0:
             lines_to_generate = len(lorem_data.LOREM_IPSUM)
 
         for i in range(0, lines_to_generate):
             if i < len(lorem_data.LOREM_IPSUM):
+                self.current_line += 1
                 self.lines.append(lorem_data.LOREM_IPSUM[i])
                 self.dirty = True  # this is ugly
+
         logger.debug(f"Generated {lines_to_generate} lines")
 
     def undo(self) -> None:

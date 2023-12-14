@@ -1,0 +1,10 @@
+# Find references to 'Arctic'
+1,30 SEARCH Arctic
+# Replace 'Arctic' with 'Polar regions'
+REPLACE Arctic Polar regions
+# Delete an irrelevant section
+15,18DELETE
+# Save the changes
+# Can't run this in unit tests, the file will end up anywhere.
+# Exit edited_walrus_facts.txt
+SAVE

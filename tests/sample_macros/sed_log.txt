@@ -1,0 +1,5 @@
+--- Current line is 1, 2 lines total ---
+Replacing
+   1 : That is a butt.
+--- Current line is 2, 2 lines total ---
+--- Current line is 2, 2 lines total ---

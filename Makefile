@@ -65,7 +65,7 @@ pre-commit: .build_history/pre-commit
 
 .build_history/bandit: .build_history $(FILES)
 	@echo "Security checks"
-	$(VENV)  bandit dedlin
+	$(VENV)  bandit dedlin -r
 	@touch .build_history/bandit
 
 .PHONY: bandit

@@ -1,0 +1,12 @@
+--- Current line is 1, 24 lines total ---
+--- Current line is 1, 24 lines total ---
+--- Current line is 1, 24 lines total ---
+Replacing
+--- Current line is 24, 24 lines total ---
+--- Current line is 24, 24 lines total ---
+Deleted lines 15 to 18
+--- Current line is 20, 20 lines total ---
+--- Current line is 20, 20 lines total ---
+--- Current line is 20, 20 lines total ---
+--- Current line is 20, 20 lines total ---
+--- Current line is 20, 20 lines total ---

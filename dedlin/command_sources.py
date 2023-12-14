@@ -43,7 +43,10 @@ class InteractiveGenerator:
             user_command_text = next(_interactive_command_handler(self.prompt))
             try:
                 command = parse_command(
-                    user_command_text, current_line=self.current_line, document_length=self.document_length
+                    user_command_text,
+                    current_line=self.current_line,
+                    document_length=self.document_length,
+                    headless=False,
                 )
             except ValidationError as error:
                 print(error)
@@ -98,7 +101,10 @@ class CommandGenerator:
         with open(str(self.macro_path), encoding="utf-8") as file:
             for line in file:
                 command = parse_command(
-                    line.strip("\n").strip("\r"), current_line=self.current_line, document_length=self.document_length
+                    line.strip("\n").strip("\r"),
+                    current_line=self.current_line,
+                    document_length=self.document_length,
+                    headless=True,
                 )
                 # TODO : handle errors
                 yield command
@@ -133,9 +139,9 @@ class StringCommandGenerator:
     def generate(
         self,
     ) -> Generator[Command, None, None]:
-        """Turn a sring into a bunch of commands"""
+        """Turn a string into a bunch of commands"""
         for line in self.source.split("\n"):
             command = parse_command(
-                line.strip("\r"), current_line=self.current_line, document_length=self.document_length
+                line.strip("\r"), current_line=self.current_line, document_length=self.document_length, headless=True
             )
             yield command

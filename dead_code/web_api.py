@@ -37,7 +37,7 @@ async def execute(payload: InputPayload) -> OutputPayload:
     commands = []
     lines = payload.lines
     for command_text in payload.commands:
-        candidate = parse_command(command_text, 0, document_length=len(lines))
+        candidate = parse_command(command_text, 0, document_length=len(lines), headless=True)
         if candidate:
             commands.append(candidate)
     output = OutputPayload()

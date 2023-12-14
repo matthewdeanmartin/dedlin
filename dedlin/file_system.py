@@ -59,6 +59,7 @@ def export(path: Path, lines: list[str], preferred_line_break: str) -> None:
             file.seek(0)
             file.write(export_markdown(lines, preferred_line_break))
     else:
+        # BUG: Isn't this the same as SAVE/WRITE/QUIT/EXIT?
         with open(str(path), "w", encoding="utf-8") as file:
             file.seek(0)
             # TODO: make this use preferred line break

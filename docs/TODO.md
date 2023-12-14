@@ -3,6 +3,12 @@
 - Launch with `dedlin`, no file name, and try to save and it blows up.
 - `1,50 Lorem` is broken, only outputs 1 additional line.
 
+## AI optimizations (for bot usage)
+- Restricted mode (no writing to new files!)
+- No browser
+- No loading snippets (Transfer)
+- No saving to new file name
+
 ## Accessibility
 
 - https://dev.to/baspin94/two-ways-to-make-your-command-line-interfaces-more-accessible-541k
@@ -74,8 +80,6 @@
 - Config
 - Chatty Mode/Quiet Mode
   - Warnings - Not a range! etc.
-- vi/vim mode where all error messages, warnings, help messages, prompts are suppressed,
-  exit is disabled and control-c is disabled.
 
 ## COMMANDLINE THINGS
 
@@ -84,13 +88,6 @@
 
 ## FILE THINGS
 
-- Save on crash
 - Implement load file, transfer
-- Use more `questionary` things, esp for load file
-  - Use `questionary` for confirm delete
+- Use command inputter patter for remaining input statements
 
-## DONE
-
-- `--verbose` works
-- macro files (almost) work again from command line
-- hypothesis can generate a stream of commands

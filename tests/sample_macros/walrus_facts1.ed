@@ -1,0 +1,13 @@
+# Load walrus facts
+1,10 LIST
+# Find the section about diet
+1,20 SEARCH diet
+# Edit the line mentioning diet
+10 EDIT Walruses would eat pizza rosa if they could.
+# Insert new fact at line 11
+11INSERT Walruses primarily feed on benthic bivalve mollusks.
+# Capitalize the newly added fact
+11 CAPITALIZE
+# Display the edited section
+8,12 LIST
+SAVE

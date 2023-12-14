@@ -149,6 +149,7 @@ def parse_range_only(
     document_length: int,
     phrases: Optional[Phrases],
     end_part: str = "",
+    headless: bool = False,
 ) -> Optional[Command]:
     """Parse a command that has a line range"""
     # TODO: the biggest generic parser should replace all of these
@@ -156,7 +157,7 @@ def parse_range_only(
         if just_command in command_forms:
             if front_part in command_forms:
                 line_range: Optional[LineRange] = LineRange(
-                    start=1, offset=0 if document_length == 0 else document_length - 1
+                    start=1, offset=0 if document_length <= 0 else document_length - 1
                 )
             else:
                 command_length = get_command_length(front_part, command_forms)
@@ -167,6 +168,11 @@ def parse_range_only(
             if command_code in (Commands.INSERT, Commands.EDIT):
                 if end_part[1:]:
                     phrases = Phrases((end_part[1:],))
+                elif headless and not end_part[1:]:
+                    # This means blank line on 2 for headless mode.
+                    # In interactive mode in means, start accepting input for line 2.
+                    # `2 INSERT`
+                    phrases = Phrases(("",))
 
             return Command(
                 command_code,
@@ -232,6 +238,7 @@ BARE_COMMANDS = {
     Commands.REDO: ("REDO",),
     Commands.UNDO: ("UNDO",),
     Commands.WRITE: ("W", "WRITE"),
+    Commands.SAVE: ("SAVE",),
     Commands.EXIT: ("E", "EXIT"),  # BUG, this takes argument.
     Commands.QUIT: ("Q", "QUIT"),
 }
@@ -248,7 +255,7 @@ def bare_command(command: str) -> Optional[Command]:
     return None
 
 
-def parse_command(command: str, current_line: int, document_length: int) -> Command:
+def parse_command(command: str, current_line: int, document_length: int, headless: bool) -> Command:
     """Parse a command"""
     original_text = command
 
@@ -275,6 +282,9 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
         target = candidate_int
         # edit end if target is greater than document length.
         target = target if target <= document_length else document_length
+        if headless:
+            print("Bare line number for interactive mode, not headless mode. Use `{candidate_int} EDIT your text`")
+            return Command(Commands.UNKNOWN, original_text=original_text)
         if document_length == 0:
             print("Can't edit empty document. Use INSERT")
             return Command(Commands.UNKNOWN, original_text=original_text)
@@ -320,7 +330,7 @@ def parse_command(command: str, current_line: int, document_length: int) -> Comm
         raise TypeError("Something has gone wrong.")
 
     candidate = parse_range_only(
-        just_command, front_part, original_text, current_line, document_length, phrases, end_part
+        just_command, front_part, original_text, current_line, document_length, phrases, end_part, headless=headless
     )
 
     if candidate:
