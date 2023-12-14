@@ -8,7 +8,7 @@ import logging
 import os
 import signal
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from openai.types.chat import ChatCompletionMessageParam
 
@@ -35,13 +35,14 @@ from dedlin.utils.exceptions import DedlinException
 logger = logging.getLogger(__name__)
 
 HIGH_TRUST_TOOLS = [
-    Commands.BROWSE, # Web browsing
-    Commands.EXPORT, # Export to html/write file not specified in startup
-    Commands.TRANSFER, # Read arbitrary files
-    Commands.MACRO, # Read/Write arbitrary files
-    Commands.CRASH, # Halts application
-    Commands.PRINT, # Either prints to device or to new file (unimplemented)
+    Commands.BROWSE,  # Web browsing
+    Commands.EXPORT,  # Export to html/write file not specified in startup
+    Commands.TRANSFER,  # Read arbitrary files
+    Commands.MACRO,  # Read/Write arbitrary files
+    Commands.CRASH,  # Halts application
+    Commands.PRINT,  # Either prints to device or to new file (unimplemented)
 ]
+
 
 class Dedlin:
     """Application for Dedlin
@@ -57,7 +58,7 @@ class Dedlin:
         inputter: InMemoryCommandGenerator,  # CommandGeneratorProtocol,
         insert_document_inputter: InMemoryInputter,  # StringGeneratorProtocol,
         edit_document_inputter: PrefillInputter,  # StringGeneratorProtocol,
-        outputter: Printable, # Callable[[Optional[str], str], None],  # Printable,
+        outputter: Printable,  # Callable[[Optional[str], str], None],  # Printable,
         headless: bool = False,
         disabled_commands: Optional[list[Commands]] = None,
         untrusted_user: bool = False,
@@ -187,7 +188,6 @@ class Dedlin:
                 self.echo_if_needed(command.original_text)
 
             if command.command == Commands.BROWSE:
-
                 if self.doc.dirty:
                     self.feedback("Discarding current document")
                 if command.phrases and command.phrases.first is None:

@@ -4,6 +4,7 @@
 - `1,50 Lorem` is broken, only outputs 1 additional line.
 
 ## AI optimizations (for bot usage)
+
 - Restricted mode (no writing to new files!)
 - No browser
 - No loading snippets (Transfer)
@@ -90,4 +91,3 @@
 
 - Implement load file, transfer
 - Use command inputter patter for remaining input statements
-

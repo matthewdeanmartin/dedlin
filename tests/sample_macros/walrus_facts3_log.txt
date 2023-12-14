@@ -1,4 +1,4 @@
---- Current line is 1, 24 lines total ---
+Current line 1 of 24
    1 : They big
    2 : They walrus
    3 : They eat
@@ -14,16 +14,16 @@
    13 : They are hunted
    14 : They are in the Artic.
    15 : Who are they?
---- Current line is 1, 24 lines total ---
---- Current line is 1, 24 lines total ---
+Current line 1 of 24
+Current line 1 of 24
 Moved
---- Current line is 1, 27 lines total ---
---- Current line is 1, 27 lines total ---
+Current line 1 of 27
+Current line 1 of 27
 Shuffled
---- Current line is 1, 27 lines total ---
---- Current line is 1, 27 lines total ---
+Current line 1 of 27
+Current line 1 of 27
 Undone
---- Current line is 1, 27 lines total ---
---- Current line is 1, 27 lines total ---
---- Current line is 1, 27 lines total ---
---- Current line is 1, 27 lines total ---
+Current line 1 of 27
+Current line 1 of 27
+Current line 1 of 27
+Current line 1 of 27

@@ -1,5 +1,5 @@
---- Current line is 1, 2 lines total ---
+Current line 1 of 2
 Replacing
    1 : That is a butt.
---- Current line is 2, 2 lines total ---
---- Current line is 2, 2 lines total ---
+Current line 2 of 2
+Current line 2 of 2

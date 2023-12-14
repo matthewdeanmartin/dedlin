@@ -1,4 +1,4 @@
---- Current line is 1, 2 lines total ---
+Current line 1 of 2
    1 : This is a cat.
---- Current line is 1, 2 lines total ---
---- Current line is 1, 2 lines total ---
+Current line 1 of 2
+Current line 1 of 2
