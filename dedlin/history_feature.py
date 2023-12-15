@@ -42,7 +42,7 @@ class HistoryLog:
         if not self.persist:
             return 0
         history_folder = self.initialize_history_folder()
-        return len(list(history_folder.glob("*.ed")))
+        return len(list(history_folder.glob("*.ed"))) + 1
 
     def make_sequential_history_file_name(self) -> str:
         """

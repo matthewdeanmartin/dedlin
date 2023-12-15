@@ -1,3 +1,4 @@
+Editing E:\github\dedlin\tests\sample_macros\walrus_facts1_out.txt
 Current line 1 of 14
    1 : They big
    2 : They walrus
@@ -14,17 +15,17 @@ Current line 1 of 14
    1 : Their diet is fish and stuff.
 Current line 1 of 14
 Current line 1 of 14
-Current line 10 of 14
-Current line 10 of 14
+Current line 1 of 14
+Current line 1 of 14
 Control C to exit insert mode
-Current line 11 of 15
-Current line 11 of 15
-Current line 11 of 15
-Current line 11 of 15
-   8 : They are lazy
-   9 : They are funny
-   10 : Walruses would eat pizza rosa if they could.
-   11 : Walruses primarily feed on benthic bivalve mollusks.
+Current line 2 of 15
+Current line 2 of 15
+Current line 2 of 15
+Current line 2 of 15
+   8 : They are fat
+   9 : They are lazy
+   10 : They are funny
+   11 : Their diet is fish and stuff.
    12 : They are mammals
-Current line 11 of 15
-Current line 11 of 15
+Current line 2 of 15
+Current line 2 of 15

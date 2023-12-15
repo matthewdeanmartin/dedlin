@@ -15,6 +15,9 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
     $ = last line
     """
     value = value.strip()
+    if value == "":
+        # Implicit range means different things depending on command... I think
+        return None
     if "," in value:
         parts = value.split(",")
         start_string = parts[0]
@@ -120,7 +123,7 @@ RANGE_ONLY = {
     Commands.HISTORY: ("HISTORY",),
     Commands.MACRO: ("MACRO",),
     Commands.BROWSE: ("BROWSE",),
-    Commands.CURRENT: ("CURRENT",),
+    Commands.CURRENT: ("C", "CURRENT"),
     Commands.SHUFFLE: ("SHUFFLE",),
     Commands.SORT: ("SORT",),
     Commands.REVERSE: ("REVERSE",),
@@ -155,7 +158,9 @@ def parse_range_only(
     # TODO: the biggest generic parser should replace all of these
     for command_code, command_forms in RANGE_ONLY.items():
         if just_command in command_forms:
-            if front_part in command_forms:
+            if front_part and front_part in command_forms:
+                # Bare command because front part is just the command.
+                # Incorrectly assuming all commands default to entire document for missing range
                 line_range: Optional[LineRange] = LineRange(
                     start=1, offset=0 if document_length <= 0 else document_length - 1
                 )
@@ -173,6 +178,12 @@ def parse_range_only(
                     # In interactive mode in means, start accepting input for line 2.
                     # `2 INSERT`
                     phrases = Phrases(("",))
+                # override range, because if they specify it, it is meaningless
+                # if they don't specify, we insert/edit current line
+                if command_code == Commands.INSERT:
+                    line_range = LineRange(start=current_line + 1 if current_line > 0 else 1, offset=0)
+                else:
+                    line_range = LineRange(start=current_line if current_line > 0 else 1, offset=0)
 
             return Command(
                 command_code,
@@ -263,6 +274,12 @@ def parse_command(command: str, current_line: int, document_length: int, headles
     if not command:
         return Command(
             command=Commands.EMPTY,
+            original_text=original_text,
+        )
+    if command == ".":
+        # This is for "ed" compatibility, where . meant, switch out of input mode back to command mode.
+        return Command(
+            command=Commands.NOOP,
             original_text=original_text,
         )
 

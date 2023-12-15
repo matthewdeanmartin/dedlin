@@ -136,3 +136,9 @@ dedlin.pyz
 /.ruff_cache/
 
 node_modules/
+
+bot_history/
+
+test2.txt
+
+test3.txt

@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)
 class Commands(Enum):
     """Enum of commands that can be executed on a document."""
 
+    COMMENT = auto()
     EMPTY = auto()
+    NOOP = auto()  # ed compatibility
     # display
     LIST = auto()
     PAGE = auto()
@@ -252,6 +254,7 @@ class Command:
     line_range: Optional[LineRange] = None
     phrases: Optional[Phrases] = None
     original_text: Optional[str] = dataclasses.field(default=None, compare=False)
+    comment: Optional[str] = None
 
     def validate(self) -> bool:
         """Check if ranges are sensible"""
@@ -267,6 +270,12 @@ class Command:
 
     def format(self) -> str:
         """Format the command as a string"""
+        if self.command == Commands.COMMENT:
+            text = self.comment if self.comment else ""
+            return f"# {text}"
+        if self.command == Commands.UNKNOWN:
+            text = self.original_text if self.original_text else ""
+            return f"# Unknown: {text}"
         range_part = self.line_range.format() if self.line_range is not None else ""
         phrase_part = self.phrases.format() if self.phrases is not None else ""
         return " ".join([range_part, self.command.name, phrase_part]).strip()

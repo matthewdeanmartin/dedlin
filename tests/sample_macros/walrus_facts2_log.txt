@@ -1,3 +1,4 @@
+Editing E:\github\dedlin\tests\sample_macros\walrus_facts2_out.txt
 Current line 1 of 24
 Current line 1 of 24
 Current line 1 of 24

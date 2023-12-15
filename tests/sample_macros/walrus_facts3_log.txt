@@ -1,3 +1,4 @@
+Editing E:\github\dedlin\tests\sample_macros\walrus_facts3_out.txt
 Current line 1 of 24
    1 : They big
    2 : They walrus
@@ -25,5 +26,6 @@ Current line 1 of 27
 Undone
 Current line 1 of 27
 Current line 1 of 27
+Command Commands.COMMENT not implemented
 Current line 1 of 27
 Current line 1 of 27

@@ -62,6 +62,7 @@ class Dedlin:
         headless: bool = False,
         disabled_commands: Optional[list[Commands]] = None,
         untrusted_user: bool = False,
+        history: bool = True,
     ) -> None:
         """Set up initial state and some dependency injection"""
 
@@ -114,7 +115,7 @@ class Dedlin:
 
         self.file_path: Optional[Path] = None
         self.history: list[Command] = []
-        self.history_log = HistoryLog(persist=not self.headless)
+        self.history_log = HistoryLog(persist=history)
         self.macro_file_name: Optional[Path] = None
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
@@ -139,6 +140,8 @@ class Dedlin:
 
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
+        if self.file_path:
+            self.feedback(f"Editing {self.file_path.absolute()}")
         lines = file_system.read_or_create_file(self.file_path)
 
         self.doc = Document(
@@ -173,9 +176,7 @@ class Dedlin:
                 self.feedback(f"Invalid command {command}")
                 self.print_ai_help(command)
 
-            self.history.append(command)
-            if not self.headless:
-                self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
+            self.log_history(command)
             self.echo_if_needed(command.format())
 
             if command.command == Commands.REDO:
@@ -184,7 +185,7 @@ class Dedlin:
                 except IndexError:
                     self.feedback("Nothing to redo, not enough history")
                     continue
-                self.history.append(command)
+                self.log_history(command)
                 self.echo_if_needed(command.original_text)
 
             if command.command == Commands.BROWSE:
@@ -200,7 +201,7 @@ class Dedlin:
             elif command.command == Commands.HISTORY:
                 for command in self.history:
                     # self.feedback(command.original_text.strip("\n\t\r "))
-                    self.feedback(command.format())
+                    self.feedback(command.format(), no_comment=True)
             elif command.command == Commands.EMPTY:
                 pass
             elif command.command == Commands.LIST and command.line_range:
@@ -247,7 +248,9 @@ class Dedlin:
                         line_range=command.line_range,
                         original_text=command.original_text,
                     )
-                    self.history.append(rewritten_history)
+                    self.log_history(rewritten_history)
+                else:
+                    self.log_history(command)
             elif command.command == Commands.PUSH and command.phrases and command.line_range:
                 line_number = command.line_range.start if command.line_range else 1
                 self.doc.push(line_number, command.phrases.as_list())
@@ -273,7 +276,7 @@ class Dedlin:
                         if edit_status.text is not None:
                             # rewrite history
                             # _ = self.history.pop()
-                            self.history.append(
+                            self.log_history(
                                 Command(
                                     command=Commands.EDIT,
                                     line_range=LineRange(start=edit_status.line_edited, offset=0),
@@ -366,6 +369,11 @@ class Dedlin:
             self.feedback(status)
         return 0
 
+    def log_history(self, command):
+        self.history.append(command)
+        if self.history:
+            self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
+
     def print_ai_help(self, command: str) -> None:
         if not self.enable_ai_help:
             return
@@ -377,8 +385,13 @@ class Dedlin:
         ask = ChatCompletionMessageParam(content=content, role="user")
         asyncio.run(client.completion([ask]))
 
-    def feedback(self, string, end="\n") -> None:
+    def feedback(self, string, end="\n", no_comment: bool = False) -> None:
         """Output feedback to the user"""
+        if not no_comment:
+            # prevent infinite loop for HISTORY command
+            comment = Command(command=Commands.COMMENT, comment=string)
+            self.log_history(command=comment)
+
         if not (self.vim_mode or self.quiet):
             self.command_outputter(string, end)
             return
@@ -435,7 +448,7 @@ class Dedlin:
 
     def final_report(self) -> None:
         """Print out the final report"""
-        if not self.headless:
+        if self.history:
             self.feedback(f"History saved to {self.history_log.history_file_string}")
 
     def save_on_crash(self, exception_type: Optional[Exception], value: Any, tb: Any) -> None:

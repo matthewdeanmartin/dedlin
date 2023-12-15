@@ -11,8 +11,10 @@ def test_extract_one_range():
 
 def test_parse_command_insert_default():
     for insert in ("I", "Insert", "insert", "i", "INSERT"):
+        # Insert for whole document doesn't make sense.
+        # Inserts happen at 1 point.
         assert parse_command(insert, 1, 3, headless=False) == Command(
-            Commands.INSERT, LineRange(start=1, offset=2), None
+            Commands.INSERT, LineRange(start=2, offset=0), None
         ), insert
 
 

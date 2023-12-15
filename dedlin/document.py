@@ -37,7 +37,7 @@ def print(*args, **kwargs):
 @icontract.invariant(lambda self: all("\n" not in line and "\r" not in line for line in self.lines))
 @icontract.invariant(
     # and not self.lines <-- I'd have to update current line this on every .append()
-    lambda self: (1 <= self.current_line <= len(self.lines) or self.current_line in (0, 1)),
+    lambda self: (1 <= self.current_line <= len(self.lines) + 1 or self.current_line in (0, 1)),
     "Current line must be a valid line",
 )
 class Document:
@@ -270,11 +270,11 @@ class Document:
             logger.warning("Didn't get an input, nothing changed.")
             return EditStatus(can_edit_again=False, text=None, line_edited=None)
         except KeyboardInterrupt:
-            logger.warning("Cancelling out of edit, line not changed.")
+            logger.warning("\nCancelling out of edit, line not changed.")
             return EditStatus(can_edit_again=False, text=None, line_edited=None)
 
         if new_line is None:
-            logger.warning("Cancelling out of edit, line not changed.")
+            logger.warning("\nCancelling out of edit, line not changed.")
             return EditStatus(can_edit_again=False, text=None, line_edited=None)
 
         self.lines[line_number - 1] = new_line
@@ -314,8 +314,10 @@ class Document:
             for phrase in phrases.as_list():
                 self.lines.insert(line_number - 1, phrase)
                 self.dirty = True
-                self.current_line = line_number
+                self.current_line = line_number + 1
                 line_number += 1
+            # HACK: if you don't do this, sequential scripted INSERT skip lines.
+            self.current_line -= 1
             return phrases
 
         user_input_text: Optional[str] = "GO!"
