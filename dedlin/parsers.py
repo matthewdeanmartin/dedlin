@@ -18,6 +18,9 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
     if value == "":
         # Implicit range means different things depending on command... I think
         return None
+
+    start: Optional[int] = None
+    end: Optional[int] = None
     if "," in value:
         parts = value.split(",")
         start_string = parts[0]
@@ -59,8 +62,7 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
         return LineRange(start=document_length, offset=0, repeat=1)
     if value and all(_ in "0123456789" for _ in value):
         start = int(value)
-        if start <= 1:
-            start = 1
+        start = max(start, 1)
         candidate = LineRange(start=start, offset=0, repeat=1)
 
         # TODO: need better parser errors
@@ -81,7 +83,7 @@ def extract_phrases(value: str) -> Optional[Phrases]:
     # handle unquoted delimited by spaces
     if '"' not in value:
         parts = [_ for _ in value.split(" ") if _.strip() != ""]
-        return Phrases(parts=parts)
+        return Phrases(parts=tuple(parts))
     if '\\"' in value:
         raise NotImplementedError("Escape quotes not implemented")
 

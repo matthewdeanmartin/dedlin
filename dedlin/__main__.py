@@ -127,7 +127,7 @@ def run(
             if not vim_mode:
                 break
         except Exception as the_exception:
-            dedlin.save_on_crash(the_exception, None, None)
+            dedlin.save_on_crash(type(the_exception), the_exception, None)
             print(traceback.format_exc())
             break
     dedlin.final_report()

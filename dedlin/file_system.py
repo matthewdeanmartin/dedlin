@@ -9,7 +9,7 @@ from typing import Optional
 from dedlin.tools.export import export_markdown
 
 
-def read_or_create_file(path: Path) -> list[str]:
+def read_or_create_file(path: Optional[Path]) -> list[str]:
     """Attempt to read file, create if it doesn't exist"""
 
     if path:
@@ -26,7 +26,7 @@ def read_file(path: Optional[Path]) -> list[str]:
     """Read a file and return a list_doc of lines"""
     lines: list[str] = []
 
-    with open(path, encoding="utf-8") as file:
+    with open(str(path), encoding="utf-8") as file:
         for line in file:
             if line.endswith("\n"):
                 lines.append(line[:-1])

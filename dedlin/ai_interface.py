@@ -1,6 +1,9 @@
 """
 Code for AI
 """
+import asyncio
+
+import dotenv
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 
@@ -19,11 +22,15 @@ The user says,
 
 
 class AiClient:
+    """Client for AI"""
+
     def __init__(self):
+        """Initialize the client"""
         self.client = AsyncOpenAI()
         self.model = "gpt-3.5-turbo"
 
-    async def completion(self, messages: list[ChatCompletionMessageParam]):
+    async def completion(self, messages: list[ChatCompletionMessageParam]) -> str:
+        """Get a completion from the AI"""
         # [{"role": "user", "content": "Hello world"}]
 
         completion = await self.client.chat.completions.create(model=self.model, messages=messages)
@@ -31,21 +38,23 @@ class AiClient:
         # print(dict(completion).get('usage'))
         choice = completion.choices[0]
         print(choice.message.content)
-        return completion
+        return choice.message.content
 
 
 if __name__ == "__main__":
-    import asyncio
 
-    import dotenv
+    def run() -> None:
+        """Example"""
 
-    dotenv.load_dotenv()
+        dotenv.load_dotenv()
 
-    async def main():
-        client = AiClient()
-        content = PROLOGUE + "Tell me about edlin."
-        ask = ChatCompletionMessageParam(content=content, role="user")
-        await client.completion([ask])
+        async def main():
+            client = AiClient()
+            content = PROLOGUE + "Tell me about edlin."
+            ask = ChatCompletionMessageParam(content=content, role="user")
+            await client.completion([ask])
 
-    # Python 3.7+
-    asyncio.run(main())
+        # Python 3.7+
+        asyncio.run(main())
+
+    run()

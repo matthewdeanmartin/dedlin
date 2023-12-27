@@ -19,11 +19,11 @@ except ModuleNotFoundError:
     import win32console
 
     PROBABLY_WINDOWS = True
-    STANDARD_IN = win32console.GetStdHandle(win32console.STD_INPUT_HANDLE)
 
 
 # alternate windows: https://stackoverflow.com/a/11616477
 if PROBABLY_WINDOWS:
+    STANDARD_IN_WINDOWS = win32console.GetStdHandle(win32console.STD_INPUT_HANDLE)
 
     def input_with_prefill(prompt: str, default: str = "") -> str:
         """Show prompt and prefill input text with default value.
@@ -39,12 +39,12 @@ if PROBABLY_WINDOWS:
             evt.KeyDown = True
             keys.append(evt)
 
-        STANDARD_IN.WriteConsoleInput(keys)
+        STANDARD_IN_WINDOWS.WriteConsoleInput(keys)
         return input(prompt)
 
 else:
 
-    def input_with_prefill(prompt: str, text: str = "") -> str:
+    def input_with_prefill(prompt: str, default: str = "") -> str:
         """Show prompt and prefill input text with default value.
 
         Linux/Mac Version
@@ -52,7 +52,7 @@ else:
 
         # ref https://stackoverflow.com/a/8505387
         def hook() -> None:
-            readline.insert_text(text)
+            readline.insert_text(default)
             readline.redisplay()
 
         readline.set_pre_input_hook(hook)

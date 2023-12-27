@@ -296,13 +296,19 @@ class Printable(Protocol):
     """Something that acts like print()"""
 
     def __call__(self, text: Optional[str], end: str = "\n") -> None:
-        ...
+        """Signature of a printable"""
 
 
-def null_printer(text: str, end: str = "") -> None:
-    """
-    Do nothing implementation of Printable
-    """
+class NullPrinter:
+    """Something that acts like print()"""
+
+    def __call__(self, text: Optional[str], end: str = "\n") -> None:
+        """
+        Do nothing implementation of Printable
+        """
+
+
+# def null_printer(text: str, end: str = "") -> None:
 
 
 @runtime_checkable
@@ -317,7 +323,6 @@ class CommandGeneratorProtocol(Protocol):
         self,
     ) -> Generator[Command, None, None]:
         """Generate commands"""
-        ...
 
 
 @runtime_checkable
@@ -326,6 +331,8 @@ class StringGeneratorProtocol(Protocol):
 
     prompt: str
     default: str
+
+    # current_line:int # will we need this?
 
     def generate(
         self,

@@ -263,7 +263,8 @@ class Document:
         # end up with a reference to a static, past state of the prompt and line number
         input_generator = self.edit_inputter.generate()
         try:
-            self.edit_inputter.current_line = f"   {line_number} : "
+            # does this next line have any impact? If so, all inputters need this property.
+            # self.edit_inputter.current_line = f"   {line_number} : "
             self.edit_inputter.default = line_text
             new_line = next(input_generator)
         except StopIteration:
@@ -339,7 +340,7 @@ class Document:
                 self.current_line = line_number
                 line_number += 1
         logger.debug(f"Inserted at {line_number}")
-        return Phrases(accumulated_lines)
+        return Phrases(tuple(accumulated_lines))
 
     def lorem(self, line_range: Optional[LineRange]) -> None:
         """Add lorem ipsum to lines"""
@@ -400,3 +401,13 @@ class Document:
         # TODO: call a mutator method instead of assigning to self.previous_lines
         self.previous_lines = self.lines.copy()
         self.previous_current_line = self.current_line
+
+    def print(self, line_range: Optional[LineRange]) -> Generator[tuple[str, str], None, None]:
+        """For handing lines off to a print() function"""
+        for line in self.lines[line_range.start - 1 : line_range.end]:
+            if line.endswith("\n"):
+                line = line[:-1]
+                end = "\n"
+            else:
+                end = ""
+            yield line, end

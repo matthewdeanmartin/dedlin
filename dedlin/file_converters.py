@@ -20,7 +20,7 @@ def write_to_markdown(filename: str, lines: list[str]) -> str:
     path = Path(filename)
     if path.suffix == ".md":
         path.rename(path.with_suffix(".html"))
-        path.write_text(html_text)
+        path.write_text(html_text, encoding="utf-8")
     else:
         print("Not markdown!")
     return html_text

@@ -83,6 +83,20 @@ def questionary_command_handler(prompt: str = "*") -> Generator[str, None, None]
         yield answer
 
 
+class CommandGeneratorProtocol:
+    def __init__(self, path: Path):
+        """Initialize the generator"""
+        self.current_line: int = 0
+        self.document_length: int = 0
+        self.macro_path: Path = path
+        self.prompt: str = "> "
+
+    def generate(
+        self,
+    ) -> Generator[Command, None, None]:
+        """Turn a file into a bunch of commands"""
+
+
 class CommandGenerator:
     """Get a typed command from a file"""
 

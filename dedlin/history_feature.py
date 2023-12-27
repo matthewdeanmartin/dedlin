@@ -2,6 +2,7 @@
 Manage history on file system
 """
 from pathlib import Path
+from typing import Optional
 
 from dedlin.utils.file_utils import locate_file
 
@@ -20,9 +21,11 @@ class HistoryLog:
         """Initialize the history log"""
         self.persist = persist
         if self.persist:
-            self.history_file = self.initialize_history_folder() / self.make_sequential_history_file_name()
+            self.history_file: Optional[Path] = (
+                self.initialize_history_folder() / self.make_sequential_history_file_name()
+            )
         else:
-            self.history_file = None
+            self.history_file: Optional[Path] = None
 
     def initialize_history_folder(self) -> Path:
         """

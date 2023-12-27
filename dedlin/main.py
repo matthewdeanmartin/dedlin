@@ -2,30 +2,33 @@
 Main code.
 
 Handles UI and links command parser to the document object
+
+
 """
 import asyncio
 import logging
 import os
 import signal
 from pathlib import Path
-from typing import Any, Optional
+from types import TracebackType
+from typing import Optional
 
-from openai.types.chat import ChatCompletionMessageParam
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
 
 import dedlin.file_system as file_system
 import dedlin.text.help_text as help_text
 from dedlin.ai_interface import PROLOGUE, AiClient
 from dedlin.basic_types import (
     Command,
+    CommandGeneratorProtocol,
     Commands,
     LineRange,
+    NullPrinter,
     Phrases,
     Printable,
-    null_printer,
+    StringGeneratorProtocol,
 )
-from dedlin.command_sources import InMemoryCommandGenerator
 from dedlin.document import Document
-from dedlin.document_sources import InMemoryInputter, PrefillInputter
 from dedlin.history_feature import HistoryLog
 from dedlin.string_comands import process_strings
 from dedlin.tools.info_bar import display_info
@@ -55,9 +58,9 @@ class Dedlin:
 
     def __init__(
         self,
-        inputter: InMemoryCommandGenerator,  # CommandGeneratorProtocol,
-        insert_document_inputter: InMemoryInputter,  # StringGeneratorProtocol,
-        edit_document_inputter: PrefillInputter,  # StringGeneratorProtocol,
+        inputter: CommandGeneratorProtocol,  # OR Union[InMemoryCommandGenerator, CommandGenerator]
+        insert_document_inputter: StringGeneratorProtocol,  # or Union[InMemoryInputter,....]
+        edit_document_inputter: StringGeneratorProtocol,  # Union[PrefillInputter
         outputter: Printable,  # Callable[[Optional[str], str], None],  # Printable,
         headless: bool = False,
         disabled_commands: Optional[list[Commands]] = None,
@@ -84,7 +87,7 @@ class Dedlin:
 
         self.doc: Optional[Document] = None
 
-        self.halt_on_error = False if not headless else True
+        self.halt_on_error = headless  # Halt if headless.
         """Stop on errors, useful for macros."""
 
         self.quit_safety = True
@@ -136,12 +139,13 @@ class Dedlin:
 
         if self.vim_mode or self.quiet:
             self.echo = False
-            self.command_outputter = null_printer
+            self.command_outputter = NullPrinter()
 
         self.macro_file_name = Path(macro_file_name) if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
         if self.file_path:
             self.feedback(f"Editing {self.file_path.absolute()}")
+
         lines = file_system.read_or_create_file(self.file_path)
 
         self.doc = Document(
@@ -193,9 +197,9 @@ class Dedlin:
                     self.feedback("Discarding current document")
                 if command.phrases and command.phrases.first is None:
                     self.feedback("No URL, can't browse")
-                elif command.phrases:
+                elif command.phrases and command.phrases.first:
                     page_as_rows = fetch_page_as_rows(command.phrases.first)
-                    phrases = Phrases(tuple(page_as_rows))
+                    phrases = Phrases(parts=tuple(page_as_rows))
                     self.doc.insert(self.doc.current_line, phrases)
 
             elif command.command == Commands.HISTORY:
@@ -254,10 +258,10 @@ class Dedlin:
             elif command.command == Commands.PUSH and command.phrases and command.line_range:
                 line_number = command.line_range.start if command.line_range else 1
                 self.doc.push(line_number, command.phrases.as_list())
-            elif command.command == Commands.COPY and command.phrases and command.line_range:
+            elif command.command == Commands.COPY and command.phrases and command.line_range and command.phrases.first:
                 self.doc.copy(command.line_range, int(command.phrases.first))
                 self.feedback("Copied")
-            elif command.command == Commands.MOVE and command.phrases and command.line_range:
+            elif command.command == Commands.MOVE and command.phrases and command.line_range and command.phrases.first:
                 self.doc.copy(command.line_range, int(command.phrases.first))
                 self.feedback("Moved")
             elif command.command == Commands.EDIT:
@@ -265,15 +269,15 @@ class Dedlin:
                     self.doc.spread(command.line_range, command.phrases.parts)
                 else:
                     self.feedback("[Control C]-[Enter] to exit edit mode")
-                    edit_line_number: Optional[int] = command.line_range.start if command.line_range else 1
+                    edit_line_number: int = command.line_range.start if command.line_range else 1
                     can_continue = True
                     while can_continue:
                         edit_status = self.doc.edit(edit_line_number)
                         can_continue = edit_status.can_edit_again
-                        if can_continue:
+                        if can_continue and edit_status.line_edited:
                             edit_line_number = edit_status.line_edited + 1
 
-                        if edit_status.text is not None:
+                        if edit_status.text is not None and edit_status.line_edited is not None:
                             # rewrite history
                             # _ = self.history.pop()
                             self.log_history(
@@ -286,13 +290,21 @@ class Dedlin:
 
                     # New line or else next text will be on the same line
                     self.command_outputter("")
-            elif command.command == Commands.SEARCH and command.line_range and command.phrases:
+            elif (
+                command.command == Commands.SEARCH and command.line_range and command.phrases and command.phrases.first
+            ):
                 for text in self.doc.search(command.line_range, value=command.phrases.first):
                     self.document_outputter(text, "")
             elif command.command == Commands.INFO:
                 for info, end in display_info(self.doc):
                     self.document_outputter(info, end)
-            elif command.command == Commands.REPLACE and command.phrases and command.line_range:
+            elif (
+                command.command == Commands.REPLACE
+                and command.phrases
+                and command.line_range
+                and command.phrases.first is not None
+                and command.phrases.second is not None
+            ):
                 self.feedback("Replacing")
                 for line in self.doc.replace(
                     command.line_range,
@@ -355,8 +367,7 @@ class Dedlin:
                 self.feedback("Unknown command, type HELP for help")
                 if self.halt_on_error:
                     raise Exception(f"Unknown command {command.original_text}")
-                else:
-                    self.print_ai_help(command)
+                self.print_ai_help(command)
             else:
                 self.feedback(f"Command {command.command} not implemented")
 
@@ -369,12 +380,14 @@ class Dedlin:
             self.feedback(status)
         return 0
 
-    def log_history(self, command):
+    def log_history(self, command: Command) -> None:
+        """Log a command to the history"""
         self.history.append(command)
         if self.history:
             self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
 
-    def print_ai_help(self, command: str) -> None:
+    def print_ai_help(self, command: Command) -> None:
+        """Print help from AI"""
         if not self.enable_ai_help:
             return
         if not os.environ.get("OPENAI_API_KEY"):
@@ -385,7 +398,7 @@ class Dedlin:
         ask = ChatCompletionMessageParam(content=content, role="user")
         asyncio.run(client.completion([ask]))
 
-    def feedback(self, string, end="\n", no_comment: bool = False) -> None:
+    def feedback(self, string: str, end="\n", no_comment: bool = False) -> None:
         """Output feedback to the user"""
         if not no_comment:
             # prevent infinite loop for HISTORY command
@@ -430,12 +443,14 @@ class Dedlin:
             self.file_path = Path(phrases.first)
         if self.file_path is None and not self.headless and not self.untrusted_user:
             # TODO: doesn't fit with the other input/output patterns
-            self.file_path = input("Please specify file name: ")
+            self.file_path = Path(input("Please specify file name: "))
         if not self.file_path and self.untrusted_user:
             self.feedback("Can't save, no initial file name specified and user is untrusted")
             return
         if not self.file_path and self.headless:
             raise TypeError("Can't save in headless mode w/o initial file name")
+        if not self.file_path:
+            raise TypeError("Need file path before saving.")
         file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
         self.doc.dirty = False
 
@@ -451,7 +466,9 @@ class Dedlin:
         if self.history:
             self.feedback(f"History saved to {self.history_log.history_file_string}")
 
-    def save_on_crash(self, exception_type: Optional[Exception], value: Any, tb: Any) -> None:
+    def save_on_crash(
+        self, _exception_type: type[BaseException], _value: BaseException, _tb: Optional[TracebackType]
+    ) -> None:
         """Save the document to the file"""
         self.save_document()
         # raise exception_type

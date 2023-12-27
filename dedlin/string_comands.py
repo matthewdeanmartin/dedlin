@@ -14,7 +14,7 @@ def block_commands(lines: list[str], command: Command) -> list[str]:
 
     # doesn't need to use preferred line break
     block = "\n".join(lines)
-    if command.command == Commands.INDENT:
+    if command.command == Commands.INDENT and command.phrases and command.phrases.first is not None:
         block = textwrap.indent(block, command.phrases.first)
     if command.command == Commands.DEDENT:
         block = textwrap.dedent(block)
@@ -32,13 +32,13 @@ def process_strings(lines: list[str], command: Command):
             lines[index] = line.lstrip()
         elif command.command == Commands.RSTRIP:
             lines[index] = line.rstrip()
-        elif command.command == Commands.CENTER:
+        elif command.command == Commands.CENTER and command.phrases and command.phrases.first is not None:
             lines[index] = line.center(int(command.phrases.first))
-        elif command.command == Commands.LJUST:
+        elif command.command == Commands.LJUST and command.phrases and command.phrases.first is not None:
             lines[index] = line.ljust(int(command.phrases.first))
-        elif command.command == Commands.RJUST:
+        elif command.command == Commands.RJUST and command.phrases and command.phrases.first is not None:
             lines[index] = line.rjust(int(command.phrases.first))
-        elif command.command == Commands.EXPANDTABS:
+        elif command.command == Commands.EXPANDTABS and command.phrases and command.phrases.first is not None:
             lines[index] = line.expandtabs(int(command.phrases.first))
         # capitalization
         elif command.command == Commands.LOWER:
