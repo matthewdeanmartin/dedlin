@@ -68,7 +68,21 @@ def run(
     verbose: bool = False,
     blind_mode: bool = False,
 ) -> Dedlin:
-    """Set up everything except things from command line"""
+    """Set up everything except things from command line.
+
+    Args:
+        file_name (Optional[str]): The file name. Defaults to None.
+        macro_file_name (Optional[str]): The macro file name. Defaults to None.
+        echo (bool): Whether to echo. Defaults to False.
+        halt_on_error (bool): Whether to halt on error. Defaults to False.
+        quit_safety (bool): Whether to quit safely. Defaults to False.
+        vim_mode (bool): Whether to use vim mode. Defaults to False.
+        verbose (bool): Whether to be verbose. Defaults to False.
+        blind_mode (bool): Whether to use blind mode. Defaults to False.
+
+    Returns:
+        Dedlin: The dedlin object.
+    """
     if verbose:
         config = configure_logging()
         logging.config.dictConfig(config)

@@ -24,13 +24,20 @@ The user says,
 class AiClient:
     """Client for AI"""
 
-    def __init__(self):
+    def __init__(self)->None:
         """Initialize the client"""
         self.client = AsyncOpenAI()
         self.model = "gpt-3.5-turbo"
 
     async def completion(self, messages: list[ChatCompletionMessageParam]) -> str:
-        """Get a completion from the AI"""
+        """Get a completion from the AI
+
+        Args:
+            messages (list[ChatCompletionMessageParam]): The messages
+
+        Returns:
+            str: The completion
+        """
         # [{"role": "user", "content": "Hello world"}]
 
         completion = await self.client.chat.completions.create(model=self.model, messages=messages)

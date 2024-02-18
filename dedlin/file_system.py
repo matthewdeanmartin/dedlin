@@ -10,7 +10,14 @@ from dedlin.tools.export import export_markdown
 
 
 def read_or_create_file(path: Optional[Path]) -> list[str]:
-    """Attempt to read file, create if it doesn't exist"""
+    """Attempt to read file, create if it doesn't exist.
+
+    Args:
+        path (Optional[Path]): The path
+
+    Returns:
+        list[str]: The lines
+    """
 
     if path:
         if not path.exists():
@@ -23,7 +30,14 @@ def read_or_create_file(path: Optional[Path]) -> list[str]:
 
 
 def read_file(path: Optional[Path]) -> list[str]:
-    """Read a file and return a list_doc of lines"""
+    """Read a file and return a list_doc of lines.
+
+    Args:
+        path (Optional[Path]): The path
+
+    Returns:
+        list[str]: The lines
+    """
     lines: list[str] = []
 
     with open(str(path), encoding="utf-8") as file:
@@ -40,7 +54,16 @@ def read_file(path: Optional[Path]) -> list[str]:
 
 
 def save_and_overwrite(path: Path, lines: list[str], preferred_line_break: str) -> None:
-    """Save a file and overwrite it"""
+    """Save a file and overwrite it.
+
+    Args:
+        path (Path): The path
+        lines (list[str]): The lines
+        preferred_line_break (str): The preferred line break
+
+    Raises:
+        TypeError: If there is no file path
+    """
     if not path:
         raise TypeError("No file path")
     with open(str(path), "w", encoding="utf-8") as file:
@@ -49,7 +72,13 @@ def save_and_overwrite(path: Path, lines: list[str], preferred_line_break: str) 
 
 
 def export(path: Path, lines: list[str], preferred_line_break: str) -> None:
-    """Save a file and overwrite it"""
+    """Save a file and overwrite it.
+
+    Args:
+        path (Path): The path
+        lines (list[str]): The lines
+        preferred_line_break (str): The preferred line break
+    """
     if not path:
         raise TypeError("No file path")
     if path.suffix.lower() == ".html":

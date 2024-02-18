@@ -49,7 +49,7 @@ dedlin file_name.txt
 
 Command line help
 
-```
+```text
 > python -m dedlin --help
 Dedlin.
 
@@ -74,7 +74,7 @@ Options:
 
 Sample session
 
-```
+```text
    _          _  _  _
  __| | ___  __| || |(_) _ _
 / _` |/ -_)/ _` || || || ' \
@@ -111,7 +111,7 @@ Sorted
 1,6 EXIT
 ```
 
-# Documentation
+## Documentation
 
 - [User Manual](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/user_manual.md)
 - [Developer roadmap](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/TODO.md)

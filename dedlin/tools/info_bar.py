@@ -9,7 +9,13 @@ from dedlin.document import Document
 
 
 def display_info(document: Document) -> Generator[tuple[str, str], None, None]:
-    """Display some natural language statistics about the document"""
+    """Display some natural language statistics about the document.
+
+    Args:
+        document (Document): The document
+    Yields:
+        tuple[str, str]: The statistic and a newline
+    """
     text = "".join(document.lines)
     time_to_read = textstat.reading_time(text, ms_per_char=14.69)
     yield f"{time_to_read} minutes to read", "\n"

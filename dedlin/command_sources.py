@@ -37,7 +37,11 @@ class InteractiveGenerator:
     def generate(
         self,
     ) -> Generator[Command, None, None]:
-        """Wrapper around prompt_toolkit for command input but typed"""
+        """Wrapper around prompt_toolkit for command input but typed.
+
+        Returns:
+            Generator[Command, None, None]: The commands
+        """
         user_command_text = ""
         while user_command_text is not None:
             user_command_text = next(_interactive_command_handler(self.prompt))
@@ -55,7 +59,13 @@ class InteractiveGenerator:
 
 
 def _interactive_command_handler(prompt: str = "*") -> Generator[str, None, None]:
-    """Wrapper around prompt_toolkit for command input"""
+    """Wrapper around prompt_toolkit for command input.
+
+    Args:
+        prompt (str): The prompt. Defaults to "*".
+    Returns:
+        Generator[str, None, None]: The commands
+    """
     # pylint: disable=global-statement
     global SESSION
     if SESSION is None:
@@ -76,7 +86,14 @@ def _interactive_command_handler(prompt: str = "*") -> Generator[str, None, None
 
 
 def questionary_command_handler(prompt: str = "*") -> Generator[str, None, None]:
-    """Wrapper around questionary for command input"""
+    """Wrapper around questionary for command input.
+
+    Args:
+        prompt (str): The prompt. Defaults to "*".
+
+    Returns:
+        Generator[str, None, None]: The commands
+    """
     # possibly should merge with simple_input?
     while True:
         answer = questionary.text(prompt).ask()
@@ -84,8 +101,12 @@ def questionary_command_handler(prompt: str = "*") -> Generator[str, None, None]
 
 
 class CommandGeneratorProtocol:
-    def __init__(self, path: Path):
-        """Initialize the generator"""
+    def __init__(self, path: Path)->None:
+        """Initialize the generator.
+
+        Args:
+            path (Path): The path
+        """
         self.current_line: int = 0
         self.document_length: int = 0
         self.macro_path: Path = path
@@ -94,14 +115,22 @@ class CommandGeneratorProtocol:
     def generate(
         self,
     ) -> Generator[Command, None, None]:
-        """Turn a file into a bunch of commands"""
+        """Turn a file into a bunch of commands.
+
+        Returns:
+            Generator[Command, None, None]: The commands
+        """
 
 
 class CommandGenerator:
     """Get a typed command from a file"""
 
-    def __init__(self, path: Path):
-        """Initialize the generator"""
+    def __init__(self, path: Path)->None:
+        """Initialize the generator.
+
+        Args:
+            path (Path): The path
+        """
         self.current_line: int = 0
         self.document_length: int = 0
         self.macro_path: Path = path
@@ -110,7 +139,11 @@ class CommandGenerator:
     def generate(
         self,
     ) -> Generator[Command, None, None]:
-        """Turn a file into a bunch of commands"""
+        """Turn a file into a bunch of commands.
+
+        Returns:
+            Generator[Command, None, None]: The commands
+        """
 
         with open(str(self.macro_path), encoding="utf-8") as file:
             for line in file:
@@ -127,8 +160,12 @@ class CommandGenerator:
 class InMemoryCommandGenerator:
     """A bunch of predefined commands"""
 
-    def __init__(self, commands: Iterable[Command]):
-        """Initialize the generator"""
+    def __init__(self, commands: Iterable[Command])->None:
+        """Initialize the generator.
+
+        Args:
+            commands (Iterable[Command]): The commands
+        """
         self.current_line: int = 0
         self.document_length: int = 0
         self.commands: Iterable[Command] = commands
@@ -136,15 +173,22 @@ class InMemoryCommandGenerator:
     def generate(
         self,
     ) -> Generator[Command, None, None]:
-        """Return a predefined command"""
+        """Return a predefined command.
+        Returns:
+            Generator[Command, None, None]: The commands
+        """
         yield from self.commands
 
 
 class StringCommandGenerator:
     """Get a typed command from a string"""
 
-    def __init__(self, source: str):
-        """Initialize the generator"""
+    def __init__(self, source: str)->None:
+        """Initialize the generator.
+
+        Args:
+            source (str): The source
+        """
         self.source: str = source
         self.current_line: int = 0
         self.document_length: int = 0
@@ -153,7 +197,11 @@ class StringCommandGenerator:
     def generate(
         self,
     ) -> Generator[Command, None, None]:
-        """Turn a string into a bunch of commands"""
+        """Turn a string into a bunch of commands.
+
+        Returns:
+            Generator[Command, None, None]: The commands
+        """
         for line in self.source.split("\n"):
             command = parse_command(
                 line.strip("\r"), current_line=self.current_line, document_length=self.document_length, headless=True

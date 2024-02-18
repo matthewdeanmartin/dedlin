@@ -102,7 +102,12 @@ class LineRange:
     @validator("start", allow_reuse=True)
     @classmethod
     def start_must_be_one_or_more(cls, start: int) -> int:
-        """Start must be 1 or more"""
+        """Start must be 1 or more
+        Args:
+            start (int): The start value
+        Returns:
+            int: The start value
+        """
         if start < 1:
             raise ValueError("start must be one or more")
         return start
@@ -110,7 +115,11 @@ class LineRange:
     @validator("offset", allow_reuse=True)
     @classmethod
     def offset_zero_or_more(cls, offset: int) -> int:
-        """Offset must be zero or more"""
+        """Offset must be zero or more
+
+        Returns:
+            int: The offset value
+        """
         if offset < 0:
             raise ValueError("offset must be zero or more")
         return offset
@@ -118,33 +127,60 @@ class LineRange:
     @classmethod
     @validator("repeat", allow_reuse=True)
     def repeat_zero_or_more(cls, repeat: int) -> int:
-        """Repeat must be zero or more"""
+        """Repeat must be zero or more
+
+        Args:
+            repeat (int): The repeat value
+
+        Returns:
+            int: The repeat value
+        """
         if repeat < 0:
             raise ValueError("repeat must be zero or more")
         return repeat
 
     @property
     def end(self) -> int:
-        """Make this derived so that start and end are valid as long as they are positive"""
+        """Make this derived so that start and end are valid as long as they are positive
+
+        Returns:
+            int: The end of the range
+        """
         return self.start + self.offset
 
     def count(self) -> int:
-        """How many rows on a 1-based index"""
+        """How many rows on a 1-based index.
+
+        Returns:
+            int: The number of rows
+        """
         return self.end - self.start + 1
 
     def validate(self) -> bool:
-        """Check if ranges are sensible"""
+        """Check if ranges are sensible
+
+        Returns:
+            bool: True if ranges are sensible
+        """
         validate = 1 <= self.start <= self.end and self.end >= 1 and self.repeat >= 0
         if not validate:
             logger.warning(f"Invalid line range: {self}")
         return validate
 
-    def to_slice(self):
-        """Convert to a slice"""
+    def to_slice(self)->slice:
+        """Convert to a slice
+
+        Returns:
+            slice: The slice
+        """
         return slice(self.start - 1, self.end)
 
     def format(self) -> str:
-        """Format the range as a string"""
+        """Format the range as a string
+
+        Returns:
+            str: The formatted range
+        """
         if self.start == self.end and self.repeat == 1:
             range_part = str(self.start)
         else:
@@ -167,65 +203,115 @@ class Phrases:
 
     @property
     def first(self) -> Optional[str]:
-        """First phrase"""
+        """First phrase
+
+        Returns:
+            Optional[str]: The first phrase
+        """
         return self.parts[0] if len(self.parts) > 0 else None
 
     @property
     def second(self) -> Optional[str]:
-        """Return the second phrase"""
+        """Return the second phrase
+
+        Returns:
+            Optional[str]: The second phrase
+        """
         return self.parts[1] if len(self.parts) > 1 else None
 
     @property
     def third(self) -> Optional[str]:
-        """Return the third part of the phrases"""
+        """Return the third part of the phrases
+
+        Returns:
+            Optional[str]: The third phrase
+        """
         return self.parts[2] if len(self.parts) > 2 else None
 
     @property
     def fourth(self) -> Optional[str]:
-        """Return the fourth phrase"""
+        """Return the fourth phrase
+        Returns:
+            Optional[str]: The fourth phrase
+        """
         return self.parts[3] if len(self.parts) > 3 else None
 
     @property
     def fifth(self) -> Optional[str]:
-        """Return the fifth phrase"""
+        """Return the fifth phrase
+
+        Returns:
+            Optional[str]: The fifth phrase
+        """
         return self.parts[4] if len(self.parts) > 4 else None
 
     @property
     def sixth(self) -> Optional[str]:
-        """Return the sixth part of the phrases"""
+        """Return the sixth part of the phrases
+
+        Returns:
+            Optional[str]: The sixth phrase
+        """
         return self.parts[5] if len(self.parts) > 5 else None
 
     @property
     def seventh(self) -> Optional[str]:
-        """Return the seventh phrase"""
+        """Return the seventh phrase
+
+        Returns:
+            Optional[str]: The seventh phrase
+        """
         return self.parts[6] if len(self.parts) > 6 else None
 
     @property
     def eighth(self) -> Optional[str]:
-        """Return the eighth phrase"""
+        """Return the eighth phrase
+
+        Returns:
+            Optional[str]: The eighth phrase
+        """
         return self.parts[7] if len(self.parts) > 7 else None
 
     @property
     def ninth(self) -> Optional[str]:
-        """Return the ninth phrase"""
+        """Return the ninth phrase
+        Returns:
+            Optional[str]: The ninth phrase
+        """
         return self.parts[8] if len(self.parts) > 8 else None
 
     @property
     def tenth(self) -> Optional[str]:
-        """Tenth phrase"""
+        """Tenth phrase
+
+        Returns:
+            Optional[str]: The tenth phrase
+        """
         return self.parts[9] if len(self.parts) > 9 else None
 
     def as_list(self) -> list[str]:
-        """Convert to a list_doc of strings"""
+        """Convert to a list_doc of strings
+
+        Returns:
+            list[str]: The list_doc of strings
+        """
         return list(filter(lambda _: _ is not None, self.parts))
 
     def format(self) -> str:
-        """Round tripable format"""
+        """Round tripable format.
+
+        Returns:
+            str: The formatted phrases
+        """
         # parts = self.as_list()
         usable_parts = []
 
         def safe_quote(value: str) -> str:
-            """Escape spaces and double quotes"""
+            """Escape spaces and double quotes
+
+            Returns:
+                str: The safe quoted string
+            """
             if " " in value and '"' not in value:
                 return f'"{value}"'
             if " " in value and '"' in value:
@@ -242,7 +328,11 @@ class Phrases:
         return " ".join(safe_quote(_) for _ in self.parts if _)
 
     def validate(self) -> bool:
-        """Check if phrases are sensible"""
+        """Check if phrases are sensible
+
+        Returns:
+            bool: True if phrases are sensible
+        """
         return None not in self.parts
 
 
@@ -257,7 +347,11 @@ class Command:
     comment: Optional[str] = None
 
     def validate(self) -> bool:
-        """Check if ranges are sensible"""
+        """Check if ranges are sensible
+
+        Returns:
+            bool: True if ranges are sensible
+        """
         if self.line_range:
             line_range_is_valid = self.line_range.validate()
             if not line_range_is_valid:
@@ -269,7 +363,11 @@ class Command:
         return True
 
     def format(self) -> str:
-        """Format the command as a string"""
+        """Format the command as a string
+
+        Returns:
+            str: The formatted command
+        """
         if self.command == Commands.COMMENT:
             text = self.comment if self.comment else ""
             return f"# {text}"
@@ -282,7 +380,15 @@ class Command:
 
 
 def try_parse_int(value: str, default_value: Optional[int] = None) -> Optional[int]:
-    """ "Parse int without raising errors"""
+    """Parse int without raising errors
+
+    Args:
+        value (str): The value to parse
+        default_value (Optional[int]): The default value if parsing fails. Defaults to None.
+
+    Returns:
+        Optional[int]: The parsed value
+    """
     try:
         return int(value)
     except ValueError:
@@ -296,7 +402,12 @@ class Printable(Protocol):
     """Something that acts like print()"""
 
     def __call__(self, text: Optional[str], end: str = "\n") -> None:
-        """Signature of a printable"""
+        """Signature of a printable.
+
+        Args:
+            text (Optional[str]): The text
+            end (str): The end. Defaults to "\n".
+        """
 
 
 class NullPrinter:
@@ -304,7 +415,11 @@ class NullPrinter:
 
     def __call__(self, text: Optional[str], end: str = "\n") -> None:
         """
-        Do nothing implementation of Printable
+        Do nothing implementation of Printable.
+
+        Args:
+            text (Optional[str]): The text
+            end (str): The end. Defaults to "\n".
         """
 
 
@@ -322,7 +437,11 @@ class CommandGeneratorProtocol(Protocol):
     def generate(
         self,
     ) -> Generator[Command, None, None]:
-        """Generate commands"""
+        """Generate commands.
+
+        Returns:
+            Generator[Command, None, None]: The commands
+        """
 
 
 @runtime_checkable
@@ -337,4 +456,9 @@ class StringGeneratorProtocol(Protocol):
     def generate(
         self,
     ) -> Generator[str, None, None]:
-        """Generate strings"""
+        """Generate strings.
+
+        Returns:
+            Generator[str, None, None]: The strings
+        """
+

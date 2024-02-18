@@ -21,7 +21,12 @@ class TalkingPrinter:
             self.engine = None
 
     def print(self, text: str, end: Optional[str]) -> None:
-        """Speak"""
+        """Speak.
+
+        Args:
+            text (str): The text to print
+            end (Optional[str]): The end
+        """
         if self.engine is None:
             logger.warning("No pyttsx3 installed, cannot speak")
             return
@@ -33,6 +38,11 @@ talking_printer = TalkingPrinter()
 
 
 def printer(text: Optional[str], end: str = "\n") -> None:
-    """Speak"""
+    """Speak.
+
+    Args:
+        text (Optional[str]): The text to print
+        end (str): The end. Defaults to "\n".
+    """
     text = "" if text is None else text
     talking_printer.print(text, end="")

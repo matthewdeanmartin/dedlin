@@ -5,7 +5,11 @@ from typing import Any
 
 
 def configure_logging() -> dict[str, Any]:
-    """Basic style"""
+    """Logging config in dict form, rather than yaml.
+
+    Returns:
+        dict[str, Any]: The logging configuration
+    """
     logging_config: dict[str, Any] = {
         "version": 1,
         "disable_existing_loggers": True,

@@ -8,7 +8,13 @@ spell = SpellChecker()
 
 def check(line: str) -> str:
     """
-    Add a 'did you mean' suggestion to each incorrect word
+    Add a 'did you mean' suggestion to each incorrect word..
+
+    Args:
+        line (str): The line to check
+
+    Returns:
+        str: The line with spelling suggestions
     """
     # find those words that may be misspelled
     misspelled = spell.unknown(spell.split_words(line))

@@ -13,6 +13,14 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
     """Extract a single line range from a string
     . = current line
     $ = last line
+
+    Args:
+        value (str): The value
+        current_line (int): The current line
+        document_length (int): The document length
+
+    Returns:
+        Optional[LineRange]: The line range
     """
     value = value.strip()
     if value == "":
@@ -74,7 +82,14 @@ def extract_one_range(value: str, current_line: int, document_length: int) -> Op
 
 
 def extract_phrases(value: str) -> Optional[Phrases]:
-    """Extract phrases from a string"""
+    """Extract phrases from a string.
+
+    Args:
+        value (str): The value
+
+    Returns:
+        Optional[Phrases]: The phrases
+    """
     # handle quotes without escapes
     if '"' in value and '\\"' not in value:
         parts = [_ for _ in value.split('"') if _.strip() != ""]
@@ -91,7 +106,15 @@ def extract_phrases(value: str) -> Optional[Phrases]:
 
 
 def ends_with_any(value: str, suffixes: Iterable[str]) -> bool:
-    """Apply endswith to lines of text"""
+    """Apply endswith to lines of text.
+
+    Args:
+        value (str): The value
+        suffixes (Iterable[str]): The suffixes
+
+    Returns:
+        bool: Whether it ends with any of the suffixes
+    """
     if not value:
         return False
     for suffix in suffixes:
@@ -103,7 +126,15 @@ def ends_with_any(value: str, suffixes: Iterable[str]) -> bool:
 
 
 def get_command_length(value: str, suffixes: Iterable[str]) -> int:
-    """Get the length of the command"""
+    """Get the length of the command.
+
+    Args:
+        value (str): The value
+        suffixes (Iterable[str]): The suffixes
+
+    Returns:
+        int: The length of the command
+    """
     for suffix in sorted(suffixes, key=len, reverse=True):
         if value.endswith(suffix):
             return len(suffix)
@@ -156,7 +187,21 @@ def parse_range_only(
     end_part: str = "",
     headless: bool = False,
 ) -> Optional[Command]:
-    """Parse a command that has a line range"""
+    """Parse a command that has a line range.
+
+    Args:
+        just_command (str): The command
+        front_part (str): The front part
+        original_text (str): The original text
+        current_line (int): The current line
+        document_length (int): The document length
+        phrases (Optional[Phrases]): The phrases
+        end_part (str): The end part. Defaults to "".
+        headless (bool): Whether headless. Defaults to False.
+
+    Returns:
+        Optional[Command]: The command
+    """
     # TODO: the biggest generic parser should replace all of these
     for command_code, command_forms in RANGE_ONLY.items():
         if just_command in command_forms:
@@ -211,7 +256,17 @@ COMMANDS_WITH_PHRASES = {
 def parse_search_replace(
     front_part: str, phrases: Optional[Phrases], original_text: str, current_line: int, document_length: int
 ) -> Optional[Command]:
-    """Parse a command that has a line range and phrases"""
+    """Parse a command that has a line range and phrases.
+
+    Args:
+        front_part (str): The front part
+        phrases (Optional[Phrases]): The phrases
+        original_text (str): The original text
+        current_line (int): The current line
+        document_length (int): The document length
+    Returns:
+        Optional[Command]: The command
+    """
     for command_code, command_forms in COMMANDS_WITH_PHRASES.items():
         if ends_with_any(front_part, command_forms) or front_part in command_forms:
             if len(command_forms) == 2:
@@ -258,7 +313,13 @@ BARE_COMMANDS = {
 
 
 def bare_command(command: str) -> Optional[Command]:
-    """Parse a command that has no line range or phrases"""
+    """Parse a command that has no line range or phrases.
+
+    Args:
+        command (str): The command
+    Returns:
+        Optional[Command]: The command
+    """
     for command_code, command_forms in BARE_COMMANDS.items():
         if command in command_forms:
             return Command(
@@ -269,7 +330,18 @@ def bare_command(command: str) -> Optional[Command]:
 
 
 def parse_command(command: str, current_line: int, document_length: int, headless: bool) -> Command:
-    """Parse a command"""
+    """Parse a command.
+
+    Args:
+        command (str): The command
+        current_line (int): The current line
+        document_length (int): The document length
+        headless (bool): Whether headless
+    Raises:
+        TypeError: If something has gone wrong
+    Returns:
+        Command: The command
+    """
     original_text = command
 
     # Handle empty text.

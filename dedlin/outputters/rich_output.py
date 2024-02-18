@@ -6,14 +6,19 @@ from rich.syntax import Syntax
 
 
 class RichPrinter:
-    """ "Make the output of the program more readable."""
+    """Make the output of the program more readable."""
 
     def __init__(self) -> None:
         """Set up initial state"""
         self.console = Console()
 
     def print(self, text: str, end: Optional[str]) -> None:
-        """Syntax highlighting"""
+        """Syntax highlighting
+
+        Args:
+            text (str): The text to print
+            end (Optional[str]): The end
+        """
         text = "" if text is None else text
         if text and text.endswith("\n"):
             text = text[:-1]
@@ -30,5 +35,11 @@ rich_printer = RichPrinter()
 
 
 def printer(text: Optional[str], end: str = "\n") -> None:
+    """Print text to standard out.
+
+    Args:
+        text (Optional[str]): The text to print
+        end (str): The end. Defaults to "\n".
+    """
     text = "" if text is None else text
     rich_printer.print(text, end="")

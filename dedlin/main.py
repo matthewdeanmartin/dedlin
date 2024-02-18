@@ -67,7 +67,18 @@ class Dedlin:
         untrusted_user: bool = False,
         history: bool = True,
     ) -> None:
-        """Set up initial state and some dependency injection"""
+        """Set up initial state and some dependency injection.
+
+        Args:
+            inputter (CommandGeneratorProtocol): The inputter
+            insert_document_inputter (StringGeneratorProtocol): The insert document inputter
+            edit_document_inputter (StringGeneratorProtocol): The edit document inputter
+            outputter (Printable): The outputter
+            headless (bool): Whether to run headless. Defaults to False.
+            disabled_commands (Optional[list[Commands]]): The disabled commands. Defaults to None.
+            untrusted_user (bool): Whether the user is untrusted. Defaults to False.
+            history (bool): Whether to save history. Defaults to True.
+        """
 
         self.disabled_commands = disabled_commands if disabled_commands else []
         """Disable list of commands for any reason"""
@@ -122,7 +133,15 @@ class Dedlin:
         self.macro_file_name: Optional[Path] = None
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
-        """Entry point for Dedlin"""
+        """Entry point for Dedlin.
+
+        Args:
+            file_name (Optional[str]): The file name. Defaults to None.
+            macro_file_name (Optional[str]): The macro file name. Defaults to None.
+
+        Returns:
+            int: The exit code
+        """
         if self.headless and not file_name:
             raise TypeError("Headless mode requires a file name")
         if self.untrusted_user and not file_name:
@@ -381,13 +400,21 @@ class Dedlin:
         return 0
 
     def log_history(self, command: Command) -> None:
-        """Log a command to the history"""
+        """Log a command to the history.
+
+        Args:
+            command (Command): The command
+        """
         self.history.append(command)
         if self.history:
             self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
 
     def print_ai_help(self, command: Command) -> None:
-        """Print help from AI"""
+        """Print help from AI.
+
+        Args:
+            command (Command): The command
+        """
         if not self.enable_ai_help:
             return
         if not os.environ.get("OPENAI_API_KEY"):
@@ -398,8 +425,14 @@ class Dedlin:
         ask = ChatCompletionMessageParam(content=content, role="user")
         asyncio.run(client.completion([ask]))
 
-    def feedback(self, string: str, end="\n", no_comment: bool = False) -> None:
-        """Output feedback to the user"""
+    def feedback(self, string: str, end:str="\n", no_comment: bool = False) -> None:
+        """Output feedback to the user.
+
+        Args:
+            string (str): The string to output
+            end (str): The end string. Defaults to "\n".
+            no_comment (bool): If True, don't log to history. Defaults to False.
+        """
         if not no_comment:
             # prevent infinite loop for HISTORY command
             comment = Command(command=Commands.COMMENT, comment=string)
@@ -412,8 +445,13 @@ class Dedlin:
         if self.verbose:
             logger.info(string)
 
-    def echo_if_needed(self, string, end="\n") -> None:
-        """Echos a string to the outputter if needed."""
+    def echo_if_needed(self, string:str, end:str="\n") -> None:
+        """Echos a string to the outputter if needed.
+
+        Args:
+            string (str): The string
+            end (str): The end string. Defaults to "\n".
+        """
         if self.echo and not (self.vim_mode or self.quiet):
             self.command_outputter(string, end)
 
@@ -433,7 +471,11 @@ class Dedlin:
         self.doc.dirty = False
 
     def save_document(self, phrases: Optional[Phrases] = None) -> None:
-        """Save the document to the file"""
+        """Save the document to the file.
+
+        Args:
+            phrases (Optional[Phrases]): The phrases. Defaults to None.
+        """
         if not self.doc:
             self.feedback("Document not initialized, can't save")
             return
@@ -448,13 +490,15 @@ class Dedlin:
             self.feedback("Can't save, no initial file name specified and user is untrusted")
             return
         if not self.file_path and self.headless:
-            raise TypeError("Can't save in headless mode w/o initial file name")
+            self.feedback("Can't save in headless mode w/o initial file name.")
+            return
         if not self.file_path:
-            raise TypeError("Need file path before saving.")
+            self.feedback("Need file path before saving, can't save.")
+            return
         file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
         self.doc.dirty = False
 
-    def save_macro(self):
+    def save_macro(self)->None:
         """Save the document to the file"""
 
         file_system.save_and_overwrite(
@@ -469,6 +513,12 @@ class Dedlin:
     def save_on_crash(
         self, _exception_type: type[BaseException], _value: BaseException, _tb: Optional[TracebackType]
     ) -> None:
-        """Save the document to the file"""
+        """Save the document to the file.
+
+        Args:
+            _exception_type (type[BaseException]): The exception type
+            _value (BaseException): The exception value
+            _tb (Optional[TracebackType]): The traceback
+        """
         self.save_document()
         # raise exception_type

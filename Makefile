@@ -102,3 +102,26 @@ pex:
 
 shiv: dedlin.pyz
 	@shiv dedlin -o dedlin.pyz --python python --console-script dedlin
+
+check_docs:
+	$(VENV) interrogate dedlin --verbose
+	$(VENV) pydoctest --config .pydoctest.json | grep -v "__init__" | grep -v "__main__" | grep -v "Unable to parse"
+
+make_docs:
+	pdoc dedlin --html -o docs --force
+
+check_md:
+	$(VENV) mdformat README.md docs/*.md
+	# $(VENV) linkcheckMarkdown README.md # it is attempting to validate ssl certs
+	$(VENV) markdownlint README.md --config .markdownlintrc
+
+check_spelling:
+	$(VENV) pylint dedlin --enable C0402 --rcfile=.pylintrc_spell
+	$(VENV) codespell README.md --ignore-words=private_dictionary.txt
+	$(VENV) codespell dedlin --ignore-words=private_dictionary.txt
+
+check_changelog:
+	# pipx install keepachangelog-manager
+	$(VENV) changelogmanager validate
+
+check_all: check_docs check_md check_spelling check_changelog audit

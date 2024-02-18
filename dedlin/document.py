@@ -27,8 +27,16 @@ class EditStatus:
 
 # noinspection PyShadowingBuiltins
 # pylint: disable=redefined-builtin
-def print(*args, **kwargs):
-    """Discourage accidental usage of print"""
+def print(*args, **kwargs)->None:
+    """Discourage accidental usage of print.
+
+    Args:
+        *args: The args
+        **kwargs: The kwargs
+
+    Raises:
+        DedlinException: Don't call UI from here.
+    """
     raise DedlinException("Don't call UI from here.")
 
 
@@ -49,7 +57,13 @@ class Document:
         edit_inputter: StringGeneratorProtocol,
         lines: list[str],
     ) -> None:
-        """Set up initial state"""
+        """Set up initial state.
+
+        Args:
+            insert_inputter (StringGeneratorProtocol): The inputter for insert
+            edit_inputter (StringGeneratorProtocol): The inputter for edit
+            lines (list[str]): The lines
+        """
         self.insert_inputter = insert_inputter
         self.edit_inputter = edit_inputter
         self.lines: list[str] = lines
@@ -59,7 +73,17 @@ class Document:
         self.dirty = False
 
     def list_doc(self, line_range: Optional[LineRange] = None) -> Generator[tuple[str, str], None, None]:
-        """Display lines specified by range, do not advance current line"""
+        """Display lines specified by range, do not advance current line.
+
+        Args:
+            line_range (Optional[LineRange]): The range. Defaults to None.
+
+        Raises:
+            ValueError: If line_range is invalid
+
+        Returns:
+            Generator[tuple[str, str], None, None]: The lines
+        """
         if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
             line_range = LineRange(1, len(self.lines) - 1)
@@ -79,7 +103,16 @@ class Document:
             # self.current_line += 1
 
     def search(self, line_range: LineRange, value: str, case_sensitive: bool = False) -> Generator[str, None, None]:
-        """Display lines that have value in line"""
+        """Display lines that have value in line.
+
+        Args:
+            line_range (LineRange): The range
+            value (str): The value
+            case_sensitive (bool): Case sensitivity. Defaults to False.
+
+        Returns:
+            Generator[str, None, None]: The lines
+        """
         if not case_sensitive:
             value = value.upper()
 
@@ -92,7 +125,12 @@ class Document:
         line_range: Optional[LineRange],
         parts: tuple[str, ...],
     ) -> None:
-        """Spread phrases across existing line range"""
+        """Spread phrases across existing line range.
+
+        Args:
+            line_range (Optional[LineRange]): The range
+            parts (tuple[str, ...]): The parts
+        """
         # TODO: handle case sensitive case
 
         if not line_range:
@@ -115,7 +153,17 @@ class Document:
         replacement: str,
         case_sensitive: bool = False,
     ) -> Generator[str, None, None]:
-        """Replace target with replacement in lines"""
+        """Replace target with replacement in lines.
+
+        Args:
+            line_range (Optional[LineRange]): The range
+            target (str): The target
+            replacement (str): The replacement
+            case_sensitive (bool): Case sensitivity. Defaults to False.
+
+        Returns:
+            Generator[str, None, None]: The lines
+        """
         # TODO: handle case sensitive case
 
         if not line_range:
@@ -134,7 +182,14 @@ class Document:
                 break
 
     def page(self, page_size: int = 5) -> Generator[tuple[str, str], None, None]:
-        """Display lines in pages"""
+        """Display lines in pages.
+
+        Args:
+            page_size (int): The page size. Defaults to 5.
+
+        Returns:
+            Generator[tuple[str, str], None, None]: The lines
+        """
 
         # TODO: add asterix to new current line
         for line_text in self.lines[self.current_line - 1 : self.current_line + page_size - 1]:
@@ -148,7 +203,14 @@ class Document:
             self.current_line = len(self.lines)
 
     def spell(self, line_range: LineRange) -> Generator[tuple[str, str], None, None]:
-        """Show spelling errors in range"""
+        """Show spelling errors in range.
+
+        Args:
+            line_range (LineRange): The range
+
+        Returns:
+            Generator[tuple[str, str], None, None]: The lines
+        """
 
         # reset current line to start of range.
         self.current_line = line_range.start
@@ -158,7 +220,12 @@ class Document:
             self.current_line += 1
 
     def copy(self, line_range: Optional[LineRange], target_line: int) -> None:
-        """Copy lines to target_line"""
+        """Copy lines to target_line.
+
+        Args:
+            line_range (Optional[LineRange]): The range
+            target_line (int): The target line
+        """
         if not line_range:
             line_range = LineRange(1, len(self.lines) - 1)
 
@@ -170,8 +237,13 @@ class Document:
         self.current_line = target_line
         logger.debug(f"Copied {line_range} to {target_line}")
 
-    def move(self, line_range: Optional[LineRange], target_line: int):
-        """Move lines to target_line"""
+    def move(self, line_range: Optional[LineRange], target_line: int)->None:
+        """Move lines to target_line.
+
+        Args:
+            line_range (Optional[LineRange]): The range
+            target_line (int): The target line
+        """
         if not line_range:
             raise ValueError("Must specify line range to move")
         if line_range.start < target_line < line_range.end:
@@ -209,7 +281,14 @@ class Document:
         lambda self: len(self.previous_lines) >= len(self.lines), "Lines should shrink or stay the same after delete"
     )
     def delete(self, line_range: Optional[LineRange] = None) -> bool:
-        """Delete lines"""
+        """Delete lines.
+
+        Args:
+            line_range (Optional[LineRange]): The range. Defaults to None.
+
+        Returns:
+            bool: True if successful
+        """
         if not self.lines:
             logger.debug("No lines to delete")
             return False
@@ -239,7 +318,12 @@ class Document:
         return True
 
     def fill(self, line_range: LineRange, value: str) -> None:
-        """Fill lines with value"""
+        """Fill lines with value.
+
+        Args:
+            line_range (LineRange): The range
+            value (str): The value
+        """
         self.backup()
         self.current_line = line_range.start
         for index in range(line_range.start, line_range.end):
@@ -249,7 +333,17 @@ class Document:
         logger.debug(f"Filled {line_range} with {value}")
 
     def edit(self, line_number: int) -> EditStatus:
-        """Edit line"""
+        """Edit line.
+
+        Args:
+            line_number (int): The line number
+
+        Raises:
+            ValueError: If line_number is negative or beyond the end of the document
+
+        Returns:
+            EditStatus: The status
+        """
         self.backup()
         if line_number - 1 < 0:
             raise ValueError("Can't edit negative row.")
@@ -288,7 +382,12 @@ class Document:
         return EditStatus(can_edit_again=True, text=new_line, line_edited=self.current_line)
 
     def push(self, line_number: int, lines: list[str]) -> None:
-        """Noninteractively insert line or lines"""
+        """Noninteractively insert line or lines.
+
+        Args:
+            line_number (int): The line number
+            lines (list[str]): The lines
+        """
         self.backup()
         for line in lines:
             self.lines.insert(line_number - 1, line)
@@ -302,7 +401,15 @@ class Document:
         line_number: int,
         phrases: Optional[Phrases] = None,
     ) -> Phrases:
-        """Insert a new line at line_number"""
+        """Insert a new line at line_number.
+
+        Args:
+            line_number (int): The line number
+            phrases (Optional[Phrases]): The phrases. Defaults to None.
+
+        Returns:
+            Phrases: The phrases
+        """
         self.backup()
         if line_number < 0:
             logger.debug("Autofixing negative line number")
@@ -343,7 +450,11 @@ class Document:
         return Phrases(tuple(accumulated_lines))
 
     def lorem(self, line_range: Optional[LineRange]) -> None:
-        """Add lorem ipsum to lines"""
+        """Add lorem ipsum to lines.
+
+        Args:
+            line_range (Optional[LineRange]): The range.
+        """
         if not line_range:
             line_range = LineRange(1, len(lorem_data.LOREM_IPSUM) - 1)
 
@@ -403,7 +514,14 @@ class Document:
         self.previous_current_line = self.current_line
 
     def print(self, line_range: Optional[LineRange]) -> Generator[tuple[str, str], None, None]:
-        """For handing lines off to a print() function"""
+        """For handing lines off to a print() function.
+
+        Args:
+            line_range (Optional[LineRange]): The range.
+
+        Returns:
+            Generator[tuple[str, str], None, None]: The lines
+        """
         for line in self.lines[line_range.start - 1 : line_range.end]:
             if line.endswith("\n"):
                 line = line[:-1]

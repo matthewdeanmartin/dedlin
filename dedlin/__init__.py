@@ -1,3 +1,7 @@
+"""
+Dedlin is an edlin clone with additional features. Possibly useful as a sed-like DSL or as an editor
+for AI function calls.
+"""
 from dedlin.command_sources import (
     CommandGenerator,
     InteractiveGenerator,

@@ -9,7 +9,15 @@ from markdown_it import MarkdownIt
 
 
 def write_to_markdown(filename: str, lines: list[str]) -> str:
-    """Write to html if markdown"""
+    """Write to html if markdown.
+
+    Args:
+        filename (str): The filename
+        lines (list[str]): The lines
+
+    Returns:
+        str: The html
+    """
     md = (
         MarkdownIt("commonmark", {"breaks": True, "html": True})
         # .use(front_matter_plugin)

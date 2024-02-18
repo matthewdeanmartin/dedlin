@@ -29,6 +29,13 @@ if PROBABLY_WINDOWS:
         """Show prompt and prefill input text with default value.
 
         Windows Version.
+
+        Args:
+            prompt (str): The prompt
+            default (str): The default. Defaults to "".
+
+        Returns:
+            str: The input
         """
         # ref: https://stackoverflow.com/a/5888246/33264
         keys = []
@@ -47,7 +54,14 @@ else:
     def input_with_prefill(prompt: str, default: str = "") -> str:
         """Show prompt and prefill input text with default value.
 
-        Linux/Mac Version
+        Linux/Mac Version.
+
+        Args:
+            prompt (str): The prompt
+            default (str): The default. Defaults to "".
+
+        Returns:
+            str: The input
         """
 
         # ref https://stackoverflow.com/a/8505387
@@ -75,7 +89,11 @@ class SimpleInputter:
     def generate(
         self,
     ) -> Generator[str, None, None]:
-        """Wrapper around questionary for inserting text"""
+        """Wrapper around questionary for inserting text.
+
+        Returns:
+            Generator[str, None, None]: The input
+        """
         while True:
             response = questionary.text(self.prompt, default=self.default).ask(kbi_msg="Exiting insert mode")
             if response is None:
@@ -90,7 +108,10 @@ class InMemoryInputter:
     """
 
     def __init__(self, lines: Iterable[str]) -> None:
-        """Set up the inputter"""
+        """Set up the inputter.
+        Args:
+            lines (Iterable[str]): The lines
+        """
         self.prompt: str = ""
         self.default: str = ""
         self.lines = lines
@@ -98,7 +119,11 @@ class InMemoryInputter:
     def generate(
         self,
     ) -> Generator[str, None, None]:
-        """Wrapper around questionary for inserting text"""
+        """Wrapper around questionary for inserting text.
+
+        Returns:
+            Generator[str, None, None]: The input
+        """
         yield from self.lines
 
 
@@ -116,7 +141,11 @@ class PrefillInputter:
     def generate(
         self,
     ) -> Generator[str, None, None]:
-        """Get input from the user"""
+        """Get input from the user.
+
+        Returns:
+            Generator[str, None, None]: The input
+        """
         try:
             value = input_with_prefill(self.prompt, self.default)
             yield value

@@ -39,7 +39,7 @@ python = ">=3.11, <4.0"
 # ui toolkits
 questionary = ">=2.0.1"
 pywin32 = { version = ">=228", markers = "sys_platform == 'win32'" }
-rich = ">=13.6.0"
+rich = ">=13.7.0, <14"
 
 # run type checks
 icontract = ">=2.6.4"
@@ -84,14 +84,26 @@ speaking = ["pyttsx3"]
 #webapi = ["fastapi","uvicorn"]
 
 [tool.poetry.dev-dependencies]
+# types
 mypy = ">=1.6.1"
+types-requests = "*"
+types-Pygments = "*"
+# testing
 pytest = ">=7.4.3"
 pytest-cov = ">=4.1.0"
 hypothesis = {extras = ["cli"], version = ">=6.88.1"}
-types-requests = "*"
+
 pre-commit = ">=3.5.0"
+
+# docs
 proselint = ">=0.13.0"
-types-Pygments = "*"
+interrogate = ">=1.5.0"
+pydoctest = ">=0.1.22"
+pdoc3 = ">=0.10.0"
+mdformat = ">=0.7.17"
+linkcheckmd = ">=1.4.0"
+codespell = ">=2.2.6"
+pyenchant = ">=3.2.2"
 
 [tool.black]
 line-length = 120

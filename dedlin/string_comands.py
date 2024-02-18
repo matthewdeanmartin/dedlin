@@ -10,7 +10,14 @@ COMMANDS_WITH_PHRASES = {
 
 
 def block_commands(lines: list[str], command: Command) -> list[str]:
-    """String manipulation for whole range as a unit, not line per line"""
+    """String manipulation for whole range as a unit, not line per line.
+
+    Args:
+        lines (list[str]): The lines
+        command (Command): The command
+    Returns:
+        list[str]: The lines
+    """
 
     # doesn't need to use preferred line break
     block = "\n".join(lines)
@@ -21,8 +28,16 @@ def block_commands(lines: list[str], command: Command) -> list[str]:
     return block.split("\n")
 
 
-def process_strings(lines: list[str], command: Command):
-    """Apply string function to each line"""
+def process_strings(lines: list[str], command: Command)->None:
+    """Apply string function to each line.
+
+    Args:
+        lines (list[str]): The lines
+        command (Command): The command
+
+    Raises:
+        NotImplementedError: If the command is not implemented
+    """
     for index, line in enumerate(lines):
         # leading and trailing space
 
