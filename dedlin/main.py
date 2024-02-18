@@ -5,6 +5,7 @@ Handles UI and links command parser to the document object
 
 
 """
+
 import asyncio
 import logging
 import os
@@ -425,7 +426,7 @@ class Dedlin:
         ask = ChatCompletionMessageParam(content=content, role="user")
         asyncio.run(client.completion([ask]))
 
-    def feedback(self, string: str, end:str="\n", no_comment: bool = False) -> None:
+    def feedback(self, string: str, end: str = "\n", no_comment: bool = False) -> None:
         """Output feedback to the user.
 
         Args:
@@ -445,7 +446,7 @@ class Dedlin:
         if self.verbose:
             logger.info(string)
 
-    def echo_if_needed(self, string:str, end:str="\n") -> None:
+    def echo_if_needed(self, string: str, end: str = "\n") -> None:
         """Echos a string to the outputter if needed.
 
         Args:
@@ -498,7 +499,7 @@ class Dedlin:
         file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
         self.doc.dirty = False
 
-    def save_macro(self)->None:
+    def save_macro(self) -> None:
         """Save the document to the file"""
 
         file_system.save_and_overwrite(

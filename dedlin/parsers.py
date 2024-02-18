@@ -1,6 +1,7 @@
 """
 Code that turns strings to command objects
 """
+
 import logging
 from typing import Iterable, Optional
 

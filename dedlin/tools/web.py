@@ -1,6 +1,7 @@
 """
 Fetch lines from web, assuming html, turn into text
 """
+
 import html2text
 import requests
 

@@ -109,10 +109,12 @@ FILES - File system commands
 """
 
 if __name__ == "__main__":
+
     def run() -> None:
         """Example"""
         print(HELP_TEXT)
         for key, value in SPECIFIC_HELP.items():
             print(f"\n{key} commands\n")
             print(value)
+
     run()

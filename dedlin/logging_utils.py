@@ -1,6 +1,7 @@
 """
 Dedupe some logging code
 """
+
 from typing import Any
 
 

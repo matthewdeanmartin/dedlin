@@ -1,12 +1,13 @@
 """
 Basic classes and mypy types
 """
+
 import dataclasses
 import logging
 from enum import Enum, auto
 from typing import Generator, Optional, Protocol, runtime_checkable
 
-from pydantic import validator
+from pydantic import field_validator
 from pydantic.dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
@@ -99,7 +100,8 @@ class LineRange:
     repeat: int = 1
 
     # problem when doc is 0 lines long
-    @validator("start", allow_reuse=True)
+    @field_validator("start")
+    @classmethod
     @classmethod
     def start_must_be_one_or_more(cls, start: int) -> int:
         """Start must be 1 or more
@@ -112,7 +114,8 @@ class LineRange:
             raise ValueError("start must be one or more")
         return start
 
-    @validator("offset", allow_reuse=True)
+    @field_validator("offset")
+    @classmethod
     @classmethod
     def offset_zero_or_more(cls, offset: int) -> int:
         """Offset must be zero or more
@@ -125,7 +128,8 @@ class LineRange:
         return offset
 
     @classmethod
-    @validator("repeat", allow_reuse=True)
+    @field_validator("repeat")
+    @classmethod
     def repeat_zero_or_more(cls, repeat: int) -> int:
         """Repeat must be zero or more
 
@@ -167,7 +171,7 @@ class LineRange:
             logger.warning(f"Invalid line range: {self}")
         return validate
 
-    def to_slice(self)->slice:
+    def to_slice(self) -> slice:
         """Convert to a slice
 
         Returns:
@@ -461,4 +465,3 @@ class StringGeneratorProtocol(Protocol):
         Returns:
             Generator[str, None, None]: The strings
         """
-

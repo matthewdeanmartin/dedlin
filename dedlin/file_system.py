@@ -3,6 +3,7 @@ Class for reading and writing lines to disk.
 
 This could be document lines or macro lines.
 """
+
 from pathlib import Path
 from typing import Optional
 

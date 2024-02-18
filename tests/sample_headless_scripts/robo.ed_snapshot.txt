@@ -11,6 +11,8 @@ Cats
 Cats
 Cats
 Cats
+Cats
+Dogs
 Dogs
 Dogs
 Dogs
@@ -37,6 +39,8 @@ Fish
 Fish
 Fish
 Fish
+Fish
+Rabbits
 Rabbits
 Rabbits
 Rabbits

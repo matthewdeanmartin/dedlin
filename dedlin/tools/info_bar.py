@@ -1,6 +1,7 @@
 """
 An info bar that runs after each command, replaces bottom bar in a full screen editor
 """
+
 from typing import Generator
 
 from textstat import textstat

@@ -1,6 +1,7 @@
 """
 Flashy stuff
 """
+
 from art import tprint
 
 

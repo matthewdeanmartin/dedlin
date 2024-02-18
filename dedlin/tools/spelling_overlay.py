@@ -1,6 +1,7 @@
 """
 Create overlay of spelling markers
 """
+
 from spellchecker import SpellChecker
 
 spell = SpellChecker()

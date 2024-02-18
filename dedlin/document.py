@@ -1,6 +1,7 @@
 """
 Abstract document class.
 """
+
 import logging
 import random
 from typing import Generator, Optional
@@ -27,7 +28,7 @@ class EditStatus:
 
 # noinspection PyShadowingBuiltins
 # pylint: disable=redefined-builtin
-def print(*args, **kwargs)->None:
+def print(*args, **kwargs) -> None:
     """Discourage accidental usage of print.
 
     Args:
@@ -237,7 +238,7 @@ class Document:
         self.current_line = target_line
         logger.debug(f"Copied {line_range} to {target_line}")
 
-    def move(self, line_range: Optional[LineRange], target_line: int)->None:
+    def move(self, line_range: Optional[LineRange], target_line: int) -> None:
         """Move lines to target_line.
 
         Args:

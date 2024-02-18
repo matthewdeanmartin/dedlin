@@ -1,4 +1,5 @@
 """Make the output of the program more readable."""
+
 from typing import Optional
 
 from rich.console import Console

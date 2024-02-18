@@ -1,6 +1,7 @@
 """
 Headless scripts do not need a companion file.
 """
+
 from pathlib import Path
 
 from dedlin import CommandGenerator, Dedlin

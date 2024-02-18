@@ -18,6 +18,7 @@ Options:
   --verbose          Displaying all debugging info.
   --blind_mode       Optimize for blind users (experimental).
 """
+
 import logging
 import logging.config
 import sys
@@ -35,6 +36,7 @@ from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.outputters import rich_output, talking_outputter
 from dedlin.outputters.plain import plain_printer
+from __about__ import __version__
 
 dotenv.load_dotenv()
 
@@ -43,7 +45,7 @@ logger = logging.getLogger(__name__)
 
 def main() -> None:
     """Main function."""
-    arguments = docopt(__doc__, version="1.4.0")
+    arguments = docopt(__doc__, version=__version__)
 
     _ = run(
         arguments["<file>"],

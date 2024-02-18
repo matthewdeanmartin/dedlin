@@ -1,6 +1,7 @@
 """
 Abstraction over print-to-standard-out.
 """
+
 from typing import Optional
 
 

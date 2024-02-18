@@ -1,4 +1,5 @@
 """Pass string commands to python."""
+
 import textwrap
 
 from dedlin.basic_types import Command, Commands
@@ -28,7 +29,7 @@ def block_commands(lines: list[str], command: Command) -> list[str]:
     return block.split("\n")
 
 
-def process_strings(lines: list[str], command: Command)->None:
+def process_strings(lines: list[str], command: Command) -> None:
     """Apply string function to each line.
 
     Args:

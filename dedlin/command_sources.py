@@ -3,6 +3,7 @@ Interactive command input methods.
 
 These handle history, syntax highlighting, and auto-suggestion.
 """
+
 from pathlib import Path
 from typing import Generator, Iterable, Optional
 
@@ -101,7 +102,7 @@ def questionary_command_handler(prompt: str = "*") -> Generator[str, None, None]
 
 
 class CommandGeneratorProtocol:
-    def __init__(self, path: Path)->None:
+    def __init__(self, path: Path) -> None:
         """Initialize the generator.
 
         Args:
@@ -125,7 +126,7 @@ class CommandGeneratorProtocol:
 class CommandGenerator:
     """Get a typed command from a file"""
 
-    def __init__(self, path: Path)->None:
+    def __init__(self, path: Path) -> None:
         """Initialize the generator.
 
         Args:
@@ -160,7 +161,7 @@ class CommandGenerator:
 class InMemoryCommandGenerator:
     """A bunch of predefined commands"""
 
-    def __init__(self, commands: Iterable[Command])->None:
+    def __init__(self, commands: Iterable[Command]) -> None:
         """Initialize the generator.
 
         Args:
@@ -183,7 +184,7 @@ class InMemoryCommandGenerator:
 class StringCommandGenerator:
     """Get a typed command from a string"""
 
-    def __init__(self, source: str)->None:
+    def __init__(self, source: str) -> None:
         """Initialize the generator.
 
         Args:

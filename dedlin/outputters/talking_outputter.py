@@ -1,4 +1,5 @@
 """Make text editor hypothetically usable while blind."""
+
 import logging
 from typing import Optional
 

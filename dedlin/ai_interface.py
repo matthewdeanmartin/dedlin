@@ -1,6 +1,7 @@
 """
 Code for AI
 """
+
 import asyncio
 
 import dotenv
@@ -24,7 +25,7 @@ The user says,
 class AiClient:
     """Client for AI"""
 
-    def __init__(self)->None:
+    def __init__(self) -> None:
         """Initialize the client"""
         self.client = AsyncOpenAI()
         self.model = "gpt-3.5-turbo"
