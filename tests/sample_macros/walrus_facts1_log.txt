@@ -1,4 +1,4 @@
-Editing E:\github\dedlin\tests\sample_macros\walrus_facts1_out.txt
+Editing C:\github\dedlin\tests\sample_macros\walrus_facts1_out.txt
 Current line 1 of 14
    1 : They big
    2 : They walrus

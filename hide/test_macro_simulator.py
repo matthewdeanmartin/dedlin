@@ -1,6 +1,7 @@
 """
 Simulates user entry from a macro file using generate
 """
+
 import logging.config
 from pathlib import Path
 from typing import Generator

@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Generator, Optional
 
 import dotenv
+from __about__ import __version__
 from docopt import docopt
 
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
@@ -36,7 +37,6 @@ from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.outputters import rich_output, talking_outputter
 from dedlin.outputters.plain import plain_printer
-from __about__ import __version__
 
 dotenv.load_dotenv()
 

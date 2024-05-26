@@ -1,6 +1,7 @@
 """
 If an app doesn't have a web API, does it even matter
 """
+
 from dataclasses import field
 
 import pydantic.dataclasses as dc

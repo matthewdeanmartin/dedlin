@@ -12,15 +12,15 @@ __all__ = [
     "__readme__",
     "__repository__",
     "__homepage__",
-    "__documentation__"
+    "__documentation__",
 ]
 
 __title__ = "dedlin"
-__version__ = "1.19.0"
+__version__ = "1.19.1"
 __description__ = "Line editor, edlin clone with many improvements"
 __author__ = "Matthew Martin"
 __author_email__ = "matthewdeanmartin@gmail.com"
-__keywords__ = ['editor', 'edlin', 'line editor']
+__keywords__ = ["editor", "edlin", "line editor"]
 __status__ = "5 - Production/Stable"
 __license__ = "MIT"
 __readme__ = "README.md"

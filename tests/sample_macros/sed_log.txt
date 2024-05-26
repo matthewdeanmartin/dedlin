@@ -1,4 +1,4 @@
-Editing E:\github\dedlin\tests\sample_macros\sed_out.txt
+Editing C:\github\dedlin\tests\sample_macros\sed_out.txt
 Current line 1 of 2
 Replacing
    1 : That is a butt.
