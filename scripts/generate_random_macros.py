@@ -4,9 +4,8 @@ This needs more business logic than I care to put into one massive decorator.
 
 import random
 
-from dedlin import LineRange
-from dedlin.basic_types import Command, Commands, Phrases
-from dedlin.lorem_data import LOREM_IPSUM
+from dedlin.basic_types import Command, Commands, LineRange, Phrases
+from dedlin.tools.lorem_data import LOREM_IPSUM
 
 
 def make_range():
@@ -15,12 +14,6 @@ def make_range():
     repeat = random.randint(1, 3)
     some_range = LineRange(start=start, offset=offset, repeat=repeat)
     return some_range
-
-
-def go():
-    [command.value for command in Commands]
-
-    make_range()
 
 
 def some_random_words():
@@ -42,55 +35,55 @@ def two_or_more_random_words():
 
 
 def make_insert():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.INSERT,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(some_random_words())),
     )
     return the_command
 
 
 def make_edit():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.EDIT,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(some_random_words())),
     )
     return the_command
 
 
 def make_copy():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.COPY,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple("1")),
     )
     return the_command
 
 
 def make_move():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.MOVE,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple("1")),
     )
     return the_command
 
 
 def make_push():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.PUSH,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(some_random_words())),
     )
     return the_command
@@ -98,11 +91,11 @@ def make_push():
 
 def make_delete():
     # should only pay attention to start-end
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.DELETE,
-        line_range=range,
+        line_range=a_range,
         # should be ignored.
         phrases=Phrases(parts=tuple(some_random_words())),
     )
@@ -110,66 +103,66 @@ def make_delete():
 
 
 def make_replace():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.REPLACE,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(two_or_more_random_words())),
     )
     return the_command
 
 
 def make_list():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.LIST,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(two_or_more_random_words())),
     )
     return the_command
 
 
 def make_page():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.PAGE,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(two_or_more_random_words())),
     )
     return the_command
 
 
 def make_spell():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.SPELL,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(two_or_more_random_words())),
     )
     return the_command
 
 
 def make_current():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.CURRENT,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(two_or_more_random_words())),
     )
     return the_command
 
 
 def make_search():
-    range = make_range()
+    a_range = make_range()
 
     the_command = Command(
         command=Commands.SEARCH,
-        line_range=range,
+        line_range=a_range,
         phrases=Phrases(parts=tuple(two_or_more_random_words())),
     )
     return the_command

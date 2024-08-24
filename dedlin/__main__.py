@@ -24,14 +24,14 @@ import logging.config
 import sys
 import traceback
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Optional
 
 import dotenv
 from __about__ import __version__
 from docopt import docopt
 
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
-from dedlin.document_sources import PrefillInputter, SimpleInputter, input_with_prefill
+from dedlin.document_sources import PrefillInputter, SimpleInputter
 from dedlin.flash import title_screen
 from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
@@ -108,14 +108,15 @@ def run(
         the_command_generator = CommandGenerator(Path(macro_file_name))
         # command_handler = the_generator.generate()
     else:
-        the_command_generator = InteractiveGenerator()
+        # this should be an abc or a protocol.
+        the_command_generator = InteractiveGenerator()  # type: ignore
         the_command_generator.prompt = " * "
         # command_handler = the_interactive_generator.generate()
 
-    def document_inputter(prompt: str, text: str = "") -> Generator[str, None, None]:
-        """Get input from the user"""
-        while True:
-            yield input_with_prefill(prompt, text)
+    # def document_inputter(prompt: str, text: str = "") -> Generator[str, None, None]:
+    #     """Get input from the user"""
+    #     while True:
+    #         yield input_with_prefill(prompt, text)
 
     dedlin = Dedlin(
         inputter=the_command_generator,  # InteractiveGenerator(),

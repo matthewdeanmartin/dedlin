@@ -90,6 +90,7 @@ speaking = ["pyttsx3"]
 #webapi = ["fastapi","uvicorn"]
 
 [tool.poetry.dev-dependencies]
+ruff = "*"
 
 metametameta = ">=0.1.0"
 # types
@@ -223,3 +224,6 @@ exclude_also = [
     # Don't complain about abstract methods, they aren't run:
     "@(abc\\.)?abstractmethod",
     ]
+
+[tool.strict-build-script]
+minimum_test_coverage = 60

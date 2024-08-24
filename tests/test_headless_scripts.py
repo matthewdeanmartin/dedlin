@@ -21,6 +21,7 @@ def test_headless():
         degenerate = Path(locate_file(f"sample_headless_scripts/{file}", __file__))
         commandGenerator = CommandGenerator(degenerate)
         results = []
+        # pylint: disable=cell-var-from-loop
         app = Dedlin(
             inputter=commandGenerator,
             insert_document_inputter=None,

@@ -4,7 +4,7 @@ Abstract document class.
 
 import logging
 import random
-from typing import Generator, Optional
+from typing import Any, Generator, Optional
 
 import icontract
 from pydantic.dataclasses import dataclass
@@ -28,7 +28,7 @@ class EditStatus:
 
 # noinspection PyShadowingBuiltins
 # pylint: disable=redefined-builtin
-def print(*args, **kwargs) -> None:
+def print(*args: Any, **kwargs: Any) -> None:
     """Discourage accidental usage of print.
 
     Args:
@@ -152,7 +152,6 @@ class Document:
         line_range: Optional[LineRange],
         target: str,
         replacement: str,
-        case_sensitive: bool = False,
     ) -> Generator[str, None, None]:
         """Replace target with replacement in lines.
 
@@ -160,12 +159,10 @@ class Document:
             line_range (Optional[LineRange]): The range
             target (str): The target
             replacement (str): The replacement
-            case_sensitive (bool): Case sensitivity. Defaults to False.
 
         Returns:
             Generator[str, None, None]: The lines
         """
-        # TODO: handle case sensitive case
 
         if not line_range:
             line_range = LineRange(1, len(self.lines) - 1)
@@ -200,8 +197,7 @@ class Document:
                 break
 
         # repair if necessary
-        if self.current_line >= len(self.lines):
-            self.current_line = len(self.lines)
+        self.current_line = min(self.current_line, len(self.lines))
 
     def spell(self, line_range: LineRange) -> Generator[tuple[str, str], None, None]:
         """Show spelling errors in range.
@@ -313,8 +309,8 @@ class Document:
             logger.debug(f"Can't delete {line_range}")
             return False
 
-        if self.current_line > len(self.lines):
-            self.current_line = len(self.lines)
+        self.current_line = min(self.current_line, len(self.lines))
+
         logger.debug(f"Deleted {line_range}")
         return True
 
@@ -523,10 +519,14 @@ class Document:
         Returns:
             Generator[tuple[str, str], None, None]: The lines
         """
-        for line in self.lines[line_range.start - 1 : line_range.end]:
-            if line.endswith("\n"):
-                line = line[:-1]
-                end = "\n"
-            else:
-                end = ""
-            yield line, end
+        if not line_range:
+            # empty generator
+            yield from []
+        else:
+            for line in self.lines[line_range.start - 1 : line_range.end]:
+                if line.endswith("\n"):
+                    line = line[:-1]
+                    end = "\n"
+                else:
+                    end = ""
+                yield line, end

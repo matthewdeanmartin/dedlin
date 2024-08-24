@@ -19,6 +19,7 @@ def test_macros():
         degenerate = Path(locate_file(f"sample_macros/{file}", __file__))
         commandGenerator = CommandGenerator(degenerate)
         results = []
+        # pylint: disable=cell-var-from-loop
         app = Dedlin(
             inputter=commandGenerator,
             insert_document_inputter=None,

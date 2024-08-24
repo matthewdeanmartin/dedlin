@@ -39,14 +39,10 @@ class AiClient:
         Returns:
             str: The completion
         """
-        # [{"role": "user", "content": "Hello world"}]
-
         completion = await self.client.chat.completions.create(model=self.model, messages=messages)
-        # print(completion.model_dump_json(indent=2))
-        # print(dict(completion).get('usage'))
         choice = completion.choices[0]
         print(choice.message.content)
-        return choice.message.content
+        return choice.message.content or ""
 
 
 if __name__ == "__main__":
@@ -56,10 +52,10 @@ if __name__ == "__main__":
 
         dotenv.load_dotenv()
 
-        async def main():
+        async def main() -> None:
             client = AiClient()
             content = PROLOGUE + "Tell me about edlin."
-            ask = ChatCompletionMessageParam(content=content, role="user")
+            ask = ChatCompletionMessageParam(content=content, role="user")  # type: ignore
             await client.completion([ask])
 
         # Python 3.7+

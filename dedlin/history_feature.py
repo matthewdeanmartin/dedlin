@@ -34,7 +34,7 @@ class HistoryLog:
                 self.initialize_history_folder() / self.make_sequential_history_file_name()
             )
         else:
-            self.history_file: Optional[Path] = None
+            self.history_file = None
 
     def initialize_history_folder(self) -> Path:
         """
@@ -80,6 +80,8 @@ class HistoryLog:
             preferred_line_break (str): The preferred line break
         """
         if not self.persist:
+            return
+        if self.history_file is None:
             return
         with open(self.history_file, "a", encoding="utf-8") as file_handle:
             file_handle.write(command)

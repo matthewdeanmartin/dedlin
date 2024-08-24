@@ -5,7 +5,7 @@ These handle history, syntax highlighting, and auto-suggestion.
 """
 
 from pathlib import Path
-from typing import Generator, Iterable, Optional
+from typing import Any, Generator, Iterable, Optional
 
 import questionary
 from prompt_toolkit import PromptSession
@@ -23,7 +23,7 @@ from dedlin.pygments_code import EdLexer
 style = style_from_pygments_cls(get_style_by_name("borland"))
 
 
-SESSION: Optional[PromptSession] = None
+SESSION: Optional[PromptSession[Any]] = None
 
 
 class InteractiveGenerator:
@@ -45,6 +45,7 @@ class InteractiveGenerator:
         """
         user_command_text = ""
         while user_command_text is not None:
+            # pylint: disable=stop-iteration-return
             user_command_text = next(_interactive_command_handler(self.prompt))
             try:
                 command = parse_command(
@@ -102,6 +103,8 @@ def questionary_command_handler(prompt: str = "*") -> Generator[str, None, None]
 
 
 class CommandGeneratorProtocol:
+    """Protocol for command generators"""
+
     def __init__(self, path: Path) -> None:
         """Initialize the generator.
 
@@ -121,6 +124,7 @@ class CommandGeneratorProtocol:
         Returns:
             Generator[Command, None, None]: The commands
         """
+        yield from []
 
 
 class CommandGenerator:

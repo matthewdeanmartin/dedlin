@@ -193,7 +193,7 @@ class Dedlin:
             if command.command in self.disabled_commands:
                 self.feedback(f"Command {command.command} is disabled")
                 if self.headless:
-                    raise Exception(f"Command {command.command} is disabled")
+                    raise DedlinException(f"Command {command.command} is disabled")
                 continue
 
             if not command.validate():
@@ -210,7 +210,7 @@ class Dedlin:
                     self.feedback("Nothing to redo, not enough history")
                     continue
                 self.log_history(command)
-                self.echo_if_needed(command.original_text)
+                self.echo_if_needed(command.original_text or "")
 
             if command.command == Commands.BROWSE:
                 if self.doc.dirty:
@@ -348,8 +348,6 @@ class Dedlin:
                 self.feedback("Shuffled")
             elif command.command == Commands.CURRENT and command.line_range:
                 self.doc.current_line = command.line_range.start
-            elif command.command == Commands.EMPTY:
-                pass
             elif command.command == Commands.CRASH:
                 raise DedlinException("Crashing")
             elif command.command == Commands.HELP:
@@ -386,7 +384,7 @@ class Dedlin:
             elif command.command == Commands.UNKNOWN:
                 self.feedback("Unknown command, type HELP for help")
                 if self.halt_on_error:
-                    raise Exception(f"Unknown command {command.original_text}")
+                    raise DedlinException(f"Unknown command {command.original_text}")
                 self.print_ai_help(command)
             else:
                 self.feedback(f"Command {command.command} not implemented")
@@ -423,7 +421,7 @@ class Dedlin:
             return
         client = AiClient()
         content = PROLOGUE + f" '{command.original_text}'"
-        ask = ChatCompletionMessageParam(content=content, role="user")
+        ask = ChatCompletionMessageParam(content=content, role="user")  # type: ignore
         asyncio.run(client.completion([ask]))
 
     def feedback(self, string: str, end: str = "\n", no_comment: bool = False) -> None:

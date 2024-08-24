@@ -20,6 +20,8 @@ class RichPrinter:
             text (str): The text to print
             end (Optional[str]): The end
         """
+        if not end:
+            end = ""
         text = "" if text is None else text
         if text and text.endswith("\n"):
             text = text[:-1]
@@ -35,6 +37,7 @@ class RichPrinter:
 rich_printer = RichPrinter()
 
 
+# pylint: disable=unused-argument
 def printer(text: Optional[str], end: str = "\n") -> None:
     """Print text to standard out.
 

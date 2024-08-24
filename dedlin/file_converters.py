@@ -1,6 +1,7 @@
 """Primative printing support"""
 
 from pathlib import Path
+from typing import cast
 
 from markdown_it import MarkdownIt
 
@@ -32,4 +33,4 @@ def write_to_markdown(filename: str, lines: list[str]) -> str:
         path.write_text(html_text, encoding="utf-8")
     else:
         print("Not markdown!")
-    return html_text
+    return cast(str, html_text)

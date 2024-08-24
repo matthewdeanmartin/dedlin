@@ -271,6 +271,7 @@ def parse_search_replace(
     for command_code, command_forms in COMMANDS_WITH_PHRASES.items():
         if ends_with_any(front_part, command_forms) or front_part in command_forms:
             if len(command_forms) == 2:
+                # pylint: disable=unbalanced-tuple-unpacking
                 abbreviation, long_command = command_forms
             else:
                 abbreviation, long_command = None, command_forms[0]

@@ -7,15 +7,15 @@ from dedlin.basic_types import LineRange, Phrases
 
 @given(integers(min_value=1), integers(min_value=0), integers(min_value=0))
 def test_create_With_any_integer(start, offset, repeat):
-    range = LineRange(start, offset, repeat)
-    assert range
+    a_range = LineRange(start, offset, repeat)
+    assert a_range
 
 
 @given(integers(min_value=1, max_value=5), integers(min_value=0, max_value=20), integers(min_value=0))
 def test_validate_and_format_with_well_behaved(start, offset, repeat):
-    range = LineRange(start, offset, repeat)
-    assert range.validate()
-    assert range.format()
+    a_range = LineRange(start, offset, repeat)
+    assert a_range.validate()
+    assert a_range.format()
 
 
 @given(builds(Phrases, parts=st.tuples(text(), text())))

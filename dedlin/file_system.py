@@ -72,7 +72,7 @@ def save_and_overwrite(path: Path, lines: list[str], preferred_line_break: str) 
         file.writelines(line + preferred_line_break for line in lines)
 
 
-def export(path: Path, lines: list[str], preferred_line_break: str) -> None:
+def export(path: Path | None, lines: list[str], preferred_line_break: str) -> None:
     """Save a file and overwrite it.
 
     Args:

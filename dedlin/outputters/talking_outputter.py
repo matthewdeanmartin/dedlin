@@ -21,6 +21,7 @@ class TalkingPrinter:
         else:
             self.engine = None
 
+    # pylint:  disable=unused-argument
     def print(self, text: str, end: Optional[str]) -> None:
         """Speak.
 
@@ -46,4 +47,4 @@ def printer(text: Optional[str], end: str = "\n") -> None:
         end (str): The end. Defaults to "\n".
     """
     text = "" if text is None else text
-    talking_printer.print(text, end="")
+    talking_printer.print(text, end=end)

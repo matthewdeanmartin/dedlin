@@ -7,6 +7,7 @@ for linux than for windows.
 """
 
 from typing import Generator, Iterable
+from unittest.mock import MagicMock
 
 import questionary
 
@@ -14,8 +15,10 @@ PROBABLY_WINDOWS = False
 try:
     import readline
 
+    win32console = MagicMock()
     STANDARD_IN = None
 except ModuleNotFoundError:
+    readline = MagicMock()
     import win32console
 
     PROBABLY_WINDOWS = True
@@ -66,12 +69,12 @@ else:
 
         # ref https://stackoverflow.com/a/8505387
         def hook() -> None:
-            readline.insert_text(default)
-            readline.redisplay()
+            readline.insert_text(default)  # type: ignore
+            readline.redisplay()  # type: ignore
 
-        readline.set_pre_input_hook(hook)
+        readline.set_pre_input_hook(hook)  # type: ignore
         result = input(prompt)
-        readline.set_pre_input_hook()
+        readline.set_pre_input_hook()  # type: ignore
         return result
 
 
@@ -150,4 +153,4 @@ class PrefillInputter:
             value = input_with_prefill(self.prompt, self.default)
             yield value
         except KeyboardInterrupt:
-            yield None
+            yield ""
