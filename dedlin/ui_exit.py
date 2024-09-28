@@ -29,8 +29,10 @@ def confirm_exit(signum: int, frame) -> None:
 def setup_signal_handlers() -> None:
     """Set up signal handlers for SIGINT, SIGBREAK, and SIGABRT to ask for user confirmation before exiting."""
     signal.signal(signal.SIGINT, confirm_exit)
-    signal.signal(signal.SIGBREAK, confirm_exit)
-    signal.signal(signal.SIGABRT, confirm_exit)
+    if hasattr(signal, "SIGBREAK"):
+        signal.signal(signal.SIGBREAK, confirm_exit)
+    if hasattr(signal, "SIGABRT"):
+        signal.signal(signal.SIGABRT, confirm_exit)
     LOGGER.info("Signal handlers set up for SIGINT, SIGBREAK, and SIGABRT.")
 
 
