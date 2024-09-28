@@ -27,9 +27,9 @@ from pathlib import Path
 from typing import Optional
 
 import dotenv
-from __about__ import __version__
 from docopt import docopt
 
+from dedlin.__about__ import __version__
 from dedlin.command_sources import CommandGenerator, InteractiveGenerator
 from dedlin.document_sources import PrefillInputter, SimpleInputter
 from dedlin.flash import title_screen
