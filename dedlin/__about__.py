@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 __title__ = "dedlin"
-__version__ = "1.19.1"
+__version__ = "1.19.3"
 __description__ = "Line editor, edlin clone with many improvements"
 __author__ = "Matthew Martin"
 __author_email__ = "matthewdeanmartin@gmail.com"

@@ -34,6 +34,7 @@ from dedlin.history_feature import HistoryLog
 from dedlin.string_comands import process_strings
 from dedlin.tools.info_bar import display_info
 from dedlin.tools.web import fetch_page_as_rows
+from dedlin.ui_exit import confirm_exit, setup_signal_handlers
 from dedlin.utils.exceptions import DedlinException
 
 logger = logging.getLogger(__name__)
@@ -156,6 +157,8 @@ class Dedlin:
             signal.signal(signal.SIGBREAK, lambda signum, frame: None)
             signal.signal(signal.SIGABRT, lambda signum, frame: None)
             print("Vim mode enabled, feedback, help and quitting disabled.")
+        elif not self.headless:
+            setup_signal_handlers()
 
         if self.vim_mode or self.quiet:
             self.echo = False
@@ -181,6 +184,7 @@ class Dedlin:
             try:
                 command = next(command_generator)
             except KeyboardInterrupt:
+                confirm_exit(-1, None)
                 break
             except StopIteration:
                 break  # it on down now

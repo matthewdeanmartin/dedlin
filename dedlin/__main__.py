@@ -37,6 +37,7 @@ from dedlin.logging_utils import configure_logging
 from dedlin.main import Dedlin
 from dedlin.outputters import rich_output, talking_outputter
 from dedlin.outputters.plain import plain_printer
+from dedlin.ui_exit import confirm_exit
 
 dotenv.load_dotenv()
 
@@ -141,8 +142,10 @@ def run(
             if not vim_mode:
                 break
         except KeyboardInterrupt:
+            confirm_exit(-1, None)
             if not vim_mode:
                 break
+
         except Exception as the_exception:
             dedlin.save_on_crash(type(the_exception), the_exception, None)
             print(traceback.format_exc())

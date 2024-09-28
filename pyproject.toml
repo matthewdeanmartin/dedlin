@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dedlin"
-version = "1.19.2"
+version = "1.19.3"
 description = "Line editor, edlin clone with many improvements"
 authors = ["Matthew Martin <matthewdeanmartin@gmail.com>"]
 keywords = ["editor", "edlin", "line editor",]
