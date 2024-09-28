@@ -314,7 +314,7 @@ class Dedlin:
                 command.command == Commands.SEARCH and command.line_range and command.phrases and command.phrases.first
             ):
                 for text in self.doc.search(command.line_range, value=command.phrases.first):
-                    self.document_outputter(text, "")
+                    self.document_outputter(text, "\n")
             elif command.command == Commands.INFO:
                 for info, end in display_info(self.doc):
                     self.document_outputter(info, end)
@@ -331,7 +331,7 @@ class Dedlin:
                     target=command.phrases.first,
                     replacement=command.phrases.second,
                 ):
-                    self.document_outputter(line, end="")
+                    self.document_outputter(line, end="\n")
             elif command.command == Commands.LOREM:
                 self.doc.lorem(command.line_range)
             elif command.command == Commands.UNDO:
