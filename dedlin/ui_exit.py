@@ -1,11 +1,12 @@
 import logging
 import signal
 import sys
+from typing import Any
 
 LOGGER = logging.getLogger(__name__)
 
 
-def confirm_exit(signum: int, frame) -> None:
+def confirm_exit(signum: int, frame: Any) -> None:
     """Handle the Ctrl+C (SIGINT) or Ctrl+Break (SIGBREAK) signals by prompting the user for confirmation.
 
     Args:
@@ -21,8 +22,13 @@ def confirm_exit(signum: int, frame) -> None:
             sys.exit(0)
         else:
             LOGGER.info("User declined to exit. Continuing the program.")
-    except RuntimeError:
+    except RuntimeError as re:
+        if "can't re-enter readline" in str(re):
+            return
+
+        LOGGER.error(re)
         LOGGER.info("Can't confirm exit, exiting")
+        print("Can't confirm exit, exiting")
         sys.exit(0)
 
 

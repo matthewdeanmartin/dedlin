@@ -50,7 +50,10 @@ if PROBABLY_WINDOWS:
             keys.append(evt)
 
         STANDARD_IN_WINDOWS.WriteConsoleInput(keys)
-        return input(prompt)
+        try:
+            return input(prompt)
+        except EOFError:
+            return default
 
 else:
 
@@ -72,10 +75,13 @@ else:
             readline.insert_text(default)  # type: ignore
             readline.redisplay()  # type: ignore
 
-        readline.set_pre_input_hook(hook)  # type: ignore
-        result = input(prompt)
-        readline.set_pre_input_hook()  # type: ignore
-        return result
+        try:
+            readline.set_pre_input_hook(hook)  # type: ignore
+            result = input(prompt)
+            readline.set_pre_input_hook()  # type: ignore
+            return result
+        except EOFError:
+            return default
 
 
 class SimpleInputter:
