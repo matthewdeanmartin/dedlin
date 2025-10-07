@@ -86,22 +86,22 @@ These switches can improve the functionality and usability of your text editor. 
 
 ure, here are some examples of how the commands could be implemented:
 
-Syntax: Allow users to set the syntax highlighting for the file by typing Syntax \[language\] in the command line. The command would highlight the file based on the language specified. For example, Syntax JavaScript would highlight the file as JavaScript code.
+Syntax: Allow users to set the syntax highlighting for the file by typing Syntax [language] in the command line. The command would highlight the file based on the language specified. For example, Syntax JavaScript would highlight the file as JavaScript code.
 
-Comment: Allow users to comment or uncomment lines by typing Comment \[range\] in the command line. The command would toggle the comments for the specified range of lines. For example, Comment 10-15 would comment or uncomment lines 10 to 15.
+Comment: Allow users to comment or uncomment lines by typing Comment [range] in the command line. The command would toggle the comments for the specified range of lines. For example, Comment 10-15 would comment or uncomment lines 10 to 15.
 
-Indent: Allow users to indent or unindent lines by typing Indent \[range\] in the command line. The command would increase or decrease the indentation of the specified range of lines. For example, Indent 5-10 would increase the indentation of lines 5 to 10.
+Indent: Allow users to indent or unindent lines by typing Indent [range] in the command line. The command would increase or decrease the indentation of the specified range of lines. For example, Indent 5-10 would increase the indentation of lines 5 to 10.
 
-Find and Replace with Confirmation: Allow users to find and replace a string with another string, but prompt the user for confirmation before each replacement by typing Replace \[text to replace\] \[replacement text\] in the command line. The command would find all instances of the text to replace and prompt the user for confirmation before replacing each one.
+Find and Replace with Confirmation: Allow users to find and replace a string with another string, but prompt the user for confirmation before each replacement by typing Replace [text to replace] [replacement text] in the command line. The command would find all instances of the text to replace and prompt the user for confirmation before replacing each one.
 
-Bookmark: Allow users to bookmark lines by typing Bookmark \[line\] in the command line. The command would add a bookmark to the specified line, allowing the user to quickly navigate to that line later by typing Goto Bookmark \[bookmark number\].
+Bookmark: Allow users to bookmark lines by typing Bookmark [line] in the command line. The command would add a bookmark to the specified line, allowing the user to quickly navigate to that line later by typing Goto Bookmark [bookmark number].
 
-Line Manipulation: Allow users to move lines up or down by typing Move \[range\] \[target line\] in the command line. The command would move the specified range of lines to the target line. For example, Move 10-15 20 would move lines 10 to 15 to line 20.
+Line Manipulation: Allow users to move lines up or down by typing Move [range] [target line] in the command line. The command would move the specified range of lines to the target line. For example, Move 10-15 20 would move lines 10 to 15 to line 20.
 
 Interactive Find: Allow users to search for a string interactively by typing Find in the command line. The command would highlight all instances of the string in the file and allow the user to navigate between them by typing Next or Prev.
 
-Export: Allow users to export the file to a different format by typing Export \[format\] \[filename\] in the command line. The command would save a copy of the file in the specified format and with the specified filename. For example, Export PDF myfile.pdf would save the file as a PDF with the filename myfile.pdf.
+Export: Allow users to export the file to a different format by typing Export [format] [filename] in the command line. The command would save a copy of the file in the specified format and with the specified filename. For example, Export PDF myfile.pdf would save the file as a PDF with the filename myfile.pdf.
 
-Auto-save: Allow users to set an auto-save interval by typing Auto-save \[interval\] in the command line. The command would save the file automatically after the specified interval or after a certain number of modifications.
+Auto-save: Allow users to set an auto-save interval by typing Auto-save [interval] in the command line. The command would save the file automatically after the specified interval or after a certain number of modifications.
 
 Version control: Allow users to create and manage versions of the file by typing Version Control in the command line. The command would allow users to create a new version of the file, view previous versions, and revert to previous versions if necessary.
