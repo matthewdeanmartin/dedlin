@@ -1,9 +1,14 @@
-[tool.poetry]
+[project]
 name = "dedlin"
 version = "1.19.4"
 description = "Line editor, edlin clone with many improvements"
-authors = ["Matthew Martin <matthewdeanmartin@gmail.com>"]
-keywords = ["editor", "edlin", "line editor",]
+authors = [
+    { name = "Matthew Martin", email = "matthewdeanmartin@gmail.com" },
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.11"
+keywords = ["editor", "edlin", "line editor", ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -12,108 +17,45 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
-include = [
-    "dedlin/**/*.py",
-    "dedlin/**/*.md",
-    "dedlin/**/*.txt",
-    "dedlin/**/*.html",
-    "dedlin/**/*.jinja",
+dependencies = [
+    "setuptools",
+    "questionary>=2.0.1",
+    "rich>=13.7.0",
+    "icontract>=2.6.4",
+    "pydantic>2.5.0",
+    "pyspellchecker>=0.7.2",
+    "textstat>=0.7.3",
+    "openai>=1.3.8",
+    "python-dotenv>=1.0.0",
+    "pygments>=2.16.1",
+    "docopt-ng>=0.9.0",
+    "html2text>=2020.1.16",
+    "requests>=2.31.0",
+    "art>=6.1",
+    "mistune<3.0.0",
+    "markdown-it-py>=3.0.0",
+    "pywin32>=228; sys_platform == 'win32'"
 ]
-exclude = [
-]
-license = "MIT"
-readme = "README.md"
-repository = "https://github.com/matthewdeanmartin/dedlin"
-homepage = "https://github.com/matthewdeanmartin/dedlin"
-documentation ="https://github.com/matthewdeanmartin/dedlin"
 
-[tool.poetry.urls]
+[project.urls]
 "Bug Tracker" = "https://github.com/matthewdeanmartin/dedlin/issues"
 "Change Log" = "https://github.com/matthewdeanmartin/dedlin/blob/main/CHANGES.md"
 
-[tool.poetry.scripts]
+[project.scripts]
 dedlin = 'dedlin.__main__:main'
 
-[tool.poetry.dependencies]
-# proselint is requiring <4
-python = ">=3.11, <4.0.0"
 
-# packaging/3.12 support for packaging with phantom deps on setuptools
-setuptools = "*"
-
-# ui toolkits
-questionary = ">=2.0.1, <3"
-pywin32 = { version = ">=228", markers = "sys_platform == 'win32'" }
-rich = ">=13.7.0, <14"
-
-# run type checks
-icontract = ">=2.6.4, <3"
-pydantic = ">2.0.0, <3"
-
-# Natural language support
-pyspellchecker = ">=0.7.2"
-textstat = ">=0.7.3"
-
-# AI support
-openai = ">=1.3.8"
-python-dotenv = ">=1.0.0"
-
-# syntax highlighting
-pygments = ">=2.16.1, <3"
-
-# cli
-docopt-ng = ">=0.9.0"
-
-# browser
-html2text = ">=2020.1.16"
-requests = ">=2.31.0"
-
-# ascii art/fonts
-art = ">=6.1, <7"
-
-# printer support (huge difference with 3+
-mistune = "<3.0.0"
-markdown-it-py = ">=3.0.0, <4"
-
-# web api
-#fastapi = { version = "*", optional = true }
-#uvicorn = { version = "*", optional = true }
-
-# Accessibilty
-[tool.poetry.extras]
-# doesn't build on gitlab actions today (dec 2023)
-# pyttsx3 = ">=2.90"
-speaking = ["pyttsx3"]
-
-#[tool.poetry.extras]
-#webapi = ["fastapi","uvicorn"]
-
-[tool.poetry.dev-dependencies]
-ruff = "*"
-
-metametameta = ">=0.1.0"
-# types
-mypy = ">=1.6.1"
-types-requests = "*"
-types-Pygments = "*"
-# testing
-pytest = ">=7.4.3"
-pytest-cov = ">=4.1.0"
-hypothesis = {extras = ["cli"], version = ">=6.88.1"}
-tox = ">=4.15.0"
-
-pre-commit = ">=3.5.0"
-
-# docs
-proselint = ">=0.13.0"
-interrogate = ">=1.5.0"
-pydoctest = ">=0.1.22"
-pdoc3 = ">=0.10.0"
-mdformat = ">=0.7.17"
-linkcheckmd = ">=1.4.0"
-codespell = ">=2.2.6"
-pyenchant = ">=3.2.2"
+[dependency-groups]
+dev = ["ruff", "metametameta>=0.1.0",
+    "mypy>=1.6.1",
+    "types-requests", "types-Pygments", "pytest>=7.4.3", "pytest-cov>=4.1.0",
+    "hypothesis[cli]>=6.88.1", "tox>=4.15.0", "pre-commit>=3.5.0", "proselint>=0.13.0",
+    "interrogate>=1.5.0", "pydoctest>=0.1.22", "pdoc3>=0.10.0", "mdformat>=0.7.17", "linkcheckmd>=1.4.0",
+    "codespell>=2.2.6", "pyenchant>=3.2.2"
+]
 
 [tool.black]
 line-length = 120
@@ -138,9 +80,6 @@ exclude = '''
                      # the root of the project
 )
 '''
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -154,6 +93,7 @@ norecursedirs = ["vendor", "scripts"]
 #markers =
 #	slow: marks tests as slow (deselect with '-m "not slow"')
 #	fast: marks tests as fast (deselect with '-m "not fast"')
+
 
 [tool.isort]
 default_section = "THIRDPARTY"
@@ -212,18 +152,16 @@ exclude_also = [
     # Don't complain about missing debug-only code:
     "def __repr__",
     "if self\\.debug",
-
     # Don't complain if tests don't hit defensive assertion code:
     "raise AssertionError",
     "raise NotImplementedError",
-
     # Don't complain if non-runnable code isn't run:
     "if 0:",
     "if __name__ == .__main__.:",
-
     # Don't complain about abstract methods, they aren't run:
     "@(abc\\.)?abstractmethod",
-    ]
+]
+
 
 [tool.strict-build-script]
 minimum_test_coverage = 60

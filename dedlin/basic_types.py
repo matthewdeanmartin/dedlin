@@ -102,7 +102,6 @@ class LineRange:
     # problem when doc is 0 lines long
     @field_validator("start")
     @classmethod
-    @classmethod
     def start_must_be_one_or_more(cls, start: int) -> int:
         """Start must be 1 or more
         Args:
@@ -116,7 +115,6 @@ class LineRange:
 
     @field_validator("offset")
     @classmethod
-    @classmethod
     def offset_zero_or_more(cls, offset: int) -> int:
         """Offset must be zero or more
 
@@ -127,7 +125,6 @@ class LineRange:
             raise ValueError("offset must be zero or more")
         return offset
 
-    @classmethod
     @field_validator("repeat")
     @classmethod
     def repeat_zero_or_more(cls, repeat: int) -> int:

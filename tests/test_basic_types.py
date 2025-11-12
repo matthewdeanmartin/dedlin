@@ -24,9 +24,9 @@ def test_line_range_validate_with_repeats():
     line_range = LineRange(1, 3, 0)
     assert line_range.validate()
 
-    # with pytest.raises(ValidationError):
-    line_range = LineRange(1, 3, -1)
-    assert not line_range.validate()
+    with pytest.raises(ValidationError):
+        _line_range = LineRange(1, 3, -1)
+        # assert not line_range.validate()
 
 
 def test_line_range_format():
