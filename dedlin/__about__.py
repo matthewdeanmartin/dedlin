@@ -16,6 +16,6 @@ __version__ = "1.19.4"
 __description__ = "Line editor, edlin clone with many improvements"
 __credits__ = [{"name": "Matthew Martin", "email": "matthewdeanmartin@gmail.com"}]
 __readme__ = "README.md"
-__requires_python__ = ">=3.11"
+__requires_python__ = ">=3.13"
 __keywords__ = ["editor", "edlin", "line editor"]
 __status__ = "5 - Production/Stable"
