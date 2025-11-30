@@ -47,12 +47,19 @@ dedlin = 'dedlin.__main__:main'
 
 
 [dependency-groups]
-dev = ["ruff", "metametameta>=0.1.0",
+dev = [ "metametameta>=0.1.0",
+    # types
     "mypy>=1.6.1",
-    "types-requests", "types-Pygments", "pytest>=7.4.3", "pytest-cov>=4.1.0",
-    "hypothesis[cli]>=6.88.1", "tox>=4.15.0", "pre-commit>=3.5.0", "proselint>=0.13.0",
+    "types-requests", "types-Pygments",
+    # tests
+    "pytest>=7.4.3", "pytest-cov>=4.1.0",
+    "hypothesis[cli]>=6.88.1", "tox>=4.15.0", "pre-commit>=3.5.0",
+    # docs
+    "proselint>=0.13.0",
     "interrogate>=1.5.0", "pydoctest>=0.1.22", "pdoc3>=0.10.0", "mdformat>=0.7.17", "linkcheckmd>=1.4.0",
-    "codespell>=2.2.6", "pyenchant>=3.2.2"
+    "codespell>=2.2.6", "pyenchant>=3.2.2",
+    # build
+    "isort", "bandit", "pylint", "black", "ruff",
 ]
 
 [tool.black]
