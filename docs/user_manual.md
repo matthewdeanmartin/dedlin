@@ -91,3 +91,15 @@ Search only displays matching rows.
 **Undo.** Undoes last step.
 
 **Quit and Exit.** These both save and exit. Exit saves without asking, Quit prompts to save if something has changed.
+
+## AI/Bot Usage
+
+Dedlin is designed for AI chatbots to edit documents. For security, there is an untrusted user mode that restricts what operations can be performed:
+
+- Cannot write to new files (only the file specified at startup)
+- Cannot use Transfer (loading files from disk)
+- Cannot use Browse (fetching web pages)
+- Cannot use Export
+- Cannot use Macro
+
+This mode is useful when running dedlin unattended or with untrusted input.

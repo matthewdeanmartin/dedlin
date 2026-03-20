@@ -1,3 +1,5 @@
+"""Signal handling and exit confirmation utilities."""
+
 import logging
 import signal
 import sys
@@ -6,7 +8,7 @@ from typing import Any
 LOGGER = logging.getLogger(__name__)
 
 
-def confirm_exit(signum: int, frame: Any) -> None:
+def confirm_exit(signum: int, _frame: Any) -> None:
     """Handle the Ctrl+C (SIGINT) or Ctrl+Break (SIGBREAK) signals by prompting the user for confirmation.
 
     Args:

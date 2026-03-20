@@ -17,6 +17,7 @@ Options:
   --vim_mode         User hostile, no feedback.
   --verbose          Displaying all debugging info.
   --blind_mode       Optimize for blind users (experimental).
+  --headless         Run without interactive prompts.
 """
 
 import logging
@@ -57,6 +58,7 @@ def main() -> None:
         vim_mode=bool(arguments["--vim_mode"]),
         verbose=bool(arguments["--verbose"]),
         blind_mode=bool(arguments["--blind_mode"]),
+        headless=bool(arguments["--headless"]),
     )
     sys.exit(0)
 
@@ -70,6 +72,7 @@ def run(
     vim_mode: bool = False,
     verbose: bool = False,
     blind_mode: bool = False,
+    headless: bool = False,
 ) -> Dedlin:
     """Set up everything except things from command line.
 
@@ -82,6 +85,7 @@ def run(
         vim_mode (bool): Whether to use vim mode. Defaults to False.
         verbose (bool): Whether to be verbose. Defaults to False.
         blind_mode (bool): Whether to use blind mode. Defaults to False.
+        headless (bool): Whether to run headless. Defaults to False.
 
     Returns:
         Dedlin: The dedlin object.
@@ -124,6 +128,7 @@ def run(
         insert_document_inputter=SimpleInputter(),
         edit_document_inputter=PrefillInputter(),
         outputter=printer,
+        headless=headless,
     )
 
     # save on crash but hides error info

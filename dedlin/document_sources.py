@@ -11,7 +11,7 @@ from unittest.mock import MagicMock
 
 import questionary
 
-PROBABLY_WINDOWS = False
+PROBABLY_WINDOWS_ = False
 try:
     import readline
 
@@ -21,11 +21,11 @@ except ModuleNotFoundError:
     readline = MagicMock()
     import win32console
 
-    PROBABLY_WINDOWS = True
+    PROBABLY_WINDOWS_ = True
 
 
 # alternate windows: https://stackoverflow.com/a/11616477
-if PROBABLY_WINDOWS:
+if PROBABLY_WINDOWS_:
     STANDARD_IN_WINDOWS = win32console.GetStdHandle(win32console.STD_INPUT_HANDLE)
 
     def input_with_prefill(prompt: str, default: str = "") -> str:

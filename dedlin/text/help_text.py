@@ -75,6 +75,7 @@ HELP - display this""",
 [range] Move [target line number] - move range to target
 [range] Copy [target line number] - copy range to target
 [range] Sort - sort lines alphabetically
+[range] Reverse - reverse line order
 [range] Shuffle - shuffle lines randomly""",
     "FILE": FILES_HELP,
     "FILES": FILES_HELP,
@@ -104,7 +105,7 @@ DISPLAY - List, Page, Spell, Search, Current
 EDIT - Edit, Insert, Delete, Replace
 DATA - Transfer, Lorem, Browse
 META - HISTORY, MACRO, REDO, UNDO, HELP
-REORDER - Move, Copy, Sort, Shuffle
+REORDER - Move, Copy, Sort, Reverse, Shuffle
 FILES - File system commands
 """
 

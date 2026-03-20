@@ -28,6 +28,7 @@
 
 ## Parser
 
+- Support non-line number ranges, e.g. `"/Done/ DELETE"` to delete lines matching a pattern
 - support for Append - as alias for insert to last line.. nope? breaks line rages
 - support for "Exit {file_name}" (almost, Needs tests)
 - ? to enable/disable safety prompts
@@ -83,9 +84,6 @@
   - Warnings - Not a range! etc.
 
 ## COMMANDLINE THINGS
-
-- docopts, e.g.
-- `dedlin file.txt --quiet|chatty --script=script.ed`
 
 ## FILE THINGS
 
