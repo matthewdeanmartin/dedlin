@@ -1,34 +1,45 @@
-## Dedline's lineage
+# Prior art
 
-A Pascal textbook first described a line editor.
-It was implemented as `ed` and inspired many good and bad editors thereafter.
-`edlin` is the main inspiration for `dedlin` which was `ed`-like editor.
+Dedlin belongs to a long line of command-driven editors.
 
-## Specifications/Source Inspirations
+## The lineage
 
-- [Video on how to use edlin](https://www.youtube.com/watch?v=CIlJeKuSl9w&t=165s)
-- [help](http://home.mnet-online.de/willybilly/fdhelp-dos/en/hhstndrd/base/edlin.htm)
-- [help another](https://www.computerhope.com/edlin.htm)
-- [wikipedia](https://en.wikipedia.org/wiki/Edlin)
-- [free dos](https://github.com/FDOS/edlin/blob/master/msgs-en.h)
+Classic line editors such as **ed** and **edlin** made text editing possible on minimal terminals by focusing on lines, ranges, and short commands. Dedlin keeps that model, but aims for a friendlier day-to-day experience with more commands, better scripting support, and quality-of-life features such as syntax-aware prompts, history, and richer output modes.
+
+## Where Dedlin fits
+
+| Tool | Best at | How Dedlin differs |
+| --- | --- | --- |
+| `ed` | Minimal Unix line editing | Dedlin is less terse and adds more convenience commands |
+| `edlin` | DOS-era line editing | Dedlin keeps the feel but expands the command set |
+| `sed` | Stream editing in pipelines | Dedlin is interactive first, but can also run scripted edits |
+| Full-screen editors | Large interactive editing sessions | Dedlin is smaller, simpler, and better suited to command-by-command changes |
+
+## Why use a line editor today?
+
+Line editors still shine when:
+
+- you are working in a plain terminal
+- the file is naturally line-oriented
+- you want repeatable edits you can save as a macro
+- you prefer explicit commands over a full-screen interface
+
+## Historical references
+
+- [Wikipedia: Edlin](https://en.wikipedia.org/wiki/Edlin)
+- [FreeDOS EDLIN help](http://home.mnet-online.de/willybilly/fdhelp-dos/en/hhstndrd/base/edlin.htm)
+- [Computer Hope EDLIN reference](https://www.computerhope.com/edlin.htm)
+- [FreeDOS edlin source](https://github.com/FDOS/edlin)
 - [edlin-w32](https://github.com/yudenisov/edlin-w32)
 - [jsedlin](https://github.com/LHerrmeyer/jsedlin)
-- [edlin-freedos](https://opensource.com/article/21/6/edlin-freedos)
-- [jeffpar's](https://jeffpar.github.io/kbarchive/kb/067/Q67706/)
 - [vscode-edlin](https://github.com/FFengIll/vscode-edlin)
-- [edlin in python](https://github.com/firefish111/edlin/blob/master/main.py)
 
-## Just other console, TUI, text based editors implemented in python
+## Related Python terminal editors
 
-- [babi](https://pypi.org/project/babi/) - nano clone, works on windows.
+Some nearby tools take different approaches:
 
-# Couldn't install
+- [babi](https://pypi.org/project/babi/) for a full-screen terminal editor
+- small curses-based editors for Linux-first workflows
+- script-oriented tools where non-interactive editing matters more than an editor prompt
 
-- [tui-editor](https://pypi.org/project/tui-editor/) - setup.py broken?
-- [kaaedit](https://pypi.org/project/kaaedit/) - Linux only
-- [exofrills](https://pypi.org/project/exofrills/) - Linux only
-- [atto](https://pypi.org/project/atto/) - Linux only
-- [py-curses-editor](https://pypi.org/project/py-curses-editor/) Library, not app
-- [ash](https://pypi.org/project/ash-editor/) Linux only
-- [yated](https://pypi.org/project/yated/) Linux only
--
+Dedlin sits between those worlds: it is interactive enough for manual editing, but still comfortable to script.

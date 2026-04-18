@@ -27,7 +27,6 @@ import traceback
 from pathlib import Path
 from typing import Optional
 
-import dotenv
 from docopt import docopt
 
 from dedlin.__about__ import __version__
@@ -39,8 +38,6 @@ from dedlin.main import Dedlin
 from dedlin.outputters import rich_output, talking_outputter
 from dedlin.outputters.plain import plain_printer
 from dedlin.ui_exit import confirm_exit
-
-dotenv.load_dotenv()
 
 logger = logging.getLogger(__name__)
 

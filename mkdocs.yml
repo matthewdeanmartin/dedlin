@@ -1,0 +1,46 @@
+site_name: "Dedlin"
+site_author: "Matthew Dean Martin <matthewdeanmartin@gmail.com>"
+site_description: "A command-driven line editor for quick terminal edits."
+
+repo_url: "https://github.com/matthewdeanmartin/dedlin"
+
+theme:
+  name: readthedocs
+  features:
+    - navigation.footer
+
+edit_uri: edit/main/docs/
+
+markdown_extensions:
+  - attr_list
+  - codehilite
+  - toc:
+      permalink: true
+
+not_in_nav: |
+  /feature_suggestions.md
+
+nav:
+  - "Home": "index.md"
+  - "Getting Started":
+      - "Installation": "installation.md"
+      - "Setup": "setup.md"
+      - "Quick Start": "quick_start.md"
+  - "Using Dedlin":
+      - "Command Language": "user_manual.md"
+      - "Headless Mode": "headless.md"
+      - "Macros": "macros.md"
+      - "Easter Eggs and Modes": "easter_eggs.md"
+  - "Background":
+      - "Prior Art": "prior_art.md"
+
+validation:
+  nav:
+    omitted_files: warn
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+plugins:
+  - search

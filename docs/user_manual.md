@@ -1,105 +1,127 @@
-# What is a line editor?
+# Command language
 
-A line editor edits a list of text items. Some things are more like a list of lines
-than other things.
+Dedlin commands follow one main pattern:
 
-## Line-like
-
-- TODO Lists
-- Grocery Lists
-- Most computer source code. Bash is usually a series of one-liners
-- Most computer configuration files
-
-## Somewhat line-like
-
-- English text. Prose normally has sentences that need line breaks and paragraphs
-  that span many lines of text.
-- Most programming languages, which like English have semantic blocks and lines
-  that run past the edge of the screen
-- ASCII art. While creating it, you might insert rows, but once complete you
-  have a block of rows that must stay together.
-
-## Commands
-
-Dedlin has a near-uniparse. Almost all commands can be reduced to the following form:
-
-```dedlin
-[start],[end],[repeat][Command][Word][...]
+```text
+[range] COMMAND [arguments]
 ```
 
-Where `[start],[end]` is a range of lines of text.
+Examples:
 
-Where `[repeat][Command]` is a command and how many times it should be executed
-
-Where `[Word][...]` are string positional arguments of the command.
-
-### Command types
-
-Commands either
-
-- display lines
-- interactively change lines, insert, edit
-- manipulate lines, e.g. delete
-- reorder lines
-
-## Implemented Commands
-
-### Command Structure
-
-```pseudocode
-([Range]) [Command] ([Phrase] ([Phrase]))
-Range = Start,(End),(Repeat)
-Command = [Letter]|Command
-Words = "text with spaces" "text with spaces"
-Words = text_without_spaces text_without_spaces
-Where () means optional.
+```text
+1,10 LIST
+3 INSERT hello
+8,12 DELETE
+REPLACE cat dog
+20,22 MOVE 1
 ```
 
-#### Commands
+## Ranges
 
-A command is either a letter or a word, e.g. I or Insert.
+Ranges are 1-based.
 
-Commands are not case-sensitive.
+- `1` means line 1
+- `1,5` means lines 1 through 5
+- `,5` means lines 1 through 5
+- `.` means the current line
+- `$` means the last line
 
-Edit is the default command.
+In interactive mode, a bare number such as `7` means **edit line 7**.
 
-#### Ranges
+## Arguments
 
-A range is a 1 indexed number. In a 3 line file, the range `1,3` represents all rows
+Arguments after the command are split on spaces unless you quote them.
 
-Everything up to the first letter is Range.
+```text
+SEARCH walrus
+REPLACE Arctic "Polar regions"
+```
 
-If the range is omitted, then either 1 or the entire document is assumed.
+## Display commands
 
-A single number is assumed to be a start.
+| Command | What it does |
+| --- | --- |
+| `LIST` | Show a range of lines |
+| `PAGE` | Show the next page of lines |
+| `SEARCH text` | Show matching lines |
+| `SPELL` | Show spelling suggestions |
+| `CURRENT` | Move the current line marker |
 
-Missing starts are assumed to be 1, so `,3` means `1,3`
+## Editing commands
 
-## Features
+| Command | What it does |
+| --- | --- |
+| `INSERT` | Insert new lines |
+| `EDIT` | Replace a line interactively or inline |
+| `DELETE` | Remove a range |
+| `REPLACE from to` | Replace text in a range |
+| `LOREM` | Insert generated placeholder text |
 
-**List, Page, Search.** These will display the document or part of it. Only Page increments the current location.
-Search only displays matching rows.
+Examples:
 
-**Insert and Edit.** These are the changes that require interactive input.
+```text
+2 INSERT hello
+10 EDIT Updated heading
+15,18 DELETE
+1,20 REPLACE draft final
+1,50 LOREM
+```
 
-**Copy, Move, Delete, Sort.** These shuffle around rows.
+## Reordering commands
 
-**Join, Split.** These split or join rows based on an optional character.
+| Command | What it does |
+| --- | --- |
+| `COPY target` | Copy a range to another location |
+| `MOVE target` | Move a range to another location |
+| `SORT` | Sort the current buffer alphabetically |
+| `REVERSE` | Reverse the current buffer |
+| `SHUFFLE` | Shuffle the current buffer |
 
-**Transfer.** This inserts from disk.
+Examples:
 
-**Undo.** Undoes last step.
+```text
+2,3 COPY 10
+20,22 MOVE 1
+SORT
+REVERSE
+SHUFFLE
+```
 
-**Quit and Exit.** These both save and exit. Exit saves without asking, Quit prompts to save if something has changed.
+## String-shaping commands
 
-## AI/Bot Usage
+These commands act on each line in the current buffer.
 
-Dedlin is designed for AI chatbots to edit documents. For security, there is an untrusted user mode that restricts what operations can be performed:
+| Command | What it does |
+| --- | --- |
+| `TITLE` | Title-case the line |
+| `SWAPCASE` | Flip upper/lower case |
+| `CASEFOLD` | Case-fold the line |
+| `CAPITALIZE` | Capitalize the first character |
+| `UPPER` | Uppercase the line |
+| `LOWER` | Lowercase the line |
+| `EXPANDTABS width` | Expand tabs to spaces |
+| `RJUST width` | Right-justify the line |
+| `LJUST width` | Left-justify the line |
+| `CENTER width` | Center the line |
+| `RSTRIP` | Remove trailing whitespace |
+| `LSTRIP` | Remove leading whitespace |
+| `STRIP` | Remove leading and trailing whitespace |
 
-- Cannot write to new files (only the file specified at startup)
-- Cannot use Transfer (loading files from disk)
-- Cannot use Browse (fetching web pages)
-- Cannot use Export
-- Cannot use Macro
+## Session and file commands
 
-This mode is useful when running dedlin unattended or with untrusted input.
+| Command | What it does |
+| --- | --- |
+| `SAVE` | Save the current file |
+| `WRITE` | Save the current file |
+| `EXIT` | Save and exit |
+| `QUIT` | Exit, optionally prompting to save |
+| `UNDO` | Undo the last change |
+| `REDO` | Repeat the previous command from history |
+| `HISTORY` | Show the command history |
+| `HELP` | Show built-in help text |
+| `BROWSE url` | Fetch a page and insert its text |
+| `EXPORT` | Write the buffer back out using export logic |
+
+## Comments and blank lines
+
+Blank lines do nothing. Lines that start with `#` are treated as comments, which is especially useful in macro files.

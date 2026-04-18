@@ -39,19 +39,10 @@ def read_file(path: Optional[Path]) -> list[str]:
     Returns:
         list[str]: The lines
     """
-    lines: list[str] = []
-
+    if path is None:
+        return []
     with open(str(path), encoding="utf-8") as file:
-        for line in file:
-            if line.endswith("\n"):
-                lines.append(line[:-1])
-            elif line.endswith("\r"):
-                lines.append(line[:-1])
-            elif line.endswith("\r\n") or line.endswith("\n\r"):
-                lines.append(line[:-2])
-            else:
-                lines.append(line)
-    return lines
+        return [line.rstrip("\r\n") for line in file]
 
 
 def save_and_overwrite(path: Path, lines: list[str], preferred_line_break: str) -> None:

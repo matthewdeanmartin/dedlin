@@ -6,19 +6,14 @@ Handles UI and links command parser to the document object
 
 """
 
-import asyncio
 import logging
-import os
 import signal
 from pathlib import Path
 from types import TracebackType
 from typing import Optional
 
-from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
-
 import dedlin.file_system as file_system
 import dedlin.text.help_text as help_text
-from dedlin.ai_interface import PROLOGUE, AiClient
 from dedlin.basic_types import (
     Command,
     CommandGeneratorProtocol,
@@ -121,9 +116,6 @@ class Dedlin:
         self.blind_mode = False
         """Assume user can't see at all"""
 
-        self.enable_ai_help = False
-        """Call OpenAI API to get help with commands"""
-
         self.headless = headless
         """No interactive features"""
 
@@ -202,7 +194,6 @@ class Dedlin:
 
             if not command.validate():
                 self.feedback(f"Invalid command {command}")
-                self.print_ai_help(command)
 
             self.log_history(command)
             self.echo_if_needed(command.format())
@@ -286,7 +277,7 @@ class Dedlin:
                 self.doc.copy(command.line_range, int(command.phrases.first))
                 self.feedback("Copied")
             elif command.command == Commands.MOVE and command.phrases and command.line_range and command.phrases.first:
-                self.doc.copy(command.line_range, int(command.phrases.first))
+                self.doc.move(command.line_range, int(command.phrases.first))
                 self.feedback("Moved")
             elif command.command == Commands.EDIT:
                 if command.phrases and command.phrases.parts:
@@ -389,7 +380,6 @@ class Dedlin:
                 self.feedback("Unknown command, type HELP for help")
                 if self.halt_on_error:
                     raise DedlinException(f"Unknown command {command.original_text}")
-                self.print_ai_help(command)
             else:
                 self.feedback(f"Command {command.command} not implemented")
 
@@ -411,22 +401,6 @@ class Dedlin:
         self.history.append(command)
         if self.history:
             self.history_log.write_command_to_history_file(command.format(), self.preferred_line_break)
-
-    def print_ai_help(self, command: Command) -> None:
-        """Print help from AI.
-
-        Args:
-            command (Command): The command
-        """
-        if not self.enable_ai_help:
-            return
-        if not os.environ.get("OPENAI_API_KEY"):
-            self.feedback("No API key for AI")
-            return
-        client = AiClient()
-        content = PROLOGUE + f" '{command.original_text}'"
-        ask = ChatCompletionMessageParam(content=content, role="user")  # type: ignore
-        asyncio.run(client.completion([ask]))
 
     def feedback(self, string: str, end: str = "\n", no_comment: bool = False) -> None:
         """Output feedback to the user.
@@ -488,14 +462,18 @@ class Dedlin:
             self.file_path = Path(phrases.first)
         if self.file_path is None and not self.headless and not self.untrusted_user:
             # TODO: doesn't fit with the other input/output patterns
-            self.file_path = Path(input("Please specify file name: "))
+            try:
+                self.file_path = Path(input("Please specify file name: "))
+            except (EOFError, KeyboardInterrupt):
+                self.feedback("No file name specified, can't save.")
+                return
         if not self.file_path and self.untrusted_user:
             self.feedback("Can't save, no initial file name specified and user is untrusted")
             return
         if not self.file_path and self.headless:
             self.feedback("Can't save in headless mode w/o initial file name.")
             return
-        if not self.file_path:
+        if not self.file_path or self.file_path.is_dir():
             self.feedback("Need file path before saving, can't save.")
             return
         file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)

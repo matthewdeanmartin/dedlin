@@ -1,9 +1,8 @@
 # dedlin
 
-Dedlin is an interactive line-by-line text editor and a DSL, similar to edlin or ed. It is perfect for
-letting AI chatbots edit documents without sending the whole document back and forth.
+Dedlin is an interactive line-by-line text editor and a DSL, similar to edlin or ed.
 
-It is scriptable making it similar to `sed` for doing find, insert, replace, delete operations on existing files.
+It is scriptable, which makes it useful for find, insert, replace, delete, and reorder operations on existing files.
 
 Soon it will support non-line number ranges, e.g. `"/Done/ DELETE`
 
@@ -22,9 +21,15 @@ where all help, warnings, feedback will be suppressed.
 
 ## Installation
 
-Requires python 3.11 or higher. Someday I'll write a standalone installer for it.
+Requires Python 3.13 or higher.
 
-Install globally in an isolated virtual environment. This is a good idea.
+Install globally in an isolated tool environment:
+
+```bash
+uv tool install dedlin
+```
+
+Or use `pipx`:
 
 ```bash
 pipx install dedlin
@@ -70,6 +75,7 @@ Options:
   --vim_mode         User hostile, no feedback.
   --verbose          Displaying all debugging info.
   --blind_mode       Optimize for blind users (experimental).
+  --headless         Run without interactive prompts.
 ```
 
 Sample session
@@ -113,6 +119,11 @@ Sorted
 
 ## Documentation
 
-- [User Manual](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/user_manual.md)
-- [Developer roadmap](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/TODO.md)
-- [Prior Art](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/prior_art.md)
+- [Docs home](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/index.md)
+- [Installation](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/installation.md)
+- [Quick start](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/quick_start.md)
+- [Command language](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/user_manual.md)
+- [Headless mode](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/headless.md)
+- [Macros](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/macros.md)
+- [Easter eggs and modes](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/easter_eggs.md)
+- [Prior art](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/prior_art.md)

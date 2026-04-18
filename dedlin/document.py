@@ -117,9 +117,11 @@ class Document:
         if not case_sensitive:
             value = value.upper()
 
+        line_number = line_range.start
         for line_text in self.lines[line_range.start - 1 : line_range.end]:
             if value in line_text.upper():
-                yield f"   {self.current_line} : {line_text}"
+                yield f"   {line_number} : {line_text}"
+            line_number += 1
 
     def spread(
         self,
@@ -243,34 +245,38 @@ class Document:
         """
         if not line_range:
             raise ValueError("Must specify line range to move")
-        if line_range.start < target_line < line_range.end:
+        if line_range.start <= target_line <= line_range.end:
             raise ValueError("Cannot move lines within the same range")
-        to_copy = self.lines[line_range.start - 1 : line_range.end].copy()
 
-        if not len(to_copy) == line_range.count():
+        to_move = self.lines[line_range.to_slice()]
+
+        if not len(to_move) == line_range.count():
             raise ValueError("Wrong range.")
 
         self.backup()
 
         if target_line > line_range.end:
-            front = self.lines[0 : target_line + 1]
-            back = self.lines[target_line + 1 :]
-            self.lines = front + to_copy + back
-            deleted = 0
-            for index in range(line_range.start - 1, line_range.end):
-                self.lines.pop(index - deleted)
-                self.dirty = True  # this is ugly
-                deleted += 1
+            # Moving back
+            new_lines = (
+                self.lines[: line_range.start - 1]
+                + self.lines[line_range.end : target_line - 1]
+                + to_move
+                + self.lines[target_line - 1 :]
+            )
+        elif target_line < line_range.start:
+            # Moving forward
+            new_lines = (
+                self.lines[: target_line - 1]
+                + to_move
+                + self.lines[target_line - 1 : line_range.start - 1]
+                + self.lines[line_range.end :]
+            )
         else:
-            front = self.lines[0 : target_line - 1]
-            back = self.lines[target_line - 1 :]
-            self.lines = front + to_copy + back
+            # This should be covered by the validation above, but just in case
+            raise ValueError("Invalid target line for move")
 
-            deleted = 0
-            for index in range(line_range.start + target_line, line_range.end + line_range.count()):
-                self.lines.pop(index - deleted)
-                self.dirty = True  # this is ugly
-                deleted += 1
+        self.lines = new_lines
+        self.dirty = True
         self.current_line = target_line
         logger.debug(f"Moving {line_range} to {target_line}")
 
@@ -457,20 +463,14 @@ class Document:
 
         self.backup()
 
-        lines_to_generate = 0
-        if line_range.start == line_range.end:
-            lines_to_generate = line_range.start
-        elif line_range.start < line_range.end:
-            lines_to_generate = line_range.end - line_range.start
+        lines_to_generate = line_range.count()
+        start_line = line_range.start
 
-        if lines_to_generate == 0:
-            lines_to_generate = len(lorem_data.LOREM_IPSUM)
-
-        for i in range(0, lines_to_generate):
-            if i < len(lorem_data.LOREM_IPSUM):
-                self.current_line += 1
-                self.lines.append(lorem_data.LOREM_IPSUM[i])
-                self.dirty = True  # this is ugly
+        for i in range(lines_to_generate):
+            text = lorem_data.LOREM_IPSUM[i % len(lorem_data.LOREM_IPSUM)]
+            self.lines.insert(start_line - 1 + i, text)
+            self.dirty = True
+            self.current_line = start_line + i
 
         logger.debug(f"Generated {lines_to_generate} lines")
 
