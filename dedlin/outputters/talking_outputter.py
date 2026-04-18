@@ -5,7 +5,7 @@ from typing import Optional
 
 try:
     import pyttsx3
-except ImportError:
+except (ImportError, RuntimeError):
     pyttsx3 = None
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,10 @@ class TalkingPrinter:
     def __init__(self) -> None:
         """Set up initial state"""
         if pyttsx3 is not None:
-            self.engine = pyttsx3.init()
+            try:
+                self.engine = pyttsx3.init()
+            except Exception:
+                self.engine = None
         else:
             self.engine = None
 
