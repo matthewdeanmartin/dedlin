@@ -12,6 +12,6 @@ jobs:
       with:
         python-version: '3.14'
           # cache: 'pipenv' # caching pipenv dependencies
-    - name: Install poetry and pipx
+    - name: Install globals
       run: |
-        pip install uv && pip install pipx && pipx install uv && make check
+        pip install uv && pip install pipx && pipx install uv && uv sync --all-extras && make check

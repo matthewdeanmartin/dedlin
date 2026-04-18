@@ -41,6 +41,7 @@ dependencies = [
 voice = ["pyttsx3>=2.90"]
 
 [project.urls]
+"Documentation" = "https://dedlin.readthedocs.io/en/latest/"
 "Bug Tracker" = "https://github.com/matthewdeanmartin/dedlin/issues"
 "Change Log" = "https://github.com/matthewdeanmartin/dedlin/blob/main/CHANGES.md"
 

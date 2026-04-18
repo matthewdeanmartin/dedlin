@@ -7,7 +7,7 @@ endif
 
 uv.lock: pyproject.toml
 	@echo "Installing dependencies"
-	@uv sync
+	@uv uv sync --all-extras
 
 # tests can't be expected to pass if dependencies aren't installed.
 # tests are often slow and linting is fast, so run tests on linted code.
