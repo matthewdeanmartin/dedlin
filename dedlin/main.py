@@ -24,6 +24,7 @@ from dedlin.basic_types import (
     Printable,
     StringGeneratorProtocol,
 )
+from dedlin.command_sources import CommandGenerator
 from dedlin.document import Document
 from dedlin.history_feature import HistoryLog
 from dedlin.string_comands import process_strings
@@ -33,6 +34,7 @@ from dedlin.ui_exit import confirm_exit, setup_signal_handlers
 from dedlin.utils.exceptions import DedlinException
 
 logger = logging.getLogger(__name__)
+MAX_MACRO_DEPTH = 3
 
 HIGH_TRUST_TOOLS = [
     Commands.BROWSE,  # Web browsing
@@ -102,7 +104,7 @@ class Dedlin:
         """Disable checking document.dirty on quit. Useful for unit tests."""
 
         self.quiet = False
-        """Supress most output, except from commands specifically for outputting to the screen."""
+        """Suppress most output, except from commands specifically for outputting to the screen."""
 
         self.vim_mode = False
         """Like quiet, except let's really try to make it unpleasant to learn and use"""
@@ -125,6 +127,7 @@ class Dedlin:
         self.history: list[Command] = []
         self.history_log = HistoryLog(persist=history)
         self.macro_file_name: Optional[Path] = None
+        self.macro_stack: list[Path] = []
 
     def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
         """Entry point for Dedlin.
@@ -156,7 +159,7 @@ class Dedlin:
             self.echo = False
             self.command_outputter = NullPrinter()
 
-        self.macro_file_name = Path(macro_file_name) if macro_file_name else None
+        self.macro_file_name = Path(macro_file_name).resolve() if macro_file_name else None
         self.file_path = Path(file_name) if file_name else None
         if self.file_path:
             self.feedback(f"Editing {self.file_path.absolute()}")
@@ -169,228 +172,287 @@ class Dedlin:
             lines=lines,
         )
         self.command_inputter.prompt = " * "
-        command_generator = self.command_inputter.generate()
-        while True:
-            self.command_inputter.document_length = len(self.doc.lines)
-            self.command_inputter.current_line = self.doc.current_line
-            try:
-                command = next(command_generator)
-            except KeyboardInterrupt:
-                confirm_exit(-1, None)
-                break
-            except StopIteration:
-                break  # it on down now
+        exit_code = self.run_command_source(self.command_inputter, active_macro=self.macro_file_name)
+        return exit_code if exit_code is not None else 0
 
-            if command is None:
-                self.feedback("Unknown command")
-                self.feedback(f"Invalid command {command}")
-                continue
+    def run_command_source(
+        self, command_inputter: CommandGeneratorProtocol, active_macro: Optional[Path] = None
+    ) -> Optional[int]:
+        """Run commands from a command source until it finishes or exits the app."""
+        if self.doc is None:
+            raise TypeError("Document not initialized")
 
-            if command.command in self.disabled_commands:
-                self.feedback(f"Command {command.command} is disabled")
-                if self.headless:
-                    raise DedlinException(f"Command {command.command} is disabled")
-                continue
+        active_macro_path = active_macro.resolve() if active_macro else None
+        if active_macro_path is not None:
+            self.macro_stack.append(active_macro_path)
 
-            if not command.validate():
-                self.feedback(f"Invalid command {command}")
-
-            self.log_history(command)
-            self.echo_if_needed(command.format())
-
-            if command.command == Commands.REDO:
+        command_generator = command_inputter.generate()
+        try:
+            while True:
+                command_inputter.document_length = len(self.doc.lines)
+                command_inputter.current_line = self.doc.current_line
                 try:
-                    command = self.history[-2]
-                except IndexError:
-                    self.feedback("Nothing to redo, not enough history")
-                    continue
-                self.log_history(command)
-                self.echo_if_needed(command.original_text or "")
+                    command = next(command_generator)
+                except KeyboardInterrupt:
+                    confirm_exit(-1, None)
+                    return 0
+                except StopIteration:
+                    return None
 
-            if command.command == Commands.BROWSE:
-                if self.doc.dirty:
-                    self.feedback("Discarding current document")
-                if command.phrases and command.phrases.first is None:
-                    self.feedback("No URL, can't browse")
-                elif command.phrases and command.phrases.first:
-                    page_as_rows = fetch_page_as_rows(command.phrases.first)
-                    phrases = Phrases(parts=tuple(page_as_rows))
-                    self.doc.insert(self.doc.current_line, phrases)
+                exit_code = self.execute_command(command)
+                if exit_code is not None:
+                    return exit_code
 
-            elif command.command == Commands.HISTORY:
-                for command in self.history:
-                    # self.feedback(command.original_text.strip("\n\t\r "))
-                    self.feedback(command.format(), no_comment=True)
-            elif command.command == Commands.EMPTY:
-                pass
-            elif command.command == Commands.LIST and command.line_range:
-                for line, end in self.doc.list_doc(command.line_range):
-                    self.document_outputter(line, end)
-            elif command.command == Commands.PAGE:
-                for line, end in self.doc.page():
-                    self.document_outputter(line, end)
-            elif command.command == Commands.SPELL and command.line_range:
-                for line, end in self.doc.spell(command.line_range):
-                    self.document_outputter(line, end=end)
-            elif command.command == Commands.PRINT:
-                for line, end in self.doc.print(command.line_range):
-                    self.document_outputter(line, end=end)
-            elif command.command == Commands.DELETE and command.line_range:
-                if self.doc.delete(command.line_range):
-                    self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
-                else:
-                    self.feedback("Could not delete")
-            elif command.command in (Commands.WRITE, Commands.SAVE):
+                self.feedback(self.status_message())
+        finally:
+            if active_macro_path is not None:
+                self.macro_stack.pop()
+
+    def execute_command(self, command: Optional[Command]) -> Optional[int]:
+        """Execute one parsed command. Returns an exit code when the app should stop."""
+        if self.doc is None:
+            raise TypeError("Document not initialized")
+
+        if command is None:
+            self.feedback("Unknown command")
+            self.feedback(f"Invalid command {command}")
+            return None
+
+        if command.command in self.disabled_commands:
+            self.feedback(f"Command {command.command} is disabled")
+            if self.headless:
+                raise DedlinException(f"Command {command.command} is disabled")
+            return None
+
+        if not command.validate():
+            self.feedback(f"Invalid command {command}")
+
+        self.log_history(command)
+        self.echo_if_needed(command.format())
+
+        if command.command == Commands.REDO:
+            try:
+                command = self.history[-2]
+            except IndexError:
+                self.feedback("Nothing to redo, not enough history")
+                return None
+            self.log_history(command)
+            self.echo_if_needed(command.original_text or "")
+
+        if command.command == Commands.BROWSE:
+            if self.doc.dirty:
+                self.feedback("Discarding current document")
+            if command.phrases and command.phrases.first is None:
+                self.feedback("No URL, can't browse")
+            elif command.phrases and command.phrases.first:
+                page_as_rows = fetch_page_as_rows(command.phrases.first)
+                phrases = Phrases(parts=tuple(page_as_rows))
+                self.doc.insert(self.doc.current_line, phrases)
+
+        elif command.command == Commands.HISTORY:
+            for history_command in self.history:
+                self.feedback(history_command.format(), no_comment=True)
+        elif command.command == Commands.EMPTY:
+            pass
+        elif command.command == Commands.LIST and command.line_range:
+            for line, end in self.doc.list_doc(command.line_range):
+                self.document_outputter(line, end)
+        elif command.command == Commands.PAGE:
+            for line, end in self.doc.page():
+                self.document_outputter(line, end)
+        elif command.command == Commands.SPELL and command.line_range:
+            for line, end in self.doc.spell(command.line_range):
+                self.document_outputter(line, end=end)
+        elif command.command == Commands.PRINT:
+            for line, end in self.doc.print(command.line_range):
+                self.document_outputter(line, end=end)
+        elif command.command == Commands.DELETE and command.line_range:
+            if self.doc.delete(command.line_range):
+                self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
+            else:
+                self.feedback("Could not delete")
+        elif command.command in (Commands.WRITE, Commands.SAVE):
+            self.save_document(command.phrases)
+        elif command.command in (Commands.EXIT, Commands.QUIT):
+            if self.vim_mode:
+                return None
+            if command.command == Commands.QUIT and self.doc.dirty and self.quit_safety:
+                self.save_document()
+                return 0
+            if command.command == Commands.EXIT:
                 self.save_document(command.phrases)
-            elif command.command in (Commands.EXIT, Commands.QUIT):
-                if self.vim_mode:
-                    continue
-                if command.command == Commands.QUIT and self.doc.dirty and self.quit_safety:
-                    # TODO: Q & E are a mess.
-                    # self.command_outputter("Save changes? (y/n) ", end="")
-                    # if "y" in next(generate):
-                    self.save_document()
-                    return 0
-                if command.command == Commands.EXIT:
-                    self.save_document(command.phrases)
-                if command.command in (Commands.QUIT, Commands.EXIT):
-                    return 0
-            elif command.command == Commands.INSERT:
-                line_number = command.line_range.start if command.line_range else 1
-                self.feedback("Control C to exit insert mode")
-                inserted = self.doc.insert(line_number, command.phrases)
-                if command.phrases is None or not command.phrases.parts:
-                    _ = self.history.pop()
-                    rewritten_history = Command(
-                        command=Commands.INSERT,
-                        phrases=inserted,
-                        line_range=command.line_range,
-                        original_text=command.original_text,
-                    )
-                    self.log_history(rewritten_history)
-                else:
-                    self.log_history(command)
-            elif command.command == Commands.PUSH and command.phrases and command.line_range:
-                line_number = command.line_range.start if command.line_range else 1
-                self.doc.push(line_number, command.phrases.as_list())
-            elif command.command == Commands.COPY and command.phrases and command.line_range and command.phrases.first:
-                self.doc.copy(command.line_range, int(command.phrases.first))
-                self.feedback("Copied")
-            elif command.command == Commands.MOVE and command.phrases and command.line_range and command.phrases.first:
-                self.doc.move(command.line_range, int(command.phrases.first))
-                self.feedback("Moved")
-            elif command.command == Commands.EDIT:
-                if command.phrases and command.phrases.parts:
-                    self.doc.spread(command.line_range, command.phrases.parts)
-                else:
-                    self.feedback("[Control C]-[Enter] to exit edit mode")
-                    edit_line_number: int = command.line_range.start if command.line_range else 1
-                    can_continue = True
-                    while can_continue:
-                        edit_status = self.doc.edit(edit_line_number)
-                        can_continue = edit_status.can_edit_again
-                        if can_continue and edit_status.line_edited:
-                            edit_line_number = edit_status.line_edited + 1
+            return 0
+        elif command.command == Commands.INSERT:
+            line_number = command.line_range.start if command.line_range else 1
+            self.feedback("Control C to exit insert mode")
+            inserted = self.doc.insert(line_number, command.phrases)
+            if command.phrases is None or not command.phrases.parts:
+                _ = self.history.pop()
+                rewritten_history = Command(
+                    command=Commands.INSERT,
+                    phrases=inserted,
+                    line_range=command.line_range,
+                    original_text=command.original_text,
+                )
+                self.log_history(rewritten_history)
+            else:
+                self.log_history(command)
+        elif command.command == Commands.PUSH and command.phrases and command.line_range:
+            line_number = command.line_range.start if command.line_range else 1
+            self.doc.push(line_number, command.phrases.as_list())
+        elif command.command == Commands.COPY and command.phrases and command.line_range and command.phrases.first:
+            self.doc.copy(command.line_range, int(command.phrases.first))
+            self.feedback("Copied")
+        elif command.command == Commands.MOVE and command.phrases and command.line_range and command.phrases.first:
+            self.doc.move(command.line_range, int(command.phrases.first))
+            self.feedback("Moved")
+        elif command.command == Commands.EDIT:
+            if command.phrases and command.phrases.parts:
+                self.doc.spread(command.line_range, command.phrases.parts)
+            else:
+                self.feedback("[Control C]-[Enter] to exit edit mode")
+                edit_line_number: int = command.line_range.start if command.line_range else 1
+                can_continue = True
+                while can_continue:
+                    edit_status = self.doc.edit(edit_line_number)
+                    can_continue = edit_status.can_edit_again
+                    if can_continue and edit_status.line_edited:
+                        edit_line_number = edit_status.line_edited + 1
 
-                        if edit_status.text is not None and edit_status.line_edited is not None:
-                            # rewrite history
-                            # _ = self.history.pop()
-                            self.log_history(
-                                Command(
-                                    command=Commands.EDIT,
-                                    line_range=LineRange(start=edit_status.line_edited, offset=0),
-                                    phrases=Phrases(parts=tuple([edit_status.text])),
-                                )
+                    if edit_status.text is not None and edit_status.line_edited is not None:
+                        self.log_history(
+                            Command(
+                                command=Commands.EDIT,
+                                line_range=LineRange(start=edit_status.line_edited, offset=0),
+                                phrases=Phrases(parts=tuple([edit_status.text])),
                             )
+                        )
 
-                    # New line or else next text will be on the same line
-                    self.command_outputter("")
-            elif (
-                command.command == Commands.SEARCH and command.line_range and command.phrases and command.phrases.first
+                self.command_outputter("")
+        elif command.command == Commands.SEARCH and command.line_range and command.phrases and command.phrases.first:
+            for text in self.doc.search(command.line_range, value=command.phrases.first):
+                self.document_outputter(text, "\n")
+        elif command.command == Commands.INFO:
+            for info, end in display_info(self.doc):
+                self.document_outputter(info, end)
+        elif (
+            command.command == Commands.REPLACE
+            and command.phrases
+            and command.line_range
+            and command.phrases.first is not None
+            and command.phrases.second is not None
+        ):
+            self.feedback("Replacing")
+            for line in self.doc.replace(
+                command.line_range,
+                target=command.phrases.first,
+                replacement=command.phrases.second,
             ):
-                for text in self.doc.search(command.line_range, value=command.phrases.first):
-                    self.document_outputter(text, "\n")
-            elif command.command == Commands.INFO:
-                for info, end in display_info(self.doc):
-                    self.document_outputter(info, end)
-            elif (
-                command.command == Commands.REPLACE
-                and command.phrases
-                and command.line_range
-                and command.phrases.first is not None
-                and command.phrases.second is not None
-            ):
-                self.feedback("Replacing")
-                for line in self.doc.replace(
-                    command.line_range,
-                    target=command.phrases.first,
-                    replacement=command.phrases.second,
-                ):
-                    self.document_outputter(line, end="\n")
-            elif command.command == Commands.LOREM:
-                self.doc.lorem(command.line_range)
-            elif command.command == Commands.UNDO:
-                self.doc.undo()
-                self.feedback("Undone")
-            elif command.command == Commands.SORT:
-                self.doc.sort()
-                self.feedback("Sorted")
-            elif command.command == Commands.REVERSE:
-                self.doc.reverse()
-                self.feedback("Reversed")
-            elif command.command == Commands.SHUFFLE:
-                self.doc.shuffle()
-                self.feedback("Shuffled")
-            elif command.command == Commands.CURRENT and command.line_range:
-                self.doc.current_line = command.line_range.start
-            elif command.command == Commands.CRASH:
-                raise DedlinException("Crashing")
-            elif command.command == Commands.HELP:
-                if not command.phrases or command.phrases.first is None:
-                    self.feedback(help_text.HELP_TEXT)
-                    # display | edit | files | data | reorder | meta | data | all
-                elif command.phrases and command.phrases.first.upper() == "ALL":
-                    for text in help_text.SPECIFIC_HELP.values():
-                        self.feedback("")
-                        self.feedback(text)
-                elif command.phrases and command.phrases.first.upper() in help_text.SPECIFIC_HELP:
-                    self.feedback(help_text.SPECIFIC_HELP[command.phrases.first.upper()])
-                else:
-                    self.feedback("Don't have help for that category")
-            elif command.command == Commands.EXPORT:
-                file_system.export(self.file_path, self.doc.lines, self.preferred_line_break)
-                self.feedback("Exported to")
-            elif command.command in (
-                Commands.TITLE,
-                Commands.SWAPCASE,
-                Commands.CASEFOLD,
-                Commands.CAPITALIZE,
-                Commands.UPPER,
-                Commands.LOWER,
-                Commands.EXPANDTABS,
-                Commands.RJUST,
-                Commands.LJUST,
-                Commands.CENTER,
-                Commands.RSTRIP,
-                Commands.LSTRIP,
-                Commands.STRIP,
-            ):
-                process_strings(self.doc.lines, command)
-            elif command.command == Commands.UNKNOWN:
-                self.feedback("Unknown command, type HELP for help")
-                if self.halt_on_error:
-                    raise DedlinException(f"Unknown command {command.original_text}")
+                self.document_outputter(line, end="\n")
+        elif command.command == Commands.LOREM:
+            self.doc.lorem(command.line_range)
+        elif command.command == Commands.UNDO:
+            self.doc.undo()
+            self.feedback("Undone")
+        elif command.command == Commands.SORT:
+            self.doc.sort()
+            self.feedback("Sorted")
+        elif command.command == Commands.REVERSE:
+            self.doc.reverse()
+            self.feedback("Reversed")
+        elif command.command == Commands.SHUFFLE:
+            self.doc.shuffle()
+            self.feedback("Shuffled")
+        elif command.command == Commands.CURRENT and command.line_range:
+            self.doc.current_line = command.line_range.start
+        elif command.command == Commands.MACRO:
+            return self.run_macro(command)
+        elif command.command == Commands.CRASH:
+            raise DedlinException("Crashing")
+        elif command.command == Commands.HELP:
+            if not command.phrases or command.phrases.first is None:
+                self.feedback(help_text.HELP_TEXT)
+            elif command.phrases.first.upper() == "ALL":
+                for text in help_text.SPECIFIC_HELP.values():
+                    self.feedback("")
+                    self.feedback(text)
+            elif command.phrases.first.upper() in help_text.SPECIFIC_HELP:
+                self.feedback(help_text.SPECIFIC_HELP[command.phrases.first.upper()])
             else:
-                self.feedback(f"Command {command.command} not implemented")
+                self.feedback("Don't have help for that category")
+        elif command.command == Commands.EXPORT:
+            file_system.export(self.file_path, self.doc.lines, self.preferred_line_break)
+            self.feedback("Exported to")
+        elif command.command in (
+            Commands.TITLE,
+            Commands.SWAPCASE,
+            Commands.CASEFOLD,
+            Commands.CAPITALIZE,
+            Commands.UPPER,
+            Commands.LOWER,
+            Commands.EXPANDTABS,
+            Commands.RJUST,
+            Commands.LJUST,
+            Commands.CENTER,
+            Commands.RSTRIP,
+            Commands.LSTRIP,
+            Commands.STRIP,
+        ):
+            process_strings(self.doc.lines, command)
+        elif command.command == Commands.UNKNOWN:
+            self.feedback("Unknown command, type HELP for help")
+            if self.halt_on_error:
+                raise DedlinException(f"Unknown command {command.original_text}")
+        else:
+            self.feedback(f"Command {command.command} not implemented")
 
-            if self.blind_mode or self.headless:
-                # Concise, for screen readers, or bots
-                status = f"Current line {self.doc.current_line} of {len(self.doc.lines)}"
-            else:
-                # Verbose, pretty for humans
-                status = f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---"
-            self.feedback(status)
-        return 0
+        return None
+
+    def resolve_macro_path(self, macro_file_name: str) -> Path:
+        """Resolve macro paths relative to the active macro, then the working directory."""
+        candidate = Path(macro_file_name).expanduser()
+        if candidate.is_absolute():
+            return candidate.resolve()
+
+        base_dir = self.macro_stack[-1].parent if self.macro_stack else Path.cwd()
+        return (base_dir / candidate).resolve()
+
+    def run_macro(self, command: Command) -> Optional[int]:
+        """Run another command stream from a macro file."""
+        macro_file_name = command.phrases.first if command.phrases else None
+        if not macro_file_name:
+            self.fail_command("MACRO requires a file path")
+            return None
+
+        macro_path = self.resolve_macro_path(macro_file_name)
+        if macro_path in self.macro_stack:
+            chain = " -> ".join(str(path) for path in [*self.macro_stack, macro_path])
+            self.fail_command(f"Macro recursion detected: {chain}")
+            return None
+        if len(self.macro_stack) >= MAX_MACRO_DEPTH:
+            self.fail_command(f"Macro nesting limit reached ({MAX_MACRO_DEPTH}): {macro_path}")
+            return None
+        if not macro_path.exists() or not macro_path.is_file():
+            self.fail_command(f"Macro file not found: {macro_path}")
+            return None
+
+        macro_inputter = CommandGenerator(macro_path)
+        return self.run_command_source(macro_inputter, active_macro=macro_path)
+
+    def fail_command(self, message: str) -> None:
+        """Report a command failure and halt in headless flows."""
+        self.feedback(message)
+        if self.halt_on_error:
+            raise DedlinException(message)
+
+    def status_message(self) -> str:
+        """Build the status line shown after each command."""
+        if self.doc is None:
+            raise TypeError("Document not initialized")
+
+        if self.blind_mode or self.headless:
+            return f"Current line {self.doc.current_line} of {len(self.doc.lines)}"
+        return f"--- Current line is {self.doc.current_line}, {len(self.doc.lines)} lines total ---"
 
     def log_history(self, command: Command) -> None:
         """Log a command to the history.

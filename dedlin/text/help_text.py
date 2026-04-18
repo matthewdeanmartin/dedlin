@@ -41,6 +41,7 @@ FILES_HELP = """File System Commands
 Quit - Exits, unless the file has been modified
 Exit [file name] - Saves file and exits
 Save - Saves file
+MACRO [file] - run commands from a macro file
 """
 
 SPECIFIC_HELP = {
@@ -67,7 +68,7 @@ SPECIFIC_HELP = {
     """,
     "META": """Meta Commands
 HISTORY [file] - list_doc all commands run
-MACRO [file] - run macro
+MACRO [file] - run macro from the current session
 REDO - redo last command
 UNDO - undo last command that changed state
 HELP - display this""",

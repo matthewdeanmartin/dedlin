@@ -1,6 +1,6 @@
 [project]
 name = "dedlin"
-version = "1.19.4"
+version = "1.20.0"
 description = "Line editor, edlin clone with many improvements"
 authors = [
     { name = "Matthew Martin", email = "matthewdeanmartin@gmail.com" },
@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 keywords = ["editor", "edlin", "line editor", ]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -19,11 +19,12 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "setuptools",
     "questionary>=2.0.1",
     "rich>=13.7.0",
+    # data modeling
     "icontract>=2.6.4",
     "pydantic>2.5.0",
+    # spell check
     "pyspellchecker>=0.7.2",
     "textstat>=0.7.3",
     "pygments>=2.16.1",
@@ -33,8 +34,11 @@ dependencies = [
     "art>=6.1",
     "mistune<3.0.0",
     "markdown-it-py>=3.0.0",
-    "pywin32>=228; sys_platform == 'win32'",
+    "pywin32>=228; sys_platform == 'win32'", # not 3.15 ready yet.
 ]
+
+[project.optional-dependencies]
+voice = ["pyttsx3>=2.90"]
 
 [project.urls]
 "Bug Tracker" = "https://github.com/matthewdeanmartin/dedlin/issues"
@@ -45,19 +49,36 @@ dedlin = 'dedlin.__main__:main'
 
 
 [dependency-groups]
-dev = [ "metametameta>=0.1.0",
-    # types
-    "mypy>=1.6.1",
-    "types-requests", "types-Pygments",
-    # tests
-    "pytest>=7.4.3", "pytest-cov>=4.1.0",
-    "hypothesis[cli]>=6.88.1", "tox>=4.15.0", "pre-commit>=3.5.0",
-    # docs
-    "proselint>=0.13.0",
-    "interrogate>=1.5.0", "pydoctest>=0.1.22", "pdoc3>=0.10.0", "mdformat>=0.7.17", "linkcheckmd>=1.4.0",
-    "codespell>=2.2.6", "pyenchant>=3.2.2",
-    # build
-    "isort", "bandit", "pylint", "black", "ruff",
+dev = [
+ "metametameta>=0.1.0",
+ # types
+ "mypy>=1.6.1",
+ "types-requests",
+ "types-Pygments",
+ # tests
+ "pytest>=7.4.3",
+ "pytest-cov>=4.1.0",
+ "hypothesis[cli]>=6.88.1",
+ "tox>=4.15.0",
+ "pre-commit>=3.5.0",
+ # docs
+ "proselint>=0.13.0",
+ "interrogate>=1.5.0",
+ "pydoctest>=0.1.22",
+ "pdoc3>=0.10.0",
+ "mdformat>=0.7.17",
+ "linkcheckmd>=1.4.0",
+ "codespell>=2.2.6",
+ "pyenchant>=3.2.2",
+ # build
+ "isort",
+ "bandit",
+ "pylint",
+ "black",
+ "ruff",
+ "pipreqs>=0.5.0",
+ "deptry>=0.25.1",
+    "gha-update; python_version >= '3.12'",
 ]
 
 [tool.black]

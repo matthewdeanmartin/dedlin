@@ -1,18 +1,29 @@
-FROM python:3.11.1-slim-buster
+# Use a minimal, secure base image
+FROM python:3.13-slim
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Set a working directory
 WORKDIR /app
-ENV PIP_NO_CACHE_DIR=off
-ENV PYTHONUNBUFFERED=1
-# multidict doesnt have pre-compiled things for many OSs
-ENV MULTIDICT_NO_EXTENSIONS=1
-# RUN apk add --no-cache linux-headers==4.19.36-r0 wget
-ENV PATH="/root/.local/bin:${PATH}"
-RUN python -m pip install --user pipx && python -m pipx ensurepath
-# RUN python3 -m pipx ensurepath
-# isort depends on pylint
-RUN pipx install isort && \
-    pipx install pylint
-RUN python -m pip install --no-cache-dir --upgrade pip --quiet \
-    && pip install poetry  --no-cache-dir --quiet
-COPY dist/so_pip-*-py3-none-any.whl /app/
-RUN poetry install dedlin-*.whl
-ENTRYPOINT ["poetry", "run", "dedlin"]
+
+# Create a non-root user for security
+RUN useradd --create-home appuser
+RUN chown appuser:appuser /app
+USER appuser
+
+# Copy only the necessary files for installation
+COPY --chown=appuser:appuser pyproject.toml uv.lock* ./
+
+# Install dependencies
+RUN uv sync --frozen --no-dev --no-install-project
+
+# Copy the application source code
+COPY --chown=appuser:appuser . .
+
+# Install the project
+RUN uv sync --frozen --no-dev
+
+# Set the entrypoint to run the tool
+ENTRYPOINT ["uv", "run", "dedlin"]
+CMD ["--help"]

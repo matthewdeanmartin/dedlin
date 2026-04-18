@@ -87,8 +87,18 @@ def test_phrases_format():
     assert result == "cat log"
 
 
+def test_phrases_format_escapes_embedded_quotes():
+    thing = Phrases(['say "hello" now'])
+    result = thing.format()
+    assert result == '"say \\"hello\\" now"'
+
+
 def test_parse_extract_phrases():
     assert extract_phrases("cat") == Phrases(["cat"])
+
+
+def test_parse_extract_phrases_with_escaped_quotes():
+    assert extract_phrases('"say \\"hello\\" now"') == Phrases(['say "hello" now'])
 
 
 def test_parse_upper():

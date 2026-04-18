@@ -91,4 +91,4 @@ def test_phrases_quotes():
     phrases = Phrases(parts=("'a a'", "'b b'", "'c c'", "'d d'", "'e e'", "'f f'"))
     assert phrases.format() == "\"'a a'\" \"'b b'\" \"'c c'\" \"'d d'\" \"'e e'\" \"'f f'\""
     phrases = Phrases(parts=('"a a"', '"b b"', '"c c"', '"d d"', '"e e"', '"f f"'))
-    assert phrases.format() == '"\\"a a\\" "\\"b b\\" "\\"c c\\" "\\"d d\\" "\\"e e\\" "\\"f f\\"'
+    assert phrases.format() == '"\\"a a\\"" "\\"b b\\"" "\\"c c\\"" "\\"d d\\"" "\\"e e\\"" "\\"f f\\""'

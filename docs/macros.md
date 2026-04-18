@@ -8,6 +8,12 @@ A Dedlin macro is a plain text file with one command per line.
 dedlin walrus.txt --macro cleanup.ed
 ```
 
+You can also run a macro from inside an active Dedlin session:
+
+```text
+MACRO cleanup.ed
+```
+
 For unattended runs, add headless mode:
 
 ```bash
@@ -46,3 +52,7 @@ SAVE
 - Start by recording a small manual session and turning it into a macro
 - Prefer explicit ranges over relying on the current line
 - End with `SAVE` or `EXIT` if the macro should persist changes
+- Nested macros resolve relative paths from the currently running macro file
+- Dedlin stops nested macros after 3 active macro levels
+- Recursive macro calls are rejected
+- `QUIT` and `EXIT` end the full app, not just the current macro

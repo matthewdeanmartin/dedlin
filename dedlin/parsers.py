@@ -3,6 +3,7 @@ Code that turns strings to command objects
 """
 
 import logging
+import shlex
 from typing import Iterable, Optional
 
 from dedlin.basic_types import Command, Commands, LineRange, Phrases, try_parse_int
@@ -91,19 +92,11 @@ def extract_phrases(value: str) -> Optional[Phrases]:
     Returns:
         Optional[Phrases]: The phrases
     """
-    # handle quotes without escapes
-    if '"' in value and '\\"' not in value:
-        parts = [_ for _ in value.split('"') if _.strip() != ""]
-        return Phrases(tuple(parts))
-
-    # handle unquoted delimited by spaces
-    if '"' not in value:
-        parts = [_ for _ in value.split(" ") if _.strip() != ""]
-        return Phrases(parts=tuple(parts))
-    if '\\"' in value:
-        raise NotImplementedError("Escape quotes not implemented")
-
-    return None
+    try:
+        parts = shlex.split(value)
+    except ValueError:
+        return None
+    return Phrases(parts=tuple(parts))
 
 
 def ends_with_any(value: str, suffixes: Iterable[str]) -> bool:
@@ -155,7 +148,6 @@ RANGE_ONLY = {
     Commands.EXIT: ("X", "EXIT"),
     Commands.TRANSFER: ("T", "TRANSFER"),
     Commands.HISTORY: ("HISTORY",),
-    Commands.MACRO: ("MACRO",),
     Commands.BROWSE: ("BROWSE",),
     Commands.CURRENT: ("C", "CURRENT"),
     Commands.SHUFFLE: ("SHUFFLE",),
@@ -251,6 +243,7 @@ COMMANDS_WITH_PHRASES = {
     Commands.PUSH: ("PUSH",),
     Commands.CRASH: ("CRASH",),
     Commands.EXPORT: ("EXPORT",),
+    Commands.MACRO: ("MACRO",),
 }
 
 
@@ -277,6 +270,16 @@ def parse_search_replace(
                 abbreviation, long_command = None, command_forms[0]
 
             line_range = None
+            if command_code == Commands.MACRO:
+                if front_part not in command_forms:
+                    logger.warning(f"Bad MACRO syntax {original_text}")
+                    return None
+                return Command(
+                    command_code,
+                    line_range=None,
+                    phrases=phrases,
+                    original_text=original_text,
+                )
             if front_part in command_forms:
                 line_range = None
             elif long_command in front_part:

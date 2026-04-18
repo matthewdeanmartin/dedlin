@@ -118,6 +118,7 @@ These commands act on each line in the current buffer.
 | `UNDO` | Undo the last change |
 | `REDO` | Repeat the previous command from history |
 | `HISTORY` | Show the command history |
+| `MACRO file.ed` | Run commands from a macro file against the current session |
 | `HELP` | Show built-in help text |
 | `BROWSE url` | Fetch a page and insert its text |
 | `EXPORT` | Write the buffer back out using export logic |

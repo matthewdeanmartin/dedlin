@@ -36,7 +36,7 @@ class Commands(Enum):
     REPLACE = auto()
 
     # file and exit
-    WRITE = auto()  # Alis for EXIT
+    WRITE = auto()  # Alias for EXIT
     SAVE = auto()  # Alias for EXIT
     QUIT = auto()
     EXIT = auto()
@@ -299,7 +299,7 @@ class Phrases:
         return list(filter(lambda _: _ is not None, self.parts))
 
     def format(self) -> str:
-        """Round tripable format.
+        """Round trippable format.
 
         Returns:
             str: The formatted phrases
@@ -313,11 +313,9 @@ class Phrases:
             Returns:
                 str: The safe quoted string
             """
-            if " " in value and '"' not in value:
-                return f'"{value}"'
-            if " " in value and '"' in value:
+            if " " in value or '"' in value:
                 value = value.replace('"', '\\"')
-                return f'"{value}'
+                return f'"{value}"'
             return value
 
         for part in self.parts:

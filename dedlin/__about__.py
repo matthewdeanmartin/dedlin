@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 __title__ = "dedlin"
-__version__ = "1.19.4"
+__version__ = "1.20.0"
 __description__ = "Line editor, edlin clone with many improvements"
 __credits__ = [{"name": "Matthew Martin", "email": "matthewdeanmartin@gmail.com"}]
 __readme__ = "README.md"

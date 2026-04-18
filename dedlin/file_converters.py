@@ -1,4 +1,4 @@
-"""Primative printing support"""
+"""Primitive printing support"""
 
 from pathlib import Path
 from typing import cast
