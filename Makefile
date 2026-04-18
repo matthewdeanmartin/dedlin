@@ -7,7 +7,7 @@ endif
 
 uv.lock: pyproject.toml
 	@echo "Installing dependencies"
-	@uv uv sync --all-extras
+	@uv sync --all-extras
 
 # tests can't be expected to pass if dependencies aren't installed.
 # tests are often slow and linting is fast, so run tests on linted code.
@@ -45,7 +45,7 @@ check: test pylint bandit pre-commit
 
 .PHONY: publish
 publish:
-	rm -rf dist && $(VENV) hatch build
+	rm -rf dist && $(VENV) uv build
 
 .PHONY: docker
 docker:
