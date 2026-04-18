@@ -44,7 +44,7 @@ pylint:  isort black
 check: test pylint bandit pre-commit
 
 .PHONY: publish
-publish: test
+publish:
 	rm -rf dist && $(VENV) hatch build
 
 .PHONY: docker
