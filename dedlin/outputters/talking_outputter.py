@@ -4,7 +4,7 @@ import logging
 from typing import Optional
 
 try:
-    import pyttsx3
+    import pyttsx3  # type: ignore[import-not-found] # ty: ignore
 except (ImportError, RuntimeError):
     pyttsx3 = None
 
@@ -25,16 +25,19 @@ class TalkingPrinter:
             self.engine = None
 
     # pylint:  disable=unused-argument
-    def print(self, text: str, end: Optional[str]) -> None:
+    def print(self, text: str, end: Optional[str], start_line: int = 0) -> None:
         """Speak.
 
         Args:
             text (str): The text to print
             end (Optional[str]): The end
+            start_line (int): The start line. Defaults to 0.
         """
         if self.engine is None:
             logger.warning("No pyttsx3 installed, cannot speak")
             return
+        if start_line > 0:
+            text = f"line {start_line}: {text}"
         self.engine.say(text)
         self.engine.runAndWait()
 
@@ -42,12 +45,13 @@ class TalkingPrinter:
 talking_printer = TalkingPrinter()
 
 
-def printer(text: Optional[str], end: str = "\n") -> None:
+def printer(text: Optional[str], end: str = "\n", start_line: int = 0) -> None:
     """Speak.
 
     Args:
         text (Optional[str]): The text to print
         end (str): The end. Defaults to "\n".
+        start_line (int): The start line. Defaults to 0.
     """
     text = "" if text is None else text
-    talking_printer.print(text, end=end)
+    talking_printer.print(text, end=end, start_line=start_line)

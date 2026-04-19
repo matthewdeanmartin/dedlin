@@ -114,7 +114,7 @@ def ends_with_any(value: str, suffixes: Iterable[str]) -> bool:
     for suffix in suffixes:
         if not suffix:
             continue
-        if value.endswith(suffix):
+        if value.endswith(str(suffix)):
             return True
     return False
 
@@ -130,7 +130,7 @@ def get_command_length(value: str, suffixes: Iterable[str]) -> int:
         int: The length of the command
     """
     for suffix in sorted(suffixes, key=len, reverse=True):
-        if value.endswith(suffix):
+        if value.endswith(str(suffix)):
             return len(suffix)
     return 0
 
@@ -144,6 +144,8 @@ RANGE_ONLY = {
     Commands.PAGE: ("P", "PAGE"),
     Commands.SPELL: ("SPELL",),
     Commands.SEARCH: ("S", "SEARCH"),  # 1 phrase
+    Commands.JUMPTO: ("J", "JUMPTO"),
+    Commands.LOOKAROUND: ("LA", "LOOKAROUND"),
     Commands.REPLACE: ("R", "REPLACE"),  # 2 phrases
     Commands.EXIT: ("X", "EXIT"),
     Commands.TRANSFER: ("T", "TRANSFER"),
@@ -265,7 +267,7 @@ def parse_search_replace(
         if ends_with_any(front_part, command_forms) or front_part in command_forms:
             if len(command_forms) == 2:
                 # pylint: disable=unbalanced-tuple-unpacking
-                abbreviation, long_command = command_forms
+                abbreviation, long_command = command_forms  # ty: ignore
             else:
                 abbreviation, long_command = None, command_forms[0]
 
@@ -314,6 +316,8 @@ BARE_COMMANDS = {
     Commands.SAVE: ("SAVE",),
     Commands.EXIT: ("E", "EXIT"),  # BUG, this takes argument.
     Commands.QUIT: ("Q", "QUIT"),
+    Commands.TOP: ("TOP",),
+    Commands.BOTTOM: ("BOTTOM",),
 }
 
 

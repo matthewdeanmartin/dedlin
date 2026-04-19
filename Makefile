@@ -146,3 +146,13 @@ prerelease: metadata-sync-check version-check dev-status-check check-all-docs te
 .PHONY: prerelease-llm
 prerelease-llm: metadata-sync-check version-check dev-status-check test-llm
 	@echo "Quiet pre-release checks complete"
+
+.PHONY: ty
+ty:
+	@echo "Running ty"
+	$(VENV) ty check dedlin
+
+.PHONY: ruff
+ruff:
+	@echo "Running ruff check"
+	$(VENV) ruff check dedlin

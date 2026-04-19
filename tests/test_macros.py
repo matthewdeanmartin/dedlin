@@ -11,7 +11,7 @@ from dedlin.utils.exceptions import DedlinException
 from dedlin.utils.file_utils import locate_file
 
 
-def test_macros():
+def test_macros(tmp_path: Path):
     for file in [
         "grep.ed",
         "sed.ed",
@@ -27,7 +27,7 @@ def test_macros():
             inputter=commandGenerator,
             insert_document_inputter=None,
             edit_document_inputter=None,
-            outputter=lambda x, end: results.append(x),
+            outputter=lambda text, end="", start_line=0: results.append(text),
             headless=True,
         )
 
@@ -36,17 +36,17 @@ def test_macros():
             locate_file(f"sample_macros/{file.replace('.ed','_in.txt')}", __file__), encoding="utf-8"
         ) as input_file:
             pristine_input = input_file.read()
-        output_file = f"sample_macros/{file.replace('.ed','_out.txt')}"
+        output_file = tmp_path / file.replace(".ed", "_out.txt")
 
         # Write to a file that can be mutated
-        with open(locate_file(output_file, __file__), "w", encoding="utf-8") as pristine_file:
+        with open(output_file, "w", encoding="utf-8") as pristine_file:
             pristine_file.write(pristine_input)
 
-        app.entry_point(file_name=locate_file(output_file, __file__))
+        app.entry_point(file_name=str(output_file))
 
         # Log results
-        output_file = f"sample_macros/{file.replace('.ed', '_log.txt')}"
-        with open(locate_file(output_file, __file__), "w", encoding="utf-8") as log_file:
+        log_file_path = tmp_path / file.replace(".ed", "_log.txt")
+        with open(log_file_path, "w", encoding="utf-8") as log_file:
             for line in results:
                 log_file.write(line)
                 log_file.write("\n")
@@ -60,7 +60,7 @@ def _run_headless_session(file_path: Path, command_source: str) -> Dedlin:
         inputter=StringCommandGenerator(command_source),
         insert_document_inputter=None,
         edit_document_inputter=None,
-        outputter=lambda x, end: results.append(x),
+        outputter=lambda text, end="", start_line=0: results.append(text),
         headless=True,
     )
     _ = app.entry_point(file_name=str(file_path))

@@ -8,7 +8,7 @@ from dedlin import CommandGenerator, Dedlin
 from dedlin.utils.file_utils import locate_file
 
 
-def test_headless():
+def test_headless(tmp_path: Path):
     for file in [
         "degenerate.ed",
         "lorem.ed",
@@ -26,8 +26,9 @@ def test_headless():
             inputter=commandGenerator,
             insert_document_inputter=None,
             edit_document_inputter=None,
-            outputter=lambda x, _: results.append(x),
+            outputter=lambda text, end="", start_line=0: results.append(text),
             headless=True,
         )
-        app.entry_point(locate_file(f"sample_headless_scripts/{file}_snapshot.txt", __file__))
+        snapshot_file = tmp_path / f"{file}_snapshot.txt"
+        app.entry_point(str(snapshot_file))
         assert results

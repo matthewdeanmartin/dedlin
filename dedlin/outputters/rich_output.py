@@ -13,37 +13,44 @@ class RichPrinter:
         """Set up initial state"""
         self.console = Console()
 
-    def print(self, text: str, end: Optional[str]) -> None:
+    def print(self, text: str, end: Optional[str], start_line: int = 0) -> None:
         """Syntax highlighting
 
         Args:
             text (str): The text to print
             end (Optional[str]): The end
+            start_line (int): The start line for numbering. Defaults to 0.
         """
         if not end:
             end = ""
         text = "" if text is None else text
         if text and text.endswith("\n"):
             text = text[:-1]
-        syntax = Syntax(
-            text,
-            "python",
-            # theme="monokai",
-            line_numbers=False,
-        )
-        self.console.print(syntax, end=end)
+
+        if start_line > 0:
+            syntax = Syntax(
+                text,
+                "python",
+                # theme="monokai",
+                line_numbers=True,
+                start_line=start_line,
+            )
+            self.console.print(syntax, end=end)
+        else:
+            self.console.print(text, end=end)
 
 
 rich_printer = RichPrinter()
 
 
 # pylint: disable=unused-argument
-def printer(text: Optional[str], end: str = "\n") -> None:
+def printer(text: Optional[str], end: str = "\n", start_line: int = 0) -> None:
     """Print text to standard out.
 
     Args:
         text (Optional[str]): The text to print
         end (str): The end. Defaults to "\n".
+        start_line (int): The start line. Defaults to 0.
     """
     text = "" if text is None else text
-    rich_printer.print(text, end="")
+    rich_printer.print(text, end="", start_line=start_line)

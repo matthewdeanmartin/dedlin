@@ -4,7 +4,7 @@ Export to file formats, particularly markdown
 
 from typing import cast
 
-import mistune
+import mistune  # type: ignore[import-untyped]
 
 
 def export_markdown(lines: list[str], preferred_line_break: str) -> str:

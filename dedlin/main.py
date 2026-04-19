@@ -65,6 +65,9 @@ class Dedlin:
         disabled_commands: Optional[list[Commands]] = None,
         untrusted_user: bool = False,
         history: bool = True,
+        dry_run: bool = False,
+        diff: bool = False,
+        stream_output: bool = False,
     ) -> None:
         """Set up initial state and some dependency injection.
 
@@ -77,6 +80,9 @@ class Dedlin:
             disabled_commands (Optional[list[Commands]]): The disabled commands. Defaults to None.
             untrusted_user (bool): Whether the user is untrusted. Defaults to False.
             history (bool): Whether to save history. Defaults to True.
+            dry_run (bool): Whether to perform a dry run. Defaults to False.
+            diff (bool): Whether to print a diff. Defaults to False.
+            stream_output (bool): Whether to print the final document to stdout. Defaults to False.
         """
 
         self.disabled_commands = disabled_commands if disabled_commands else []
@@ -84,6 +90,15 @@ class Dedlin:
 
         self.untrusted_user = untrusted_user
         """Disable saving to file by script argument"""
+
+        self.dry_run = dry_run
+        """Prevent saving and show unified diff instead"""
+
+        self.diff = diff
+        """Show unified diff on save or exit"""
+
+        self.stream_output = stream_output
+        """Print the final document to stdout"""
 
         # Autoconfigure untrusted_user mode
         if self.untrusted_user and not self.disabled_commands:
@@ -105,6 +120,8 @@ class Dedlin:
 
         self.quiet = False
         """Suppress most output, except from commands specifically for outputting to the screen."""
+        if stream_output:
+            self.quiet = True
 
         self.vim_mode = False
         """Like quiet, except let's really try to make it unpleasant to learn and use"""
@@ -129,18 +146,24 @@ class Dedlin:
         self.macro_file_name: Optional[Path] = None
         self.macro_stack: list[Path] = []
 
-    def entry_point(self, file_name: Optional[str] = None, macro_file_name: Optional[str] = None) -> int:
+    def entry_point(
+        self,
+        file_name: Optional[str] = None,
+        macro_file_name: Optional[str] = None,
+        initial_lines: Optional[list[str]] = None,
+    ) -> int:
         """Entry point for Dedlin.
 
         Args:
             file_name (Optional[str]): The file name. Defaults to None.
             macro_file_name (Optional[str]): The macro file name. Defaults to None.
+            initial_lines (Optional[list[str]]): The initial lines to edit. Defaults to None.
 
         Returns:
             int: The exit code
         """
-        if self.headless and not file_name:
-            raise TypeError("Headless mode requires a file name")
+        if self.headless and not file_name and initial_lines is None:
+            raise TypeError("Headless mode requires a file name or initial lines")
         if self.untrusted_user and not file_name:
             raise TypeError("Untrusted user mode requires a file name")
 
@@ -164,7 +187,8 @@ class Dedlin:
         if self.file_path:
             self.feedback(f"Editing {self.file_path.absolute()}")
 
-        lines = file_system.read_or_create_file(self.file_path)
+        lines = file_system.read_or_create_file(self.file_path) if initial_lines is None else initial_lines.copy()
+        self.original_lines = lines.copy()
 
         self.doc = Document(
             insert_inputter=self.insert_document_inputter,
@@ -173,6 +197,10 @@ class Dedlin:
         )
         self.command_inputter.prompt = " * "
         exit_code = self.run_command_source(self.command_inputter, active_macro=self.macro_file_name)
+
+        if self.diff or self.dry_run:
+            self.print_diff()
+
         return exit_code if exit_code is not None else 0
 
     def run_command_source(
@@ -255,17 +283,23 @@ class Dedlin:
         elif command.command == Commands.EMPTY:
             pass
         elif command.command == Commands.LIST and command.line_range:
-            for line, end in self.doc.list_doc(command.line_range):
-                self.document_outputter(line, end)
+            for line_number, line, end in self.doc.list_doc(command.line_range):
+                self.document_outputter(line, end=end, start_line=line_number)
         elif command.command == Commands.PAGE:
-            for line, end in self.doc.page():
-                self.document_outputter(line, end)
+            page_size = 5
+            if not self.headless and not self.macro_stack:
+                import shutil
+
+                term_size = shutil.get_terminal_size((80, 24))
+                page_size = max(5, term_size.lines - 3)
+            for line_number, line, end in self.doc.page(page_size):
+                self.document_outputter(line, end=end, start_line=line_number)
         elif command.command == Commands.SPELL and command.line_range:
-            for line, end in self.doc.spell(command.line_range):
-                self.document_outputter(line, end=end)
+            for line_number, line, end in self.doc.spell(command.line_range):
+                self.document_outputter(line, end=end, start_line=line_number)
         elif command.command == Commands.PRINT:
-            for line, end in self.doc.print(command.line_range):
-                self.document_outputter(line, end=end)
+            for line_number, line, end in self.doc.print(command.line_range):
+                self.document_outputter(line, end=end, start_line=line_number)
         elif command.command == Commands.DELETE and command.line_range:
             if self.doc.delete(command.line_range):
                 self.feedback(f"Deleted lines {command.line_range.start} to {command.line_range.end}")
@@ -330,8 +364,16 @@ class Dedlin:
 
                 self.command_outputter("")
         elif command.command == Commands.SEARCH and command.line_range and command.phrases and command.phrases.first:
-            for text in self.doc.search(command.line_range, value=command.phrases.first):
-                self.document_outputter(text, "\n")
+            for line_number, text, end in self.doc.search(command.line_range, value=command.phrases.first):
+                self.document_outputter(text, end=end, start_line=line_number)
+        elif command.command == Commands.JUMPTO and command.line_range and command.phrases and command.phrases.first:
+            for line_number, text, end in self.doc.jumpto(command.line_range, value=command.phrases.first):
+                self.document_outputter(text, end=end, start_line=line_number)
+        elif (
+            command.command == Commands.LOOKAROUND and command.line_range and command.phrases and command.phrases.first
+        ):
+            for line_number, text, end in self.doc.lookaround(command.line_range, value=command.phrases.first):
+                self.document_outputter(text, end=end, start_line=line_number)
         elif command.command == Commands.INFO:
             for info, end in display_info(self.doc):
                 self.document_outputter(info, end)
@@ -343,12 +385,12 @@ class Dedlin:
             and command.phrases.second is not None
         ):
             self.feedback("Replacing")
-            for line in self.doc.replace(
+            for line_number, line, end in self.doc.replace(
                 command.line_range,
                 target=command.phrases.first,
                 replacement=command.phrases.second,
             ):
-                self.document_outputter(line, end="\n")
+                self.document_outputter(line, end=end, start_line=line_number)
         elif command.command == Commands.LOREM:
             self.doc.lorem(command.line_range)
         elif command.command == Commands.UNDO:
@@ -497,6 +539,21 @@ class Dedlin:
         if self.verbose:
             logger.info(string)
 
+    def print_diff(self) -> None:
+        """Print a unified diff of the original vs current document lines."""
+        if not self.doc:
+            return
+        import difflib
+        import sys
+
+        diff = difflib.unified_diff(
+            [line + "\n" for line in self.original_lines],
+            [line + "\n" for line in self.doc.lines],
+            fromfile=str(self.file_path) if self.file_path else "original",
+            tofile=str(self.file_path) if self.file_path else "modified",
+        )
+        sys.stdout.writelines(diff)
+
     def save_document_safe(self) -> None:
         """Save the document to the file"""
         if not self.doc:
@@ -506,6 +563,11 @@ class Dedlin:
         if self.file_path is None:
             self.feedback("Can't save, no initial file name specified")
             return
+
+        if self.dry_run:
+            self.feedback("Dry run: skipping save_document_safe")
+            return
+
         file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
         self.doc.dirty = False
 
@@ -538,6 +600,11 @@ class Dedlin:
         if not self.file_path or self.file_path.is_dir():
             self.feedback("Need file path before saving, can't save.")
             return
+
+        if self.dry_run:
+            self.feedback("Dry run: skipping save_document")
+            return
+
         file_system.save_and_overwrite(self.file_path, self.doc.lines, self.preferred_line_break)
         self.doc.dirty = False
 
@@ -545,11 +612,19 @@ class Dedlin:
         """Save the document to the file"""
 
         file_system.save_and_overwrite(
-            Path("history.ed"), [_.original_text for _ in self.history], self.preferred_line_break
+            Path("history.ed"),
+            [_.original_text for _ in self.history if _.original_text is not None],
+            self.preferred_line_break,
         )
 
     def final_report(self) -> None:
         """Print out the final report"""
+        if self.stream_output and self.doc is not None:
+            import sys
+
+            sys.stdout.writelines(line + "\n" for line in self.doc.lines)
+            return
+
         if self.history:
             self.feedback(f"History saved to {self.history_log.history_file_string}")
 

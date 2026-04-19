@@ -73,5 +73,5 @@ def test_document_replace():
     doc = Document(fake_input, fake_edit, lines)
 
     result = list(doc.replace(LineRange(2, offset=1), target="snow", replacement="ice"))
-    assert "but the ice in idaho falls mainly on the mountain" in result[0]
+    assert "but the ice in idaho falls mainly on the mountain" in result[0][1]
     assert len(result) == 1

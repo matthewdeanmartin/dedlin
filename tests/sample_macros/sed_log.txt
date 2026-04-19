@@ -1,6 +1,6 @@
 Editing C:\github\dedlin\tests\sample_macros\sed_out.txt
 Current line 1 of 2
 Replacing
-   1 : That is a butt.
+That is a butt.
 Current line 2 of 2
 Current line 2 of 2

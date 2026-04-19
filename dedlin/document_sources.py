@@ -18,8 +18,8 @@ try:
     win32console = MagicMock()
     STANDARD_IN = None
 except ModuleNotFoundError:
-    readline = MagicMock()
-    import win32console
+    readline = MagicMock()  # type: ignore[assignment] # ty: ignore
+    import win32console  # type: ignore[no-redef,assignment]
 
     PROBABLY_WINDOWS_ = True
 

@@ -21,14 +21,11 @@ def test_search_bug_repro():
     """SEARCH command should display correct line numbers."""
     doc = Document(fake_input, fake_edit, ["apple", "banana", "cherry", "apple pie"])
     results = list(doc.search(LineRange(1, 3), "apple"))
-    # results are strings like "   1 : apple"
-    # apple pie is at index 4, but we search range 1-4 (LineRange(1,3) is 1,2,3,4)
-    # Wait, LineRange(1, 3) is start=1, offset=3, so end=4.
-    line_numbers = [r.strip().split(":")[0].strip() for r in results]
+    line_numbers = [str(r[0]) for r in results]
     assert line_numbers == ["1", "4"]
 
 
-def test_move_command_bug_repro():
+def test_move_command_bug_repro(tmp_path: Path):
     """Dedlin.entry_point should call doc.move for MOVE command."""
     # Move line 1 to position 3 (after line 2)
     # LineRange(1, 0) is just line 1.
@@ -39,7 +36,7 @@ def test_move_command_bug_repro():
     lines = ["line 1", "line 2", "line 3"]
 
     # We need to write lines to a file first because entry_point reads from it
-    p = Path("test_move_repro.txt")
+    p = tmp_path / "test_move_repro.txt"
     p.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     try:
@@ -57,9 +54,9 @@ def test_move_command_bug_repro():
             p.unlink()
 
 
-def test_read_file_crlf_bug_repro():
+def test_read_file_crlf_bug_repro(tmp_path: Path):
     """read_file should correctly handle CRLF."""
-    p = Path("test_crlf_repro.txt")
+    p = tmp_path / "test_crlf_repro.txt"
     with open(p, "wb") as f:
         f.write(b"line1\r\nline2\r\n")
     try:

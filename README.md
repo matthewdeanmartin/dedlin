@@ -56,26 +56,33 @@ Command line help
 
 ```text
 > python -m dedlin --help
-Dedlin.
+usage: dedlin [-h] [--version] [-e] [--halt-on-error] [--promptless-quit]
+              [--vim-mode] [-v] [--blind-mode] [--headless] [--dry-run]
+              [--diff]
+              {edit,exec,macro,stream} ...
 
-An improved version of the edlin.
+Dedlin. An improved version of the edlin.
 
-Usage:
-  dedlin [<file>] [options]
-  dedlin (-h | --help)
-  dedlin --version
+positional arguments:
+  {edit,exec,macro,stream}
+                        Subcommands
+    edit                Start an interactive session
+    exec                Run inline commands
+    macro               Run a macro file
+    stream              Read from stdin, process, write to stdout
 
-Options:
-  -h --help          Show this screen.
-  --version          Show version.
-  --macro=<macro>    Run macro file.
-  --echo             Echo commands.
-  --halt_on_error    End program on error.
-  --promptless_quit  Skip prompt on quit.
-  --vim_mode         User hostile, no feedback.
-  --verbose          Displaying all debugging info.
-  --blind_mode       Optimize for blind users (experimental).
-  --headless         Run without interactive prompts.
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  -e, --echo            Echo commands.
+  --halt-on-error       End program on error.
+  --promptless-quit     Skip prompt on quit.
+  --vim-mode            User hostile, no feedback.
+  -v, --verbose         Displaying all debugging info.
+  --blind-mode          Optimize for blind users (experimental).
+  --headless            Run without interactive prompts.
+  --dry-run             Prevent actual file modification and print a unified diff to stdout instead.
+  --diff                Print a unified diff of the changes made at the end of the session.
 ```
 
 Sample session

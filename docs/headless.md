@@ -4,10 +4,10 @@ Headless mode is for runs where you do not want interactive prompts.
 
 ## Best use
 
-Headless mode works best with a file and a macro:
+Headless mode works best with a file and a macro, using the new `macro` subcommand:
 
 ```bash
-dedlin notes.txt --headless --macro cleanup.ed
+dedlin macro cleanup.ed notes.txt --headless
 ```
 
 That combination gives you a repeatable, non-interactive editing run.

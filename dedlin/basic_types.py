@@ -24,6 +24,8 @@ class Commands(Enum):
     LIST = auto()
     PAGE = auto()
     SEARCH = auto()
+    JUMPTO = auto()
+    LOOKAROUND = auto()
     SPELL = auto()
     CURRENT = auto()
 
@@ -42,6 +44,8 @@ class Commands(Enum):
     EXIT = auto()
     TRANSFER = auto()
     EXPORT = auto()
+    TOP = auto()
+    BOTTOM = auto()
 
     # Add text
     BROWSE = auto()
@@ -400,25 +404,27 @@ def try_parse_int(value: str, default_value: Optional[int] = None) -> Optional[i
 class Printable(Protocol):
     """Something that acts like print()"""
 
-    def __call__(self, text: Optional[str], end: str = "\n") -> None:
+    def __call__(self, text: Optional[str], end: str = "\n", start_line: int = 0) -> None:
         """Signature of a printable.
 
         Args:
             text (Optional[str]): The text
             end (str): The end. Defaults to "\n".
+            start_line (int): The line number for syntax highlighting. Defaults to 0.
         """
 
 
 class NullPrinter:
     """Something that acts like print()"""
 
-    def __call__(self, text: Optional[str], end: str = "\n") -> None:
+    def __call__(self, text: Optional[str], end: str = "\n", start_line: int = 0) -> None:
         """
         Do nothing implementation of Printable.
 
         Args:
             text (Optional[str]): The text
             end (str): The end. Defaults to "\n".
+            start_line (int): The line number for syntax highlighting. Defaults to 0.
         """
 
 

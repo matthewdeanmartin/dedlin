@@ -73,7 +73,7 @@ class Document:
         self.previous_current_line = 0
         self.dirty = False
 
-    def list_doc(self, line_range: Optional[LineRange] = None) -> Generator[tuple[str, str], None, None]:
+    def list_doc(self, line_range: Optional[LineRange] = None) -> Generator[tuple[int, str, str], None, None]:
         """Display lines specified by range, do not advance current line.
 
         Args:
@@ -83,7 +83,7 @@ class Document:
             ValueError: If line_range is invalid
 
         Returns:
-            Generator[tuple[str, str], None, None]: The lines
+            Generator[tuple[int, str, str], None, None]: The lines
         """
         if line_range is None or line_range.start == 0 or line_range.end == 0:
             # everything, not an arbitrary cutoff
@@ -95,7 +95,7 @@ class Document:
         line_number = line_range.start
         for line_text in self.lines[line_range.to_slice()]:
             # lines never end in a newline
-            yield f"   {line_number} : {line_text}", "\n"
+            yield line_number, line_text, "\n"
             line_number += 1
 
             # tiny inefficiency here
@@ -103,7 +103,9 @@ class Document:
             #     break
             # self.current_line += 1
 
-    def search(self, line_range: LineRange, value: str, case_sensitive: bool = False) -> Generator[str, None, None]:
+    def search(
+        self, line_range: LineRange, value: str, case_sensitive: bool = False
+    ) -> Generator[tuple[int, str, str], None, None]:
         """Display lines that have value in line.
 
         Args:
@@ -112,7 +114,7 @@ class Document:
             case_sensitive (bool): Case sensitivity. Defaults to False.
 
         Returns:
-            Generator[str, None, None]: The lines
+            Generator[tuple[int, str, str], None, None]: The lines
         """
         if not case_sensitive:
             value = value.upper()
@@ -120,8 +122,75 @@ class Document:
         line_number = line_range.start
         for line_text in self.lines[line_range.start - 1 : line_range.end]:
             if value in line_text.upper():
-                yield f"   {line_number} : {line_text}"
+                yield line_number, line_text, "\n"
             line_number += 1
+
+    def jumpto(
+        self, line_range: LineRange, value: str, case_sensitive: bool = False
+    ) -> Generator[tuple[int, str, str], None, None]:
+        """Jump to the first occurrence of a value.
+
+        Args:
+            line_range (LineRange): The range
+            value (str): The value
+            case_sensitive (bool): Case sensitivity. Defaults to False.
+
+        Returns:
+            Generator[tuple[int, str, str], None, None]: The lines
+        """
+        if not case_sensitive:
+            value = value.upper()
+
+        line_number = line_range.start
+        for line_text in self.lines[line_range.start - 1 : line_range.end]:
+            if value in line_text.upper():
+                self.current_line = line_number
+                yield line_number, line_text, "\n"
+                return
+            line_number += 1
+
+    def lookaround(
+        self, line_range: LineRange, value: str, case_sensitive: bool = False
+    ) -> Generator[tuple[int, str, str], None, None]:
+        """Search and display context around matches.
+
+        Args:
+            line_range (LineRange): The range
+            value (str): The value
+            case_sensitive (bool): Case sensitivity. Defaults to False.
+
+        Returns:
+            Generator[tuple[int, str, str], None, None]: The lines
+        """
+        if not case_sensitive:
+            value = value.upper()
+
+        context_lines = 2
+        matches = []
+
+        line_number = line_range.start
+        for line_text in self.lines[line_range.start - 1 : line_range.end]:
+            if value in line_text.upper():
+                matches.append(line_number)
+            line_number += 1
+
+        if not matches:
+            return
+
+        last_yielded = 0
+        for match_num in matches:
+            start_context = max(line_range.start, match_num - context_lines)
+            end_context = min(line_range.end, match_num + context_lines)
+
+            if last_yielded > 0 and last_yielded < start_context - 1:
+                yield 0, "---", "\n"
+
+            # Avoid re-yielding lines we already yielded in overlapping contexts
+            actual_start = max(start_context, last_yielded + 1)
+
+            for ln in range(actual_start, end_context + 1):
+                yield ln, self.lines[ln - 1], "\n"
+                last_yielded = ln
 
     def spread(
         self,
@@ -154,7 +223,7 @@ class Document:
         line_range: Optional[LineRange],
         target: str,
         replacement: str,
-    ) -> Generator[str, None, None]:
+    ) -> Generator[tuple[int, str, str], None, None]:
         """Replace target with replacement in lines.
 
         Args:
@@ -163,7 +232,7 @@ class Document:
             replacement (str): The replacement
 
         Returns:
-            Generator[str, None, None]: The lines
+            Generator[tuple[int, str, str], None, None]: The lines
         """
 
         if not line_range:
@@ -175,25 +244,25 @@ class Document:
                 line_text = line_text.replace(target, replacement)
                 self.lines[self.current_line] = line_text
                 self.dirty = True  # this is ugly
-                yield f"   {self.current_line + 1 } : {line_text}"
+                yield self.current_line + 1, line_text, "\n"
             if self.current_line <= len(self.lines):
                 self.current_line += 1
             else:
                 break
 
-    def page(self, page_size: int = 5) -> Generator[tuple[str, str], None, None]:
+    def page(self, page_size: int = 5) -> Generator[tuple[int, str, str], None, None]:
         """Display lines in pages.
 
         Args:
             page_size (int): The page size. Defaults to 5.
 
         Returns:
-            Generator[tuple[str, str], None, None]: The lines
+            Generator[tuple[int, str, str], None, None]: The lines
         """
 
         # TODO: add asterix to new current line
         for line_text in self.lines[self.current_line - 1 : self.current_line + page_size - 1]:
-            yield f"   {self.current_line} : {line_text}", "\n"
+            yield self.current_line, line_text, "\n"
             self.current_line += 1
             if self.current_line - 1 >= len(self.lines):
                 break
@@ -201,21 +270,21 @@ class Document:
         # repair if necessary
         self.current_line = min(self.current_line, len(self.lines))
 
-    def spell(self, line_range: LineRange) -> Generator[tuple[str, str], None, None]:
+    def spell(self, line_range: LineRange) -> Generator[tuple[int, str, str], None, None]:
         """Show spelling errors in range.
 
         Args:
             line_range (LineRange): The range
 
         Returns:
-            Generator[tuple[str, str], None, None]: The lines
+            Generator[tuple[int, str, str], None, None]: The lines
         """
 
         # reset current line to start of range.
         self.current_line = line_range.start
         for line_text in self.lines[line_range.start - 1 : line_range.end]:
             end = "" if line_text[:-1] == "\n" else "\n"
-            yield f"   {self.current_line} : {spelling_overlay.check(line_text)}", end
+            yield self.current_line, spelling_overlay.check(line_text), end
             self.current_line += 1
 
     def copy(self, line_range: Optional[LineRange], target_line: int) -> None:
@@ -510,23 +579,25 @@ class Document:
         self.previous_lines = self.lines.copy()
         self.previous_current_line = self.current_line
 
-    def print(self, line_range: Optional[LineRange]) -> Generator[tuple[str, str], None, None]:
+    def print(self, line_range: Optional[LineRange]) -> Generator[tuple[int, str, str], None, None]:
         """For handing lines off to a print() function.
 
         Args:
             line_range (Optional[LineRange]): The range.
 
         Returns:
-            Generator[tuple[str, str], None, None]: The lines
+            Generator[tuple[int, str, str], None, None]: The lines
         """
         if not line_range:
             # empty generator
             yield from []
         else:
+            line_number = line_range.start
             for line in self.lines[line_range.start - 1 : line_range.end]:
                 if line.endswith("\n"):
                     line = line[:-1]
                     end = "\n"
                 else:
                     end = ""
-                yield line, end
+                yield line_number, line, end
+                line_number += 1

@@ -1,5 +1,5 @@
 Editing C:\github\dedlin\tests\sample_macros\grep_out.txt
 Current line 1 of 2
-   1 : This is a cat.
+This is a cat.
 Current line 1 of 2
 Current line 1 of 2

@@ -4,7 +4,7 @@ An info bar that runs after each command, replaces bottom bar in a full screen e
 
 from typing import Generator
 
-from textstat import textstat
+from textstat import textstat  # type: ignore[import-untyped]
 
 from dedlin.document import Document
 

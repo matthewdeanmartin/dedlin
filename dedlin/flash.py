@@ -2,7 +2,7 @@
 Flashy stuff
 """
 
-from art import tprint
+from art import tprint  # type: ignore[import-untyped]
 
 
 def title_screen(user_is_blind: bool) -> None:

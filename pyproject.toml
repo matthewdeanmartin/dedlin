@@ -28,7 +28,6 @@ dependencies = [
     "pyspellchecker>=0.7.2",
     "textstat>=0.7.3",
     "pygments>=2.16.1",
-    "docopt-ng>=0.9.0",
     "html2text>=2020.1.16",
     "requests>=2.31.0",
     "art>=6.1",
@@ -79,7 +78,9 @@ dev = [
  "ruff",
  "pipreqs>=0.5.0",
  "deptry>=0.25.1",
-    "gha-update; python_version >= '3.12'",
+ "gha-update; python_version >= '3.12'",
+ "types-pywin32>=311.0.0.20260408",
+ "ty>=0.0.31",
 ]
 
 [tool.black]
@@ -112,7 +113,7 @@ testpaths = [
     "tests",
 ]
 junit_family = "xunit1"
-norecursedirs = ["vendor", "scripts"]
+norecursedirs = [".hypothesis",".venv", ".tox", "venv", "build", "dist", "vendor", "scripts"]
 # don't know how to do this in toml
 #addopts = "--strict-markers"
 #markers =
@@ -131,13 +132,7 @@ use_parentheses = true
 
 [tool.ruff]
 line-length = 320
-
-# Enable Pyflakes `E` and `F` codes by default.
-select = ["E", "F"]
-ignore = [
-    "E722",
-    "E501",
-]
+target-version = "py313"
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -163,12 +158,18 @@ exclude = [
     "venv",
     "hide"
 ]
+
+[tool.ruff.lint]
+# Enable Pyflakes `E` and `F` codes by default.
+select = ["E", "F"]
+ignore = [
+    "E722",
+    "E501",
+]
 per-file-ignores = { }
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-
-target-version = "py313"
 
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
