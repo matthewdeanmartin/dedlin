@@ -7,7 +7,7 @@ authors = [
 ]
 license = { text = "MIT" }
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 keywords = ["editor", "edlin", "line editor", ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -15,7 +15,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
@@ -50,6 +49,11 @@ dedlin = 'dedlin.__main__:main'
 
 [dependency-groups]
 dev = [
+    "jiggle-version>=2.1.0",
+    "troml-dev-status>=0.6.0",
+    "dont-be-lazy>=0.1.2",
+    "pydoc-fork>=3.0.0",
+
  "metametameta>=0.1.0",
  # types
  "mypy>=1.6.1",
