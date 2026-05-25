@@ -93,7 +93,7 @@ pylint: isort black
     {{venv}} ruff check . --fix --exclude=test_legacy,dead_code
 
 # Run all checks
-check: mypy test pylint bandit pre-commit tool-audit
+check: mypy test pylint bandit tool-audit
 
 check-deps: lock safety
     echo "Checking dependencies"

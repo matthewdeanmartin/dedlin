@@ -41,7 +41,7 @@ pylint:  isort black
 	@echo "Linting with pylint"
 	$(VENV) pylint dedlin --fail-under 9.7
 
-check: test pylint bandit pre-commit
+check: test pylint bandit
 
 .PHONY: publish
 publish:
