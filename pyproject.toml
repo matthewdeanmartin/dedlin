@@ -220,4 +220,6 @@ include = [
 ]
 
 [tool.uv]
+
+[tool.uv.pip]
 universal = true
