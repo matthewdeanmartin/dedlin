@@ -107,6 +107,7 @@ def run(args: argparse.Namespace) -> Dedlin:
     initial_lines = None
     file_name = None
 
+    the_command_generator: InteractiveGenerator | CommandGenerator | StringCommandGenerator
     if args.subcommand == "edit":
         file_name = args.file
         the_command_generator = InteractiveGenerator()

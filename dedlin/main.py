@@ -172,7 +172,8 @@ class Dedlin:
             self.halt_on_error = False
             # these do nothing on Windows?
             signal.signal(signal.SIGINT, lambda signum, frame: None)
-            signal.signal(signal.SIGBREAK, lambda signum, frame: None)
+            if hasattr(signal, "SIGBREAK"):
+                signal.signal(signal.SIGBREAK, lambda signum, frame: None)  # type: ignore[attr-defined]
             signal.signal(signal.SIGABRT, lambda signum, frame: None)
             print("Vim mode enabled, feedback, help and quitting disabled.")
         elif not self.headless:
