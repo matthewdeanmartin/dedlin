@@ -134,3 +134,11 @@ Sorted
 - [Macros](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/macros.md)
 - [Easter eggs and modes](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/easter_eggs.md)
 - [Prior art](https://github.com/matthewdeanmartin/dedlin/blob/main/docs/prior_art.md)
+
+## Project Links
+
+- [GitHub](https://github.com/matthewdeanmartin/dedlin)
+- [PyPI](https://pypi.org/project/dedlin/)
+- [Documentation](https://dedlin.readthedocs.io/en/latest/)
+- [Bug Tracker](https://github.com/matthewdeanmartin/dedlin/issues)
+- [Change Log](https://github.com/matthewdeanmartin/dedlin/blob/main/CHANGELOG.md)

@@ -41,7 +41,7 @@ voice = ["pyttsx3>=2.90"]
 [project.urls]
 "Documentation" = "https://dedlin.readthedocs.io/en/latest/"
 "Bug Tracker" = "https://github.com/matthewdeanmartin/dedlin/issues"
-"Change Log" = "https://github.com/matthewdeanmartin/dedlin/blob/main/CHANGES.md"
+"Change Log" = "https://github.com/matthewdeanmartin/dedlin/blob/main/CHANGELOG.md"
 
 [project.scripts]
 dedlin = 'dedlin.__main__:main'
