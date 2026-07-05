@@ -55,7 +55,7 @@ dev = [
     "pydoc-fork>=3.0.0",
     "keepachangelog-manager-fork[all]>=6.5.0",
 
- "metametameta>=0.1.0",
+ "metametameta>=0.1.14",
  # types
  "mypy>=1.6.1",
  "types-requests",
