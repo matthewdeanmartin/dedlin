@@ -53,7 +53,7 @@ dev = [
     "troml-dev-status>=0.6.0",
     "dont-be-lazy>=0.1.2",
     "pydoc-fork>=3.0.0",
-    "keepachangelog-manager-fork[all]>=6.5.0",
+    "keepachangelog-manager-fork[all]>=6.6.0",
 
  "metametameta>=0.1.14",
  # types
