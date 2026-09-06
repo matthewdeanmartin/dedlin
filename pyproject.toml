@@ -16,6 +16,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 ]
 dependencies = [
     "questionary>=2.0.1",
@@ -32,7 +33,7 @@ dependencies = [
     "art>=6.1",
     "mistune<3.0.0",
     "markdown-it-py>=3.0.0",
-    "pywin32>=228; sys_platform == 'win32'", # not 3.15 ready yet.
+    "pywin32>=228; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]
@@ -53,7 +54,11 @@ dev = [
     "troml-dev-status>=0.6.0",
     "dont-be-lazy>=0.1.2",
     "pydoc-fork>=3.0.0",
-    "keepachangelog-manager-fork[all]>=6.6.0",
+    # The [all] extra pulls in google-re2, which has no cp315 wheel and fails to
+    # build on Windows (missing absl headers). The base package is pure Python and
+    # provides the `kaclm validate` functionality this repo actually uses.
+    "keepachangelog-manager-fork[all]>=6.6.0; python_version < '3.15'",
+    "keepachangelog-manager-fork>=6.6.0; python_version >= '3.15'",
 
  "metametameta>=0.1.14",
  # types
@@ -67,7 +72,9 @@ dev = [
  "tox>=4.15.0",
  "pre-commit>=3.5.0",
  # docs
- "proselint>=0.13.0",
+ # proselint hard-depends on google-re2 (not an optional extra), which has no
+ # cp315 wheel and fails to build on Windows (missing absl headers).
+ "proselint>=0.13.0; python_version < '3.15'",
  "interrogate>=1.5.0",
  "pydoctest>=0.1.22",
  "pdoc3>=0.10.0",
@@ -224,7 +231,7 @@ build-backend = "hatchling.build"
 include = [
     "dedlin/**/*.py",
     "dedlin/py.typed",
-    "/README.md", "LICENSE",
+    "/README.md", "/LICENSE",
 ]
 
 exclude = [
@@ -236,7 +243,7 @@ packages = ["dedlin"]
 include = [
     "dedlin/**/*.py",
     "dedlin/py.typed",
-    "/README.md", "LICENSE",
+    "/README.md", "/LICENSE",
 ]
 
 [tool.uv]
