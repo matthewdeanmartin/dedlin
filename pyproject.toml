@@ -31,7 +31,13 @@ dependencies = [
     "html2text>=2020.1.16",
     "requests>=2.31.0",
     "art>=6.1",
-    "mistune<3.0.0",
+    # Python 3.15 made re.Scanner reject capturing groups, which breaks every mistune
+    # 2.x release at parse time (ValueError: Cannot use capturing groups in re.Scanner).
+    # tools/export.py only uses the HTML renderer, whose output is byte-identical between
+    # 2.1.0 and 3.3.4, so 3.15+ can simply take mistune 3. mistune 3.0.0 had an unrelated
+    # AST-renderer regression, hence >=3.1.4.
+    "mistune<3.0.0; python_version < '3.15'",
+    "mistune>=3.1.4; python_version >= '3.15'",
     "markdown-it-py>=3.0.0",
     "pywin32>=228; sys_platform == 'win32'",
 ]
