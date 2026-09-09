@@ -63,8 +63,8 @@ dev = [
     # The [all] extra pulls in google-re2, which has no cp315 wheel and fails to
     # build on Windows (missing absl headers). The base package is pure Python and
     # provides the `kaclm validate` functionality this repo actually uses.
-    "keepachangelog-manager-fork[all]>=6.6.0; python_version < '3.15'",
-    "keepachangelog-manager-fork>=6.6.0; python_version >= '3.15'",
+    "keepachangelog-manager-fork[fast]>=6.8.0; python_version < '3.15'",
+    "keepachangelog-manager-fork[stdlib]>=6.8.0; python_version >= '3.15'",
 
  "metametameta>=0.1.14",
  # types
