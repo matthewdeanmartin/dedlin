@@ -142,3 +142,9 @@ Sorted
 - [Documentation](https://dedlin.readthedocs.io/en/latest/)
 - [Bug Tracker](https://github.com/matthewdeanmartin/dedlin/issues)
 - [Change Log](https://github.com/matthewdeanmartin/dedlin/blob/main/CHANGELOG.md)
+
+## Python 3.15 verification (2026-10-04)
+
+96 tests pass on RC3 with Pydantic 2.14.0b2/core 2.49.0 prerelease wheels and on 3.14.7. Stable Pydantic remains wheel-blocked. Bound textstat \<1 because its major prerelease removed the statistics API used here. Existing Mistune 3 export compatibility is not yet published.
+
+Stable locks were refreshed with `uv lock --upgrade`. Dependency verification uses fresh environments and published wheels only; no source builds. Full developer tools still have wheel blockers (linkcheckmd or PyYAML); passing unit tests do not certify the full developer group. Evidence and details: `C:/github/python315_batch5_2026-10-04.md`. Human operators review and file any upstream bugs.

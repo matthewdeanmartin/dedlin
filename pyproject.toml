@@ -26,7 +26,7 @@ dependencies = [
     "pydantic>2.5.0",
     # spell check
     "pyspellchecker>=0.7.2",
-    "textstat>=0.7.3",
+    "textstat>=0.7.3,<1",
     "pygments>=2.16.1",
     "html2text>=2020.1.16",
     "requests>=2.31.0",
@@ -80,7 +80,7 @@ dev = [
  # docs
  # proselint hard-depends on google-re2 (not an optional extra), which has no
  # cp315 wheel and fails to build on Windows (missing absl headers).
- "proselint>=0.13.0; python_version < '3.15'",
+ "proselint>=0.13.0",
  "interrogate>=1.5.0",
  "pydoctest>=0.1.22",
  "pdoc3>=0.10.0",
