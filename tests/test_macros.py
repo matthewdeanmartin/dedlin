@@ -33,7 +33,7 @@ def test_macros(tmp_path: Path):
 
         # Read in the input file so we can copy it.
         with open(
-            locate_file(f"sample_macros/{file.replace('.ed','_in.txt')}", __file__), encoding="utf-8"
+            locate_file(f"sample_macros/{file.replace('.ed', '_in.txt')}", __file__), encoding="utf-8"
         ) as input_file:
             pristine_input = input_file.read()
         output_file = tmp_path / file.replace(".ed", "_out.txt")

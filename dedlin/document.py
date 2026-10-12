@@ -46,7 +46,7 @@ def print(*args: Any, **kwargs: Any) -> None:
 @icontract.invariant(lambda self: all("\n" not in line and "\r" not in line for line in self.lines))
 @icontract.invariant(
     # and not self.lines <-- I'd have to update current line this on every .append()
-    lambda self: (1 <= self.current_line <= len(self.lines) + 1 or self.current_line in (0, 1)),
+    lambda self: 1 <= self.current_line <= len(self.lines) + 1 or self.current_line in (0, 1),
     "Current line must be a valid line",
 )
 class Document:

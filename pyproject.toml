@@ -180,7 +180,7 @@ exclude = [
 [tool.ruff.lint]
 # Enable Pyflakes `E` and `F` codes by default.
 select = ["E", "F"]
-ignore = [
+ignore = ["RUF100", 
     "E722",
     "E501",
 ]
